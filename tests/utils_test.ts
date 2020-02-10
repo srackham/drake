@@ -7,6 +7,7 @@ test({
   fn() {
     let files = glob("mod.ts");
     assertEquals(files.length, 1);
+    assertEquals(files[0], "mod.ts");
   }
 });
 
