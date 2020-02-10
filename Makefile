@@ -12,7 +12,7 @@ SHELL := bash
 
 .PHONY: test
 test: fmt
-	deno test --allow-env --allow-write --allow-net tests/
+	deno test -A tests/
 
 .PHONY: fmt
 fmt:
