@@ -10,7 +10,7 @@ SHELL := bash
 .ONESHELL:
 .SILENT:
 
-SRC_FILES = mod.ts lib/*.ts tmp/*.ts
+SRC_FILES = mod.ts lib/*.ts tests/*.ts tmp/*.ts
 
 .PHONY: test
 test: fmt
