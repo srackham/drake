@@ -1,7 +1,7 @@
-export { desc, task, run }
+export { desc, task, run, taskReg };
 
-    import { opts } from "./cli.ts"
-import { manpage, vers } from "./manpage.ts"
+import { opts } from "./cli.ts";
+import { manpage, vers } from "./manpage.ts";
 
 type Action = () => void;
 
@@ -29,31 +29,34 @@ function task(name: string, prereqs: string[], action: Action): void {
   lastDesc = ""; // Consume decription.
 }
 
-// Return an ordered list (first to last) of tasks and dependent task from the list of task names.
+// Return a list of tasks and all dependent tasks, in first to last execution order,
+// from the list of task names.
 function resolveTasks(names: string[]): string[] {
-  let result: string[] = [];
-  for (let name of names) {
-    if (taskReg[name] === undefined) {
-      throw new Error(`missing task: ${name}`);
+  const expand = function(names: string[]): string[] {
+    // Recursively exoand prerequisites into task names list.
+    let result: string[] = [];
+    for (let name of names) {
+      if (taskReg[name] === undefined) {
+        throw new Error(`missing task: ${name}`);
+      }
+      result.unshift(name);
+      let prereqs = taskReg[name].prereqs;
+      console.log("name: ", name, "prereqs:", prereqs);
+      if (prereqs.length !== 0) {
+        result = resolveTasks(prereqs).concat(result);
+      }
+      console.log("result:", result);
     }
-    let prereqs = taskReg[name].prereqs;
-    console.log('prereqs:',prereqs)
-    if (prereqs.length !== 0) {
-      result = resolveTasks(prereqs).concat(prereqs,[name],result);
+    return result;
+  };
+  let result = [];
+  for (let name of expand(names)) {
+    // Drop downstream dups.
+    if (result.indexOf(name) != -1) {
+      continue;
     }
-    console.log('result:',result)
+    result.push(name);
   }
-  /*
-  // Drop dups.
-  let copy = result.concat();
-  result = [];
-  for (let name of copy) {
-    if (result.indexOf(name) !== -1) {
-      result.push(name);
-    }
-  }
-    console.log('deduped result:',result)
-    */
   return result;
 }
 
@@ -73,7 +76,8 @@ function run(): void {
     }
   } else {
     let tasks = resolveTasks(opts.tasks);
-    console.log("resolved:",tasks)
+    console.log("deduped result:", tasks);
+    // Run tasks.
     for (let task of tasks) {
       taskReg[task].action();
     }
