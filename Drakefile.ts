@@ -5,7 +5,7 @@ task("1", ["2", "3"], function () {
     console.log("task: 1")
 })
 
-desc("Task 2")
+// desc("Task 2")
 task("2", ["3"], function () {
     console.log("task: 2")
 })

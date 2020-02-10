@@ -1,6 +1,6 @@
 export { desc, task, run, tasksReg as tasks, Task };
 
-import { opts } from "./cli.ts";
+import { env } from "./cli.ts";
 import { manpage, vers } from "./manpage.ts";
 
 type Action = () => void;
@@ -63,11 +63,11 @@ function resolveTasks(names: string[]): string[] {
 }
 
 function run(): void {
-  if (opts.help) {
+  if (env["--help"]) {
     console.log(`${manpage}\n`);
-  } else if (opts.vers) {
+  } else if (env["--version"]) {
     console.log(vers);
-  } else if (opts.list) {
+  } else if (env["--list"]) {
     const keys: string[] = [];
     for (const k in tasksReg) {
       keys.push(k);
@@ -80,7 +80,7 @@ function run(): void {
       console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
     }
   } else {
-    const tasks = resolveTasks(opts.tasks);
+    const tasks = resolveTasks(env.tasks);
     console.log("deduped result:", tasks);
     // Run tasks.
     for (const task of tasks) {

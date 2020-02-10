@@ -1,49 +1,34 @@
-export { opts, vars, parseArgs, Options, Variables };
+export { env, Env, parseArgs };
 
-interface Options {
-  force: boolean;
-  quiet: boolean;
-  help: boolean;
-  vers: boolean;
-  list: boolean;
-  dryrun: boolean;
-  tasks: string[]; // Command-line tasks.
-}
+type Env = { [name: string]: any; tasks: string[]; };
+const env: Env = { tasks: [] };
 
-const opts: Options = {
-  force: false,
-  quiet: false,
-  help: false,
-  vers: false,
-  list: false,
-  dryrun: false,
-  tasks: []
-};
-
-type Variables = { [name: string]: string; }; // Command-line variables.
-const vars: Variables = {};
-
-function parseArgs(args: string[], opts: Options, vars: Variables): void {
+function parseArgs(args: string[], env: Env): void {
   for (const arg of args) {
     const match = arg.match(/^([\w_]+)=(.*)$/);
     if (match) {
-      vars[match[1]] = match[2];
+      env[match[1]] = match[2];
     } else if (arg == "-f" || arg == "--force") {
-      opts.force = true;
+      env["-f"] = true;
+      env["--force"] = true;
     } else if (arg == "-h" || arg == "--help") {
-      opts.help = true;
+      env["-h"] = true;
+      env["--help"] = true;
     } else if (arg == "-l" || arg == "--list") {
-      opts.list = true;
+      env["-l"] = true;
+      env["--list"] = true;
     } else if (arg == "-n" || arg == "--dry-run") {
-      opts.dryrun = true;
+      env["-n"] = true;
+      env["--dry-run"] = true;
     } else if (arg == "-q" || arg == "--quiet") {
-      opts.quiet = true;
+      env["-q"] = true;
+      env["--quiet"] = true;
     } else if (arg == "--version") {
-      opts.vers = true;
+      env["--version"] = true;
     } else {
-      opts.tasks.push(arg);
+      env.tasks.push(arg);
     }
   }
 }
 
-parseArgs(Deno.args, opts, vars);
+parseArgs(Deno.args, env);

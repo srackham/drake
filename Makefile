@@ -22,6 +22,6 @@ fmt:
 
 .PHONY: run
 run: test
-	deno run -A Drakefile.ts foo "qux=Foo Bar" bar
+	deno run -A Drakefile.ts 1 3 "qux=Foo Bar" 2
 
 
