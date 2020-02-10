@@ -31,16 +31,18 @@ function task(name: string, prereqs: string[], action: Action): void {
 
 // Return a list of tasks and all dependent tasks, in first to last execution order,
 // from the list of task names.
+// TODO
+// function resolveTasks(tasks: Tasks, names: string[]): Tasks[] {
 function resolveTasks(names: string[]): string[] {
   const expand = function(names: string[]): string[] {
     // Recursively exoand prerequisites into task names list.
     let result: string[] = [];
-    for (let name of names) {
+    for (const name of names) {
       if (tasksReg[name] === undefined) {
-        throw new Error(`missing task: ${name}`);
+        throw new Error(`unknown task: ${name}`);
       }
       result.unshift(name);
-      let prereqs = tasksReg[name].prereqs;
+      const prereqs = tasksReg[name].prereqs;
       console.log("name: ", name, "prereqs:", prereqs);
       if (prereqs.length !== 0) {
         result = resolveTasks(prereqs).concat(result);
@@ -49,8 +51,8 @@ function resolveTasks(names: string[]): string[] {
     }
     return result;
   };
-  let result = [];
-  for (let name of expand(names)) {
+  const result = [];
+  for (const name of expand(names)) {
     // Drop downstream dups.
     if (result.indexOf(name) != -1) {
       continue;
@@ -66,22 +68,22 @@ function run(): void {
   } else if (opts.vers) {
     console.log(vers);
   } else if (opts.list) {
-    let keys: string[] = [];
-    for (let k in tasksReg) {
+    const keys: string[] = [];
+    for (const k in tasksReg) {
       keys.push(k);
     }
     const maxLen = keys.reduce(function(a, b) {
       return a.length > b.length ? a : b;
     }).length;
-    for (let k of keys.sort()) {
+    for (const k of keys.sort()) {
       const task = tasksReg[k];
       console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
     }
   } else {
-    let tasks = resolveTasks(opts.tasks);
+    const tasks = resolveTasks(opts.tasks);
     console.log("deduped result:", tasks);
     // Run tasks.
-    for (let task of tasks) {
+    for (const task of tasks) {
       tasksReg[task].action();
     }
   }
