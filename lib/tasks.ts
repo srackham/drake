@@ -1,4 +1,4 @@
-export { desc, task, run, tasks, Task };
+export { desc, task, run, tasksReg as tasks, Task };
 
 import { opts } from "./cli.ts";
 import { manpage, vers } from "./manpage.ts";
@@ -14,7 +14,7 @@ interface Task {
 
 // Task registry.
 type Tasks = { [name: string]: Task; };
-const tasks: Tasks = {};
+const tasksReg: Tasks = {};
 
 let lastDesc: string;
 
@@ -25,7 +25,7 @@ function desc(description: string): void {
 
 // Register task.
 function task(name: string, prereqs: string[], action: Action): void {
-  tasks[name] = { name, desc: lastDesc, prereqs, action };
+  tasksReg[name] = { name, desc: lastDesc, prereqs, action };
   lastDesc = ""; // Consume decription.
 }
 
@@ -36,11 +36,11 @@ function resolveTasks(names: string[]): string[] {
     // Recursively exoand prerequisites into task names list.
     let result: string[] = [];
     for (let name of names) {
-      if (tasks[name] === undefined) {
+      if (tasksReg[name] === undefined) {
         throw new Error(`missing task: ${name}`);
       }
       result.unshift(name);
-      let prereqs = tasks[name].prereqs;
+      let prereqs = tasksReg[name].prereqs;
       console.log("name: ", name, "prereqs:", prereqs);
       if (prereqs.length !== 0) {
         result = resolveTasks(prereqs).concat(result);
@@ -67,19 +67,22 @@ function run(): void {
     console.log(vers);
   } else if (opts.list) {
     let keys: string[] = [];
-    for (let k in tasks) {
+    for (let k in tasksReg) {
       keys.push(k);
     }
+    const maxLen = keys.reduce(function(a, b) {
+      return a.length > b.length ? a : b;
+    }).length;
     for (let k of keys.sort()) {
-      let task = tasks[k];
-      console.log(`${task.name}: ${task.desc}`);
+      const task = tasksReg[k];
+      console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
     }
   } else {
     let tasks = resolveTasks(opts.tasks);
     console.log("deduped result:", tasks);
     // Run tasks.
     for (let task of tasks) {
-      tasks[task].action();
+      tasksReg[task].action();
     }
   }
 }
