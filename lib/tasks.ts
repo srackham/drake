@@ -1,4 +1,4 @@
-export { desc, task, run, taskReg };
+export { desc, task, run, tasks, Task };
 
 import { opts } from "./cli.ts";
 import { manpage, vers } from "./manpage.ts";
@@ -13,8 +13,8 @@ interface Task {
 }
 
 // Task registry.
-type TaskReg = { [name: string]: Task; };
-const taskReg: TaskReg = {};
+type Tasks = { [name: string]: Task; };
+const tasks: Tasks = {};
 
 let lastDesc: string;
 
@@ -25,7 +25,7 @@ function desc(description: string): void {
 
 // Register task.
 function task(name: string, prereqs: string[], action: Action): void {
-  taskReg[name] = { name, desc: lastDesc, prereqs, action };
+  tasks[name] = { name, desc: lastDesc, prereqs, action };
   lastDesc = ""; // Consume decription.
 }
 
@@ -36,11 +36,11 @@ function resolveTasks(names: string[]): string[] {
     // Recursively exoand prerequisites into task names list.
     let result: string[] = [];
     for (let name of names) {
-      if (taskReg[name] === undefined) {
+      if (tasks[name] === undefined) {
         throw new Error(`missing task: ${name}`);
       }
       result.unshift(name);
-      let prereqs = taskReg[name].prereqs;
+      let prereqs = tasks[name].prereqs;
       console.log("name: ", name, "prereqs:", prereqs);
       if (prereqs.length !== 0) {
         result = resolveTasks(prereqs).concat(result);
@@ -67,11 +67,11 @@ function run(): void {
     console.log(vers);
   } else if (opts.list) {
     let keys: string[] = [];
-    for (let k in taskReg) {
+    for (let k in tasks) {
       keys.push(k);
     }
     for (let k of keys.sort()) {
-      let task = taskReg[k];
+      let task = tasks[k];
       console.log(`${task.name}: ${task.desc}`);
     }
   } else {
@@ -79,7 +79,7 @@ function run(): void {
     console.log("deduped result:", tasks);
     // Run tasks.
     for (let task of tasks) {
-      taskReg[task].action();
+      tasks[task].action();
     }
   }
 }
