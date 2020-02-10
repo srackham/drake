@@ -10,11 +10,18 @@ SHELL := bash
 .ONESHELL:
 .SILENT:
 
+SRC_FILES = mod.ts lib/*.ts tmp/*.ts
+
 .PHONY: test
 test: fmt
 	deno test -A tests/
 
 .PHONY: fmt
 fmt:
-	deno fmt lib/*.ts tests/*.ts
+	deno fmt $(SRC_FILES)
+
+.PHONY: run
+run: test
+	deno run -A Drakefile.ts foo "qux=Foo Bar" bar
+
 
