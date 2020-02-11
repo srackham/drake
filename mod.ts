@@ -1,4 +1,4 @@
 export { env } from './lib/cli.ts'
 export { desc, run, task } from './lib/tasks.ts'
-export * from './lib/utils.ts'
+export { exec, glob, sh } from './lib/utils.ts'
 

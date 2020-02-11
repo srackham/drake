@@ -1,4 +1,4 @@
-export { desc, task, run, tasksReg as tasks, Task };
+export { desc, task, run, taskRegistry, Task, resolveActions };
 
 import { env } from "./cli.ts";
 import { manpage, vers } from "./manpage.ts";
@@ -14,7 +14,7 @@ interface Task {
 
 // Task registry.
 type Tasks = { [name: string]: Task; };
-const tasksReg: Tasks = {};
+const taskRegistry: Tasks = {};
 
 let lastDesc: string;
 
@@ -24,8 +24,8 @@ function desc(description: string): void {
 }
 
 // Register task.
-function task(name: string, prereqs: string[], action: Action): void {
-  tasksReg[name] = { name, desc: lastDesc, prereqs, action };
+function task(name: string, prereqs: string[], action?: Action): void {
+  taskRegistry[name] = { name, desc: lastDesc, prereqs, action };
   lastDesc = ""; // Consume decription.
 }
 
@@ -38,16 +38,14 @@ function resolveActions(names: string[]): string[] {
     // Recursively exoand prerequisites into task names list.
     let result: string[] = [];
     for (const name of names) {
-      if (tasksReg[name] === undefined) {
+      if (taskRegistry[name] === undefined) {
         throw new Error(`unknown task: ${name}`);
       }
       result.unshift(name);
-      const prereqs = tasksReg[name].prereqs;
-      console.log("name: ", name, "prereqs:", prereqs);
+      const prereqs = taskRegistry[name].prereqs;
       if (prereqs.length !== 0) {
         result = resolveActions(prereqs).concat(result);
       }
-      console.log("result:", result);
     }
     return result;
   };
@@ -62,6 +60,12 @@ function resolveActions(names: string[]): string[] {
   return result;
 }
 
+function log(message: string) {
+  if (!env["--quiet"]) {
+    console.log(message);
+  }
+}
+
 async function run() {
   if (env["--help"]) {
     console.log(`${manpage}\n`);
@@ -69,22 +73,23 @@ async function run() {
     console.log(vers);
   } else if (env["--list"]) {
     const keys: string[] = [];
-    for (const k in tasksReg) {
+    for (const k in taskRegistry) {
       keys.push(k);
     }
     const maxLen = keys.reduce(function(a, b) {
       return a.length > b.length ? a : b;
     }).length;
     for (const k of keys.sort()) {
-      const task = tasksReg[k];
+      const task = taskRegistry[k];
       console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
     }
   } else {
     const tasks = resolveActions(env["--tasks"]);
-    console.log("deduped result:", tasks);
     // Run tasks.
     for (const task of tasks) {
-      const action = tasksReg[task].action;
+      const action = taskRegistry[task].action;
+      if (!action) continue;
+      log(`Running ${task} ...`);
       if (action.constructor.name === "AsyncFunction") {
         await action();
       } else {

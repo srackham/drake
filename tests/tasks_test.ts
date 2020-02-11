@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { test } from "https://deno.land/std/testing/mod.ts";
-import { desc, task, tasks } from "../lib/tasks.ts";
+import { desc, resolveActions, task, taskRegistry } from "../lib/tasks.ts";
 
 test({
   name: "resolveActions",
@@ -16,6 +16,7 @@ test({
     desc("Task 3");
     task("3", [], () => {});
 
-    assertEquals(tasks["1"].desc, "Task 1");
+    assertEquals(taskRegistry["1"].desc, "Task 1");
+    assertEquals(resolveActions(["1", "3", "2"]), ["3", "2", "1"]);
   }
 });
