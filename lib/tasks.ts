@@ -32,8 +32,8 @@ function task(name: string, prereqs: string[], action: Action): void {
 // Return a list of tasks and all dependent tasks, in first to last execution order,
 // from the list of task names.
 // TODO
-// function resolveTasks(tasks: Tasks, names: string[]): Tasks[] {
-function resolveTasks(names: string[]): string[] {
+// function resolveActions(tasks: Tasks, names: string[]): Tasks[] {
+function resolveActions(names: string[]): string[] {
   const expand = function(names: string[]): string[] {
     // Recursively exoand prerequisites into task names list.
     let result: string[] = [];
@@ -45,7 +45,7 @@ function resolveTasks(names: string[]): string[] {
       const prereqs = tasksReg[name].prereqs;
       console.log("name: ", name, "prereqs:", prereqs);
       if (prereqs.length !== 0) {
-        result = resolveTasks(prereqs).concat(result);
+        result = resolveActions(prereqs).concat(result);
       }
       console.log("result:", result);
     }
@@ -54,7 +54,7 @@ function resolveTasks(names: string[]): string[] {
   const result = [];
   for (const name of expand(names)) {
     // Drop downstream dups.
-    if (result.indexOf(name) != -1) {
+    if (result.indexOf(name) !== -1) {
       continue;
     }
     result.push(name);
@@ -62,7 +62,7 @@ function resolveTasks(names: string[]): string[] {
   return result;
 }
 
-function run(): void {
+async function run() {
   if (env["--help"]) {
     console.log(`${manpage}\n`);
   } else if (env["--version"]) {
@@ -80,11 +80,16 @@ function run(): void {
       console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
     }
   } else {
-    const tasks = resolveTasks(env.tasks);
+    const tasks = resolveActions(env["--tasks"]);
     console.log("deduped result:", tasks);
     // Run tasks.
     for (const task of tasks) {
-      tasksReg[task].action();
+      const action = tasksReg[task].action;
+      if (action.constructor.name === "AsyncFunction") {
+        await action();
+      } else {
+        action();
+      }
     }
   }
 }

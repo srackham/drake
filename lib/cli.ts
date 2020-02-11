@@ -1,7 +1,7 @@
 export { env, Env, parseArgs };
 
-type Env = { [name: string]: any; tasks: string[]; };
-const env: Env = { tasks: [] };
+type Env = { [name: string]: any; };
+const env: Env = { "--tasks": [] };
 
 function parseArgs(args: string[], env: Env): void {
   for (const arg of args) {
@@ -26,7 +26,7 @@ function parseArgs(args: string[], env: Env): void {
     } else if (arg === "--version") {
       env["--version"] = true;
     } else {
-      env.tasks.push(arg);
+      env["--tasks"].push(arg);
     }
   }
 }

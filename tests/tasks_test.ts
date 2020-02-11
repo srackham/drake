@@ -3,7 +3,7 @@ import { test } from "https://deno.land/std/testing/mod.ts";
 import { desc, task, tasks } from "../lib/tasks.ts";
 
 test({
-  name: "resolveTasks",
+  name: "resolveActions",
   fn() {
     //   taskReg.clear()
 
