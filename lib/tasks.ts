@@ -90,10 +90,12 @@ async function run() {
       const action = taskRegistry[task].action;
       if (!action) continue;
       log(`Running ${task} ...`);
-      if (action.constructor.name === "AsyncFunction") {
-        await action();
-      } else {
-        action();
+      if (!env["--dry-run"]) {
+        if (action.constructor.name === "AsyncFunction") {
+          await action();
+        } else {
+          action();
+        }
       }
     }
   }
