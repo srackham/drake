@@ -4,21 +4,32 @@ const vers = "0.0.1";
 
 const manpage = String.raw `
 NAME
-    deno DRAKEFILE [OPTION...] [VARIABLE...] [TASK...]
+    drake - amake-like build tool for Deno.
+
+DESCRIPTION
+The drake library provides functions for defining
+and executing TypeScript build tasks on the Deno runtime.
+The build script is just a TypeScript (or JavaScript)
+module file.
+
+EXAMPLE
+
 
 SYNOPSIS
-    TODO
+    deno DRAKEFILE [OPTION...] [VARIABLE...] [TASK...]
 
 OPTIONS
-    -f, --force           Unconditionally make all tasks.
+    -f, --force           Unconditionally execute all tasks.
     -h, --help            Display this help message.
     -l, --list            Display tasks and task descriptions.
     -n, --dry-run         Skip execution of task actions.
-    -q, --quiet           Do not log messages to standard output.
-    --version             Display the Drake version.
+    -q, --quiet           Do not log drake messages to standard output.
+    --version             Display the drake version.
 
 
 VARIABLES
+    A variable is a named string value that is made available to the
+    build script
     Variables are formatted like '<name>=<value>' e.g. 'vers=0.1.0'.
     Accessed via 'vars' e.g. 'vars.vers'.
 
