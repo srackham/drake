@@ -1,6 +1,5 @@
-export { desc, task, run, taskRegistry, Task, resolveActions };
-
-import { env } from "./cli.ts";
+export { Action, Task, TaskRegistry };
+import { Env } from "./cli.ts";
 import { manpage, vers } from "./manpage.ts";
 
 type Action = () => void;
@@ -12,89 +11,95 @@ interface Task {
   action: Action;
 }
 
-// Task registry.
 type Tasks = { [name: string]: Task; };
-const taskRegistry: Tasks = {};
 
-let lastDesc: string;
+class TaskRegistry {
+  env: Env;
+  tasks: Tasks;
+  lastDesc: string;
 
-// Set task description.
-function desc(description: string): void {
-  lastDesc = description;
-}
+  constructor(env: Env) {
+    this.env = env;
+    this.tasks = {};
+    this.lastDesc = "";
+  }
 
-// Register task.
-function task(name: string, prereqs: string[], action?: Action): void {
-  taskRegistry[name] = { name, desc: lastDesc, prereqs, action };
-  lastDesc = ""; // Consume decription.
-}
+  desc(description: string): void {
+    this.lastDesc = description;
+  }
 
-// Return a list of tasks and all dependent tasks, in first to last execution order,
-// from the list of task names.
-// TODO
-// function resolveActions(tasks: Tasks, names: string[]): Tasks[] {
-function resolveActions(names: string[]): string[] {
-  const expand = function(names: string[]): string[] {
-    // Recursively exoand prerequisites into task names list.
+  register(name: string, prereqs: string[], action?: Action): void {
+    this.tasks[name] = { name, desc: this.lastDesc, prereqs, action };
+    this.lastDesc = ""; // Consume decription.
+  }
+
+  log(message: string) {
+    if (!this.env["--quiet"]) {
+      console.log(message);
+    }
+  }
+
+  // Recursively exoand and flatten prerequisites into task names list.
+  private expand(names: string[]): string[] {
     let result: string[] = [];
     for (const name of names) {
-      if (taskRegistry[name] === undefined) {
+      if (this.tasks[name] === undefined) {
         throw new Error(`unknown task: ${name}`);
       }
       result.unshift(name);
-      const prereqs = taskRegistry[name].prereqs;
+      const prereqs = this.tasks[name].prereqs;
       if (prereqs.length !== 0) {
-        result = resolveActions(prereqs).concat(result);
+        result = this.resolveActions(prereqs).concat(result);
       }
     }
     return result;
-  };
-  const result = [];
-  for (const name of expand(names)) {
-    // Drop downstream dups.
-    if (result.indexOf(name) !== -1) {
-      continue;
-    }
-    result.push(name);
   }
-  return result;
-}
 
-function log(message: string) {
-  if (!env["--quiet"]) {
-    console.log(message);
+  // Return a list of tasks and all dependent tasks, in first to last execution order,
+  // from the list of task names.
+  resolveActions(names: string[]): string[] {
+    const result = [];
+    for (const name of this.expand(names)) {
+      // Drop downstream dups.
+      if (result.indexOf(name) !== -1) {
+        continue;
+      }
+      result.push(name);
+    }
+    return result;
   }
-}
 
-async function run() {
-  if (env["--help"]) {
-    console.log(`${manpage}\n`);
-  } else if (env["--version"]) {
-    console.log(vers);
-  } else if (env["--list"]) {
-    const keys: string[] = [];
-    for (const k in taskRegistry) {
-      keys.push(k);
-    }
-    const maxLen = keys.reduce(function(a, b) {
-      return a.length > b.length ? a : b;
-    }).length;
-    for (const k of keys.sort()) {
-      const task = taskRegistry[k];
-      console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
-    }
-  } else {
-    const tasks = resolveActions(env["--tasks"]);
-    // Run tasks.
-    for (const task of tasks) {
-      const action = taskRegistry[task].action;
-      if (!action) continue;
-      log(`Running ${task} ...`);
-      if (!env["--dry-run"]) {
-        if (action.constructor.name === "AsyncFunction") {
-          await action();
-        } else {
-          action();
+  // Resolve and run
+  async run(names: string[]) {
+    if (this.env["--help"]) {
+      console.log(`${manpage}\n`);
+    } else if (this.env["--version"]) {
+      console.log(vers);
+    } else if (this.env["--list"]) {
+      const keys: string[] = [];
+      for (const k in this.tasks) {
+        keys.push(k);
+      }
+      const maxLen = keys.reduce(function(a, b) {
+        return a.length > b.length ? a : b;
+      }).length;
+      for (const k of keys.sort()) {
+        const task = this.tasks[k];
+        console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
+      }
+    } else {
+      const tasks = this.resolveActions(names);
+      // Run tasks.
+      for (const task of tasks) {
+        const action = this.tasks[task].action;
+        if (!action) continue;
+        this.log(`Running ${task} ...`);
+        if (!this.env["--dry-run"]) {
+          if (action.constructor.name === "AsyncFunction") {
+            await action();
+          } else {
+            action();
+          }
         }
       }
     }

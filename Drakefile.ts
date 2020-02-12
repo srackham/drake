@@ -2,12 +2,12 @@ import { desc, exec, glob, run, sh, task } from "./mod.ts";
 
 const SRC_FILES = glob("**/*.ts");
 
-desc("format source files");
+desc("Format source files");
 task("fmt", [], async function() {
   await exec(["deno", "fmt"].concat(SRC_FILES));
 });
 
-desc("run tests");
+desc("Run tests");
 task("test", ["fmt"], async function() {
   await sh("deno test -A tests/");
 });

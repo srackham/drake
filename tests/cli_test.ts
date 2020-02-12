@@ -5,7 +5,7 @@ import { Env, parseArgs } from "../lib/cli.ts";
 test({
   name: "parseArgs",
   fn() {
-    const env: Env = { "--tasks": [] };
+    const env: Env = {};
     parseArgs(
       ["-h", "-q", "-f", "-l", "-n", "task1", "qux=42", "foo_bar=Foo & Bar",
         "task2"],

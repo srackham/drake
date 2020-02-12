@@ -1,9 +1,11 @@
-export { env, Env, parseArgs };
+export { Env, parseArgs };
 
 type Env = { [name: string]: any; };
-const env: Env = { "--tasks": [] };
 
 function parseArgs(args: string[], env: Env): void {
+  if (env["--tasks"] === undefined) {
+    env["--tasks"] = [];
+  }
   for (const arg of args) {
     const match = arg.match(/^([\w_]+)=(.*)$/);
     if (match) {
@@ -30,5 +32,3 @@ function parseArgs(args: string[], env: Env): void {
     }
   }
 }
-
-parseArgs(Deno.args, env);
