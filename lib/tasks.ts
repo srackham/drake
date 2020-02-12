@@ -1,6 +1,5 @@
 export { Action, Task, TaskRegistry };
 import { Env } from "./cli.ts";
-import { manpage, vers } from "./manpage.ts";
 
 type Action = () => void;
 
@@ -69,37 +68,34 @@ class TaskRegistry {
     return result;
   }
 
-  // Resolve and run
+  // Print list of tasks and task descriptions.
+  list() {
+    const keys: string[] = [];
+    for (const k in this.tasks) {
+      keys.push(k);
+    }
+    const maxLen = keys.reduce(function(a, b) {
+      return a.length > b.length ? a : b;
+    }).length;
+    for (const k of keys.sort()) {
+      const task = this.tasks[k];
+      console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
+    }
+  }
+
+  // Resolve task names and run tasks.
   async run(names: string[]) {
-    if (this.env["--help"]) {
-      console.log(`${manpage}\n`);
-    } else if (this.env["--version"]) {
-      console.log(vers);
-    } else if (this.env["--list"]) {
-      const keys: string[] = [];
-      for (const k in this.tasks) {
-        keys.push(k);
-      }
-      const maxLen = keys.reduce(function(a, b) {
-        return a.length > b.length ? a : b;
-      }).length;
-      for (const k of keys.sort()) {
-        const task = this.tasks[k];
-        console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
-      }
-    } else {
-      const tasks = this.resolveActions(names);
-      // Run tasks.
-      for (const task of tasks) {
-        const action = this.tasks[task].action;
-        if (!action) continue;
-        this.log(`Running ${task} ...`);
-        if (!this.env["--dry-run"]) {
-          if (action.constructor.name === "AsyncFunction") {
-            await action();
-          } else {
-            action();
-          }
+    const tasks = this.resolveActions(names);
+    // Run tasks.
+    for (const task of tasks) {
+      const action = this.tasks[task].action;
+      if (!action) continue;
+      this.log(`Running ${task} ...`);
+      if (!this.env["--dry-run"]) {
+        if (action.constructor.name === "AsyncFunction") {
+          await action();
+        } else {
+          action();
         }
       }
     }

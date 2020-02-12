@@ -1,7 +1,10 @@
+const vers = "0.0.1";
+
 export { exec, glob, sh } from './lib/utils.ts'
 export { desc, run, task, log, env }
 
 import { Env, parseArgs } from './lib/cli.ts'
+import { help } from './lib/help.ts'
 import { Action, TaskRegistry } from './lib/tasks.ts'
 
 // Instantiate environment and tasks registry and parse command-line.
@@ -24,5 +27,13 @@ function log(message: string) {
 }
 
 function run() {
+        if (env["--help"]) {
+      help()
+    } else if (env["--version"]) {
+      console.log(vers);
+    } else if (env["--list"]) {
+        taskRegistry.list()
+    } else {
   taskRegistry.run(env["--tasks"])
+    }
 }

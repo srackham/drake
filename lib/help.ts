@@ -1,6 +1,8 @@
-export { vers, manpage };
+export { help };
 
-const vers = "0.0.1";
+function help(): void {
+  console.log(`${manpage}\n`);
+}
 
 const manpage = String.raw `
 NAME
