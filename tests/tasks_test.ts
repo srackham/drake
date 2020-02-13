@@ -18,7 +18,7 @@ test({
     taskRegistry.desc("Task 3");
     taskRegistry.register("3", [], () => {});
 
-    assertEquals(taskRegistry.tasks["1"].desc, "Task 1");
+    assertEquals(taskRegistry.get("1").desc, "Task 1");
     assertEquals(
       taskRegistry.resolveActions(["1", "3", "2"]),
       ["3", "2", "1"]

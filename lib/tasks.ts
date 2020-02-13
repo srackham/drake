@@ -12,14 +12,14 @@ interface Task {
 
 type Tasks = { [name: string]: Task; };
 
-class TaskRegistry {
+class TaskRegistry extends Map<string, Task> {
   env: Env;
-  tasks: Tasks;
+  // tasks: Tasks;
   lastDesc: string;
 
   constructor(env: Env) {
+    super();
     this.env = env;
-    this.tasks = {};
     this.lastDesc = "";
   }
 
@@ -28,11 +28,11 @@ class TaskRegistry {
   }
 
   register(name: string, prereqs: string[], action?: Action): void {
-    this.tasks[name] = { name, desc: this.lastDesc, prereqs, action };
+    this.set(name, { name, desc: this.lastDesc, prereqs, action });
     this.lastDesc = ""; // Consume decription.
   }
 
-  log(message: string) {
+  log(message: string): void {
     if (!this.env["--quiet"]) {
       console.log(message);
     }
@@ -42,11 +42,11 @@ class TaskRegistry {
   private expand(names: string[]): string[] {
     let result: string[] = [];
     for (const name of names) {
-      if (this.tasks[name] === undefined) {
+      if (this.get(name) === undefined) {
         throw new Error(`unknown task: ${name}`);
       }
       result.unshift(name);
-      const prereqs = this.tasks[name].prereqs;
+      const prereqs = this.get(name).prereqs;
       if (prereqs.length !== 0) {
         result = this.resolveActions(prereqs).concat(result);
       }
@@ -69,17 +69,14 @@ class TaskRegistry {
   }
 
   // Print list of tasks and task descriptions.
-  list() {
-    const keys: string[] = [];
-    for (const k in this.tasks) {
-      keys.push(k);
-    }
+  list(): void {
+    const keys = Array.from(this.keys());
     const maxLen = keys.reduce(function(a, b) {
       return a.length > b.length ? a : b;
     }).length;
     for (const k of keys.sort()) {
-      const task = this.tasks[k];
-      console.log(`${task.name.padEnd(maxLen + 1)} ${task.desc}`);
+      const task = this.get(k);
+      console.log(`${task.name.padEnd(maxLen)} ${task.desc}`);
     }
   }
 
@@ -88,7 +85,7 @@ class TaskRegistry {
     const tasks = this.resolveActions(names);
     // Run tasks.
     for (const task of tasks) {
-      const action = this.tasks[task].action;
+      const action = this.get(task).action;
       if (!action) continue;
       this.log(`Running ${task} ...`);
       if (!this.env["--dry-run"]) {
