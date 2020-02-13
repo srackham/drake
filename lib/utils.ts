@@ -2,6 +2,7 @@ export { sh, glob, exec };
 
 import { walkSync } from "https://deno.land/std@v0.32.0/fs/mod.ts";
 import { globToRegExp } from "https://deno.land/std@v0.32.0/path/mod.ts";
+import { log } from "../mod.ts";
 
 // Return array of file names matching the glob patterns relative to the cwd.
 // e.g. glob("tmp/*.ts", "lib/*.ts", "mod.ts");
@@ -13,6 +14,7 @@ function glob(...patterns: string[]): string[] {
 
 // Execute process.
 async function exec(args: string[]) {
+  log(`exec: ${args}`);
   // create subprocess
   const p = Deno.run({
     args: args,
@@ -30,6 +32,7 @@ async function exec(args: string[]) {
 
 // Execute shell command.
 async function sh(cmd: string) {
+  log(`sh: ${cmd}`);
   let args: string[];
   if (Deno.build.os === "win") {
     args = [Deno.env("COMSPEC"), "/C", cmd];
@@ -43,6 +46,6 @@ async function sh(cmd: string) {
   });
   const { code } = await p.status();
   if (code !== 0) {
-    throw new Error(`sh: ${cmd}: error code: ${code}: ${cmd}`);
+    throw new Error(`sh: ${cmd}: error code: ${code}`);
   }
 }
