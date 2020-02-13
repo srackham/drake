@@ -1,6 +1,6 @@
 export { Env, parseArgs };
 
-type Env = { [name: string]: any; };
+type Env = { [name: string]: any; "--tasks"?: string[]; };
 
 function parseArgs(args: string[], env: Env): void {
   if (env["--tasks"] === undefined) {
