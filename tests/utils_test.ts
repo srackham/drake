@@ -1,6 +1,5 @@
-import { assertEquals } from "https://deno.land/std@v0.32.0/testing/asserts.ts";
-import { test } from "https://deno.land/std@v0.32.0/testing/mod.ts";
 import { exec, glob, sh } from "../lib/utils.ts";
+import { assertEquals, test } from "./deps.ts";
 
 test({
   name: "glob",

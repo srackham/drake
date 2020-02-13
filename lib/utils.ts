@@ -1,8 +1,7 @@
 export { sh, glob, exec };
 
-import { walkSync } from "https://deno.land/std@v0.32.0/fs/mod.ts";
-import { globToRegExp } from "https://deno.land/std@v0.32.0/path/mod.ts";
 import { log } from "../mod.ts";
+import { globToRegExp, walkSync } from "./deps.ts";
 
 // Return array of file names matching the glob patterns relative to the cwd.
 // e.g. glob("tmp/*.ts", "lib/*.ts", "mod.ts");
