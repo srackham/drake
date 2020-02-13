@@ -43,7 +43,7 @@ class TaskRegistry extends Map<string, Task> {
     let result: string[] = [];
     for (const name of names) {
       if (this.get(name) === undefined) {
-        throw new Error(`unknown task: ${name}`);
+        throw new Error(`missing task: ${name}`);
       }
       result.unshift(name);
       const prereqs = this.get(name).prereqs;
@@ -87,7 +87,7 @@ class TaskRegistry extends Map<string, Task> {
     for (const task of tasks) {
       const action = this.get(task).action;
       if (!action) continue;
-      this.log(`Running ${task} ...`);
+      this.log(`task: ${task}`);
       if (!this.env["--dry-run"]) {
         if (action.constructor.name === "AsyncFunction") {
           await action();

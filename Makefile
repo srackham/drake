@@ -22,6 +22,6 @@ fmt:
 
 .PHONY: run
 run: test
-	deno run -A ./examples/Drakefile.ts 1 3 "qux=Foo Bar" 2
+	deno run -A ./examples/Drakefile.ts prereqs pause "qux=Foo Bar" noop
 
 
