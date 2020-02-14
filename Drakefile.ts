@@ -5,7 +5,7 @@ const SRC_FILES = glob("**/*.ts");
 
 desc("Run tests");
 task("test", ["fmt"], async function() {
-  await sh("deno test -A tests/");
+  await sh("deno test -A tests/*.ts");
 });
 
 desc("Format source files");

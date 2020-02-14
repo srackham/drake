@@ -14,7 +14,7 @@ SRC_FILES = Drakefile.ts mod.ts lib/*.ts tests/*.ts tmp/*.ts
 
 .PHONY: test
 test: fmt
-	deno test -A tests/
+	deno test -A tests/*.ts
 
 .PHONY: fmt
 fmt:

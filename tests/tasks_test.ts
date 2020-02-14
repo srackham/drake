@@ -1,10 +1,9 @@
 import { Env } from "../lib/cli.ts";
 import { TaskRegistry } from "../lib/tasks.ts";
-import { assertEquals, test } from "./deps.ts";
+import { assertEquals } from "./deps.ts";
 
-test({
-  name: "resolveActions",
-  fn() {
+Deno.test(
+  function resolveActionsTest() {
     const env: Env = {};
     const taskRegistry = new TaskRegistry(env);
 
@@ -23,4 +22,6 @@ test({
       ["3", "2", "1"]
     );
   }
-});
+);
+
+await Deno.runTests();

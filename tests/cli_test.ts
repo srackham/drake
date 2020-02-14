@@ -1,13 +1,21 @@
 import { Env, parseArgs } from "../lib/cli.ts";
-import { assertEquals, test } from "./deps.ts";
+import { assertEquals } from "./deps.ts";
 
-test({
-  name: "parseArgs",
-  fn() {
+Deno.test(
+  function parseArgsTest() {
     const env: Env = {};
     parseArgs(
-      ["-h", "-q", "-f", "-l", "-n", "task1", "qux=42", "foo_bar=Foo & Bar",
-        "task2"],
+      [
+        "-h",
+        "-q",
+        "-f",
+        "-l",
+        "-n",
+        "task1",
+        "qux=42",
+        "foo_bar=Foo & Bar",
+        "task2"
+      ],
       env
     );
     assertEquals(env["--dry-run"], true);
@@ -21,4 +29,6 @@ test({
     assertEquals(env.foo_bar, "Foo & Bar");
     assertEquals(env.qux, "42");
   }
-});
+);
+
+await Deno.runTests();
