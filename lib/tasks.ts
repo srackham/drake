@@ -46,14 +46,15 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   // Recursively exoand and flatten prerequisites into task names list.
-  private expand(names: string[]): string[] {
-    let result: string[] = [];
+  private expand(names: string[]): Task[] {
+    let result: Task[] = [];
     for (const name of names) {
-      if (this.get(name) === undefined) {
+      const task = this.get(name);
+      if (task === undefined) {
         throw new Error(`missing task: ${name}`);
       }
-      result.unshift(name);
-      const prereqs = this.get(name).prereqs;
+      result.unshift(task);
+      const prereqs = task.prereqs;
       if (prereqs.length !== 0) {
         result = this.resolveActions(prereqs).concat(result);
       }
@@ -63,14 +64,14 @@ class TaskRegistry extends Map<string, Task> {
 
   // Return a list of tasks and all dependent tasks, in first to last execution order,
   // from the list of task names.
-  resolveActions(names: string[]): string[] {
-    const result = [];
-    for (const name of this.expand(names)) {
+  resolveActions(names: string[]): Task[] {
+    const result: Task[] = [];
+    for (const task of this.expand(names)) {
       // Drop downstream dups.
-      if (result.indexOf(name) !== -1) {
+      if (result.find(t => t.name === task.name)) {
         continue;
       }
-      result.push(name);
+      result.push(task);
     }
     return result;
   }
@@ -92,9 +93,9 @@ class TaskRegistry extends Map<string, Task> {
     const tasks = this.resolveActions(names);
     // Run tasks.
     for (const task of tasks) {
-      const action = this.get(task).action;
+      const action = task.action;
       if (!action) continue;
-      this.log(`task: ${task}`);
+      this.log(`task: ${task.name}`);
       if (!this.env["--dry-run"]) {
         if (action.constructor.name === "AsyncFunction") {
           await action();
