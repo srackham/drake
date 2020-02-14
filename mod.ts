@@ -1,39 +1,43 @@
 const vers = "0.0.1";
 
-export { exec, glob, sh } from './lib/utils.ts'
-export { desc, run, task, log, env }
+export { glob, sh } from "./lib/utils.ts";
+export { desc, run, task, log, env };
 
-import { Env, parseArgs } from './lib/cli.ts'
-import { help } from './lib/help.ts'
-import { Action, TaskRegistry } from './lib/tasks.ts'
+import { Env, parseArgs } from "./lib/cli.ts";
+import { help } from "./lib/help.ts";
+import { Action, TaskRegistry } from "./lib/tasks.ts";
 
 // Instantiate environment and tasks registry and parse command-line.
 const env: Env = {};
-const taskRegistry = new TaskRegistry(env)
+const taskRegistry = new TaskRegistry(env);
 parseArgs(Deno.args, env);
 
 // Set task description.
 function desc(description: string): void {
-  taskRegistry.desc(description)
+  taskRegistry.desc(description);
 }
 
 // Register task.
-function task(name: string, prereqs: string[], action?: Action): void {
-  taskRegistry.register(name,prereqs,action)
+function task(name: string, prereqs: string[] = [], action?: Action): void {
+  taskRegistry.register(name, prereqs, action);
 }
 
-function log(message: string) {
-  taskRegistry.log(message)
+function log(message: string): void {
+  taskRegistry.log(message);
 }
 
-function run() {
-        if (env["--help"]) {
-      help()
-    } else if (env["--version"]) {
-      console.log(vers);
-    } else if (env["--list"]) {
-        taskRegistry.list()
-    } else {
-  taskRegistry.run(env["--tasks"])
+function run(): void {
+  if (env["--help"]) {
+    help();
+  } else if (env["--version"]) {
+    console.log(vers);
+  } else if (env["--list"]) {
+    taskRegistry.list();
+  } else {
+    const tasks = env["--tasks"];
+    if (tasks.length === 0 && env["--default-task"]) {
+      tasks.push(env["--default-task"]);
     }
+    taskRegistry.run(env["--tasks"]);
+  }
 }
