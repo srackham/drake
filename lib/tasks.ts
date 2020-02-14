@@ -1,20 +1,22 @@
 export { Action, Task, TaskRegistry };
+import * as path from "https://deno.land/std@v0.32.0/path/mod.ts";
 import { Env } from "./cli.ts";
 
 type Action = () => void;
 
-interface Task {
+class Task {
   name: string;
   desc: string;
   prereqs: string[];
   action: Action;
-}
 
-type Tasks = { [name: string]: Task; };
+  isFileTask(): boolean {
+    return path.isAbsolute(this.name) || this.name.startsWith(".");
+  }
+}
 
 class TaskRegistry extends Map<string, Task> {
   env: Env;
-  // tasks: Tasks;
   lastDesc: string;
 
   constructor(env: Env) {
@@ -28,8 +30,13 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   register(name: string, prereqs: string[], action?: Action): void {
-    this.set(name, { name, desc: this.lastDesc, prereqs, action });
+    const task = new Task();
+    task.name = name;
+    task.desc = this.lastDesc;
     this.lastDesc = ""; // Consume decription.
+    task.prereqs = prereqs;
+    task.action = action;
+    this.set(name, task);
   }
 
   log(message: string): void {
