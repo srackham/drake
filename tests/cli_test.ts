@@ -1,5 +1,5 @@
+import { assertEquals } from "https://deno.land/std@v0.33.0/testing/asserts.ts";
 import { Env, parseArgs } from "../lib/cli.ts";
-import { assertEquals } from "./deps.ts";
 
 Deno.test(
   function parseArgsTest() {

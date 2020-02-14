@@ -1,5 +1,5 @@
+import { assertEquals } from "https://deno.land/std@v0.33.0/testing/asserts.ts";
 import { glob, sh } from "../lib/utils.ts";
-import { assertEquals } from "./deps.ts";
 
 Deno.test(
   function globTest() {
