@@ -46,4 +46,9 @@ task("script", [], function() {
       wc Drakefile.ts`);
 });
 
+desc("File task");
+task("./target-file", ["./prereq-file"], function() {
+  console.log("running file task");
+});
+
 run();

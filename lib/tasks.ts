@@ -1,8 +1,19 @@
 export { Action, Task, TaskRegistry };
-import * as path from "https://deno.land/std@v0.32.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
+import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
 
 type Action = () => void;
+
+// Return true if name is a file task name i.e. an absolute file name path or a relative path
+// starting with '.'.
+// Throw error is name contains wildcards.
+function isFileName(name: string): boolean {
+  if (/[*?]/.test(name)) {
+    throw new Error(`wildcard names are not allowed: ${name}`);
+  }
+  return isAbsolute(name) || name.startsWith(".");
+}
 
 class Task {
   name: string;
@@ -10,8 +21,40 @@ class Task {
   prereqs: string[];
   action: Action;
 
-  isFileTask(): boolean {
-    return path.isAbsolute(this.name) || this.name.startsWith(".");
+  // Return false if the task is not a file task.
+  // Return false if the task name file does not exist.
+  // Return true if the task name file exists and is newer than all prerequisite files
+  // otherwise return false.
+  // Throw error if any prerequisite path does not exists.
+  isUpToDate(): boolean {
+    if (!isFileName(this.name)) {
+      return false;
+    }
+    // Check all prerequisite paths exist.
+    for (const name of this.prereqs) {
+      if (!isFileName(name)) {
+        continue;
+      }
+      if (!existsSync(name)) {
+        throw new Error(
+          `task ${this.name}: missing prerequisite path: ${name}`
+        );
+      }
+    }
+    if (!existsSync(this.name)) {
+      return false;
+    }
+    const target = Deno.statSync(this.name);
+    for (const name of this.prereqs) {
+      if (!isFileName(name)) {
+        continue;
+      }
+      const prereq = Deno.statSync(this.name);
+      if (target.modified < prereq.modified) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -46,11 +89,15 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   // Recursively exoand and flatten prerequisites into task names list.
+  // Throw error if non-file task is missing.
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
     for (const name of names) {
       const task = this.get(name);
       if (task === undefined) {
+        if (isFileName(name)) { // Allow missing file name prerequisite tasks.
+          continue;
+        }
         throw new Error(`missing task: ${name}`);
       }
       result.unshift(task);
@@ -90,17 +137,24 @@ class TaskRegistry extends Map<string, Task> {
 
   // Resolve task names and run tasks.
   async run(names: string[]) {
+    for (const name of names) {
+      if (this.get(name) === undefined) {
+        throw new Error(`missing task: ${name}`);
+      }
+    }
     const tasks = this.resolveActions(names);
+    console.log(`resolved tasks: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
-      const action = task.action;
-      if (!action) continue;
+      if (!task.action || task.isUpToDate()) {
+        continue;
+      }
       this.log(`task: ${task.name}`);
       if (!this.env["--dry-run"]) {
-        if (action.constructor.name === "AsyncFunction") {
-          await action();
+        if (task.action.constructor.name === "AsyncFunction") {
+          await task.action();
         } else {
-          action();
+          task.action();
         }
       }
     }
