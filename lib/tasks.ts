@@ -145,10 +145,13 @@ class TaskRegistry extends Map<string, Task> {
       }
     }
     const tasks = this.resolveActions(targets);
-    this.log(`resolved tasks: ${tasks.map(t => t.name)}`);
+    this.log(`resolved targets: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
-      if (!task.action || task.isUpToDate()) {
+      if (!task.action) {
+        continue;
+      }
+      if (!this.env["--always-make"] && task.isUpToDate()) {
         continue;
       }
       this.log(`task: ${task.name}`);
