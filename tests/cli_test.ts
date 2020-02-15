@@ -23,9 +23,9 @@ Deno.test(
     assertEquals(env["--force"], true);
     assertEquals(env["--list"], true);
     assertEquals(env["--help"], true);
-    assertEquals(env["--tasks"].length, 2);
-    assertEquals(env["--tasks"][0], "task1");
-    assertEquals(env["--tasks"][1], "task2");
+    assertEquals(env["--targets"].length, 2);
+    assertEquals(env["--targets"][0], "task1");
+    assertEquals(env["--targets"][1], "task2");
     assertEquals(env.foo_bar, "Foo & Bar");
     assertEquals(env.qux, "42");
   }

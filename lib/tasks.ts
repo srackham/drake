@@ -138,13 +138,13 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   // Resolve task names and run tasks.
-  async run(names: string[]) {
-    for (const name of names) {
+  async run(targets: string[]) {
+    for (const name of targets) {
       if (this.get(name) === undefined) {
         throw new Error(`missing task: ${name}`);
       }
     }
-    const tasks = this.resolveActions(names);
+    const tasks = this.resolveActions(targets);
     this.log(`resolved tasks: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {

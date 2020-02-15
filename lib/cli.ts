@@ -1,10 +1,10 @@
 export { Env, parseArgs };
 
-type Env = { [name: string]: any; "--tasks"?: string[]; };
+type Env = { [name: string]: any; "--targets"?: string[]; };
 
 function parseArgs(args: string[], env: Env): void {
-  if (env["--tasks"] === undefined) {
-    env["--tasks"] = [];
+  if (env["--targets"] === undefined) {
+    env["--targets"] = [];
   }
   for (const arg of args) {
     const match = arg.match(/^([\w_]+)=(.*)$/);
@@ -28,7 +28,7 @@ function parseArgs(args: string[], env: Env): void {
     } else if (arg === "--version") {
       env["--version"] = true;
     } else {
-      env["--tasks"].push(arg);
+      env["--targets"].push(arg);
     }
   }
 }

@@ -34,10 +34,10 @@ function run(): void {
   } else if (env["--list"]) {
     taskRegistry.list();
   } else {
-    const tasks = env["--tasks"];
+    const tasks = env["--targets"];
     if (tasks.length === 0 && env["--default-task"]) {
       tasks.push(env["--default-task"]);
     }
-    taskRegistry.run(env["--tasks"]);
+    taskRegistry.run(env["--targets"]);
   }
 }
