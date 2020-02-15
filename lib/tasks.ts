@@ -37,7 +37,7 @@ class Task {
       }
       if (!existsSync(name)) {
         throw new Error(
-          `task ${this.name}: missing prerequisite path: ${name}`
+          `task: ${this.name}: missing prerequisite path: ${name}`
         );
       }
     }
@@ -78,7 +78,9 @@ class TaskRegistry extends Map<string, Task> {
     task.desc = this.lastDesc;
     this.lastDesc = ""; // Consume decription.
     task.prereqs = prereqs;
-    task.action = action;
+    if (action) {
+      task.action = action.bind(task);
+    }
     this.set(name, task);
   }
 
@@ -143,7 +145,7 @@ class TaskRegistry extends Map<string, Task> {
       }
     }
     const tasks = this.resolveActions(names);
-    console.log(`resolved tasks: ${tasks.map(t => t.name)}`);
+    this.log(`resolved tasks: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
       if (!task.action || task.isUpToDate()) {
