@@ -8,8 +8,8 @@ Deno.test(
       [
         "-h",
         "-q",
-        "-f",
-        "-l",
+        "-a",
+        "-t",
         "-n",
         "task1",
         "qux=42",
@@ -20,8 +20,8 @@ Deno.test(
     );
     assertEquals(env["--dry-run"], true);
     assertEquals(env["--quiet"], true);
-    assertEquals(env["--force"], true);
-    assertEquals(env["--list"], true);
+    assertEquals(env["--always-make"], true);
+    assertEquals(env["--tasks"], true);
     assertEquals(env["--help"], true);
     assertEquals(env["--targets"].length, 2);
     assertEquals(env["--targets"][0], "task1");

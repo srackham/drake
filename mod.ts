@@ -31,7 +31,7 @@ function run(): void {
     help();
   } else if (env["--version"]) {
     console.log(vers);
-  } else if (env["--list"]) {
+  } else if (env["--tasks"]) {
     taskRegistry.list();
   } else {
     const tasks = env["--targets"];
