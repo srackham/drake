@@ -54,5 +54,4 @@ async function sh(cmds: string | string[]) {
   if (code !== 0) {
     throw new Error(`sh: ${cmd}: error code: ${code}`);
   }
-  console.log("CODE:", code);
 }

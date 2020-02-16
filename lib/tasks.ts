@@ -146,37 +146,23 @@ class TaskRegistry extends Map<string, Task> {
     }
     const tasks = this.resolveActions(targets);
     this.log(`resolved targets: ${tasks.map(t => t.name)}`);
-
     // Run tasks.
-    await tasks.reduce(async (prevPromise, nextTask) => {
-      await prevPromise;
-      if (nextTask.action.constructor.name === "AsyncFunction") {
-        console.log("ASYNC");
-        return await nextTask.action();
-      } else {
-        console.log("NON-ASYNC");
-        nextTask.action();
-        return Promise.resolve();
+    for (const task of tasks) {
+      if (!task.action) {
+        continue;
       }
-    }, Promise.resolve());
-
-    // for (const task of tasks) {
-    //   if (!task.action) {
-    //     continue;
-    //   }
-    //   if (!this.env["--always-make"] && task.isUpToDate()) {
-    //     continue;
-    //   }
-    //   this.log(`task: ${task.name}`);
-    //   if (!this.env["--dry-run"]) {
-    //     if (task.action.constructor.name === "AsyncFunction") {
-    //       console.log("ASYNC");
-    //       await task.action();
-    //     } else {
-    //       console.log("NON-ASYNC");
-    //       task.action();
-    //     }
-    //   }
-    // }
+      if (!this.env["--always-make"] && task.isUpToDate()) {
+        continue;
+      }
+      this.log(`task: ${task.name}`);
+      if (!this.env["--dry-run"]) {
+        if (task.action.constructor.name === "AsyncFunction") {
+          await task.action();
+        } else {
+          task.action();
+        }
+        this.log(`done: ${task.name}`);
+      }
+    }
   }
 }
