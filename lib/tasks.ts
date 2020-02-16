@@ -154,14 +154,19 @@ class TaskRegistry extends Map<string, Task> {
       if (!this.env["--always-make"] && task.isUpToDate()) {
         continue;
       }
-      this.log(`task: ${task.name}`);
+      const startTime = new Date().getTime();
+      this.log(`${task.name} started`);
       if (!this.env["--dry-run"]) {
         if (task.action.constructor.name === "AsyncFunction") {
           await task.action();
         } else {
           task.action();
         }
-        this.log(`done: ${task.name}`);
+        const endTime = new Date().getTime();
+        this.log(
+          `${task.name} finished in ${((endTime - startTime) / 1000).toFixed(2)
+            } seconds`
+        );
       }
     }
   }
