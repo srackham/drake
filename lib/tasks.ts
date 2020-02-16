@@ -1,4 +1,5 @@
 export { Action, Task, TaskRegistry };
+import { bold, green } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
@@ -133,7 +134,7 @@ class TaskRegistry extends Map<string, Task> {
     }).length;
     for (const k of keys.sort()) {
       const task = this.get(k);
-      console.log(`${task.name.padEnd(maxLen)} ${task.desc}`);
+      console.log(`${green(bold(task.name.padEnd(maxLen)))} ${task.desc}`);
     }
   }
 
@@ -145,7 +146,7 @@ class TaskRegistry extends Map<string, Task> {
       }
     }
     const tasks = this.resolveActions(targets);
-    this.log(`resolved targets: ${tasks.map(t => t.name)}`);
+    this.log(`${green(bold("resolved targets"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
       if (!task.action) {
@@ -155,7 +156,7 @@ class TaskRegistry extends Map<string, Task> {
         continue;
       }
       const startTime = new Date().getTime();
-      this.log(`${task.name} started`);
+      this.log(green(bold(`${task.name} started`)));
       if (!this.env["--dry-run"]) {
         if (task.action.constructor.name === "AsyncFunction") {
           await task.action();
@@ -164,8 +165,8 @@ class TaskRegistry extends Map<string, Task> {
         }
         const endTime = new Date().getTime();
         this.log(
-          `${task.name} finished in ${((endTime - startTime) / 1000).toFixed(2)
-            } seconds`
+          green(bold(`${task.name} finished`)) +
+            ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
         );
       }
     }
