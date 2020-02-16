@@ -1,24 +1,16 @@
-import { sh } from "../lib/utils.ts";
-import { desc, run, task } from "../mod.ts";
+import { desc, run, sh, task } from "../mod.ts";
 
 desc("Actionless task with prerequisites");
 task("prereqs", ["noop", "pause"]);
 
 desc("Synchronous task that does nothing");
-task("noop", ["pause"], function() {});
-
-desc("Asynchronous task pauses for 1 second");
-task("pause", [], async function() {
-  await new Promise(resolve => {
-    setTimeout(() => {
-      resolve();
-    }, 1000);
-  });
+task("noop", ["pause"], function() {
+  console.log(this.desc);
 });
 
 desc("Execute shell command");
-task("shell", [], function() {
-  sh("echo Hello World");
+task("shell", [], async function() {
+  await sh("echo Hello World");
 });
 
 desc("Execute multiple shell commands sequentially");
@@ -29,13 +21,13 @@ task("sequential", [], async function() {
 });
 
 desc("Execute multiple shell commands concurrently");
-task("concurrent", [], function() {
-  sh(["echo Hello World", "ls", "wc Drakefile.ts"]);
+task("concurrent", [], async function() {
+  await sh(["echo Hello World", "ls", "wc Drakefile.ts"]);
 });
 
 desc("Execute bash shell script");
-task("script", [], function() {
-  sh(`set -e  # Exit immediately on error.
+task("script", [], async function() {
+  await sh(`set -e  # Exit immediately on error.
       echo Hello World
       if [ "$EUID" -eq 0 ]; then
           echo "Running as root"
@@ -46,9 +38,23 @@ task("script", [], function() {
       wc Drakefile.ts`);
 });
 
-desc("File task");
-task("./target-file", ["./prereq-file"], function() {
-  console.log("running file task");
+desc("Asynchronous task pauses for 1 second");
+task("pause", [], async function() {
+  await new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, 1000);
+  });
 });
 
-run();
+desc("File task");
+task("/tmp/file1", ["shell", "/tmp/file2"], function() {
+  console.log(this.desc);
+});
+
+desc("Execute shell command");
+task("shell2", ["shell"], async function() {
+  await sh("echo Hello World 2");
+});
+
+await run();

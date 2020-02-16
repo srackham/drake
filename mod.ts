@@ -26,7 +26,7 @@ function log(message: string): void {
   taskRegistry.log(message);
 }
 
-function run(): void {
+async function run() {
   if (env["--help"]) {
     help();
   } else if (env["--version"]) {
@@ -38,6 +38,6 @@ function run(): void {
     if (tasks.length === 0 && env["--default-task"]) {
       tasks.push(env["--default-task"]);
     }
-    taskRegistry.run(env["--targets"]);
+    await taskRegistry.run(env["--targets"]);
   }
 }

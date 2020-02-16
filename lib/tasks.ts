@@ -3,7 +3,7 @@ import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
 
-type Action = () => void;
+type Action = () => any;
 
 // Return true if name is a file task name i.e. an absolute file name path or a relative path
 // starting with '.'.
@@ -146,22 +146,37 @@ class TaskRegistry extends Map<string, Task> {
     }
     const tasks = this.resolveActions(targets);
     this.log(`resolved targets: ${tasks.map(t => t.name)}`);
+
     // Run tasks.
-    for (const task of tasks) {
-      if (!task.action) {
-        continue;
+    await tasks.reduce(async (prevPromise, nextTask) => {
+      await prevPromise;
+      if (nextTask.action.constructor.name === "AsyncFunction") {
+        console.log("ASYNC");
+        return await nextTask.action();
+      } else {
+        console.log("NON-ASYNC");
+        nextTask.action();
+        return Promise.resolve();
       }
-      if (!this.env["--always-make"] && task.isUpToDate()) {
-        continue;
-      }
-      this.log(`task: ${task.name}`);
-      if (!this.env["--dry-run"]) {
-        if (task.action.constructor.name === "AsyncFunction") {
-          await task.action();
-        } else {
-          task.action();
-        }
-      }
-    }
+    }, Promise.resolve());
+
+    // for (const task of tasks) {
+    //   if (!task.action) {
+    //     continue;
+    //   }
+    //   if (!this.env["--always-make"] && task.isUpToDate()) {
+    //     continue;
+    //   }
+    //   this.log(`task: ${task.name}`);
+    //   if (!this.env["--dry-run"]) {
+    //     if (task.action.constructor.name === "AsyncFunction") {
+    //       console.log("ASYNC");
+    //       await task.action();
+    //     } else {
+    //       console.log("NON-ASYNC");
+    //       task.action();
+    //     }
+    //   }
+    // }
   }
 }
