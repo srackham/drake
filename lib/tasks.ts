@@ -95,6 +95,7 @@ class TaskRegistry extends Map<string, Task> {
   // Throw error if non-file task is missing.
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
+    names.reverse(); // So the result maintains the same order.
     for (const name of names) {
       const task = this.get(name);
       if (task === undefined) {
@@ -112,8 +113,8 @@ class TaskRegistry extends Map<string, Task> {
     return result;
   }
 
-  // Return a list of tasks and all dependent tasks, in first to last execution order,
-  // from the list of task names.
+  // Return a list of tasks and all dependent tasks, from the list of task names.
+  // Ordered in first to last execution order,
   resolveActions(names: string[]): Task[] {
     const result: Task[] = [];
     for (const task of this.expand(names)) {
