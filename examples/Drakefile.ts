@@ -1,11 +1,12 @@
-import { desc, run, sh, task } from "../mod.ts";
+import { desc, env, execute, invoke, run, sh, task } from "../mod.ts";
 
 desc("Actionless task with prerequisites");
 task("prereqs", ["noop", "pause"]);
 
 desc("Synchronous task that does nothing");
 task("noop", ["pause"], function() {
-  console.log(this.desc);
+  console.log(`${this.desc} executing in ${Deno.cwd()}`);
+  console.log(`$HOME=${env["$HOME"]}`);
 });
 
 desc("Execute shell command");
@@ -55,6 +56,16 @@ task("/tmp/file1", ["shell", "/tmp/file2"], function() {
 desc("Execute shell command");
 task("shell2", ["shell"], async function() {
   await sh("echo Hello World 2");
+});
+
+desc("execute noop action function");
+task("execute", [], async function() {
+  await execute("noop");
+});
+
+desc("invoke noop task");
+task("invoke", [], async function() {
+  await invoke("noop");
 });
 
 run();
