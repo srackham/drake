@@ -1,5 +1,6 @@
 export { Action, Task, TaskRegistry };
-import { bold, green } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
+import { bold, green,
+  yellow } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
@@ -74,6 +75,9 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   register(name: string, prereqs: string[], action?: Action): void {
+    if (this.get(name) !== undefined) {
+      throw new Error(`task already exists: ${name}`);
+    }
     const task = new Task();
     task.name = name;
     task.desc = this.lastDesc;
@@ -91,11 +95,11 @@ class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  // Recursively exoand and flatten prerequisites into task names list.
+  // Recursively expand and flatten prerequisites into task names list.
   // Throw error if non-file task is missing.
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
-    names.reverse(); // So the result maintains the same order.
+    names.reverse(); // Result maintains the same order as the list of names.
     for (const name of names) {
       const task = this.get(name);
       if (task === undefined) {
@@ -135,7 +139,11 @@ class TaskRegistry extends Map<string, Task> {
     }).length;
     for (const k of keys.sort()) {
       const task = this.get(k);
-      console.log(`${green(bold(task.name.padEnd(maxLen)))} ${task.desc}`);
+      console.log(
+        `${green(bold(task.name.padEnd(maxLen)))} ${task.desc} ${yellow(
+          `[${task.prereqs}]`
+        )}`
+      );
     }
   }
 
