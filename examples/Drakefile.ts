@@ -22,7 +22,7 @@ task("sequential", [], async function() {
 
 desc("Execute multiple shell commands concurrently");
 task("concurrent", [], async function() {
-  await sh(["echo Hello World", "ls", "wc Drakefile.ts"]);
+  await sh(["sleep 1", "sleep 1", "sleep 1"]);
 });
 
 desc("Execute bash shell script");
@@ -57,4 +57,4 @@ task("shell2", ["shell"], async function() {
   await sh("echo Hello World 2");
 });
 
-await run();
+run();
