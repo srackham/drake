@@ -8,7 +8,7 @@ function parseArgs(args: string[], env: Env): void {
   }
   let arg: string | undefined;
   while (!!(arg = args.shift())) {
-    const match = arg.match(/^([\w_]+)=(.*)$/);
+    const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
     if (match) {
       env[match[1]] = match[2];
       continue;

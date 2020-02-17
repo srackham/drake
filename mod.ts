@@ -9,6 +9,9 @@ import { Action, TaskRegistry } from "./lib/tasks.ts";
 
 // Instantiate environment and tasks registry and parse command-line.
 const env: Env = {};
+for (const name of Object.getOwnPropertyNames(Deno.env())) {
+  env[`$${name}`] = Deno.env(name);
+}
 const taskRegistry = new TaskRegistry(env);
 parseArgs(Deno.args.slice(), env);
 
