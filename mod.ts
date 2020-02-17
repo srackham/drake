@@ -10,7 +10,7 @@ import { Action, TaskRegistry } from "./lib/tasks.ts";
 // Instantiate environment and tasks registry and parse command-line.
 const env: Env = {};
 const taskRegistry = new TaskRegistry(env);
-parseArgs(Deno.args, env);
+parseArgs(Deno.args.slice(), env);
 
 // Set task description.
 function desc(description: string): void {

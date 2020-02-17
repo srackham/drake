@@ -6,29 +6,63 @@ function parseArgs(args: string[], env: Env): void {
   if (env["--targets"] === undefined) {
     env["--targets"] = [];
   }
-  for (const arg of args) {
+  let arg: string | undefined;
+  while (!!(arg = args.shift())) {
     const match = arg.match(/^([\w_]+)=(.*)$/);
     if (match) {
       env[match[1]] = match[2];
-    } else if (arg === "-a" || arg === "--always-make") {
-      env["-a"] = true;
-      env["--always-make"] = true;
-    } else if (arg === "-h" || arg === "--help") {
-      env["-h"] = true;
-      env["--help"] = true;
-    } else if (arg === "-t" || arg === "--tasks") {
-      env["-t"] = true;
-      env["--tasks"] = true;
-    } else if (arg === "-n" || arg === "--dry-run") {
-      env["-n"] = true;
-      env["--dry-run"] = true;
-    } else if (arg === "-q" || arg === "--quiet") {
-      env["-q"] = true;
-      env["--quiet"] = true;
-    } else if (arg === "--version") {
-      env["--version"] = true;
-    } else {
-      env["--targets"].push(arg);
+      continue;
+    }
+    switch (arg) {
+      case "-a":
+      case "--always-make":
+        env["-a"] = true;
+        env["--always-make"] = true;
+        break;
+      case "-d":
+      case "--directory":
+        arg = args.shift();
+        if (arg === undefined) {
+          throw new Error("missing --directory option value");
+        }
+        env["-d"] = arg;
+        env["--directory"] = arg;
+        break;
+      case "-f":
+      case "--drakefile":
+        arg = args.shift();
+        if (arg === undefined) {
+          throw new Error("missing --drakefile option value");
+        }
+        env["-f"] = arg;
+        env["--drakefile"] = arg;
+        break;
+      case "-h":
+      case "--help":
+        env["-h"] = true;
+        env["--help"] = true;
+        break;
+      case "-t":
+      case "--tasks":
+        env["-t"] = true;
+        env["--tasks"] = true;
+        break;
+      case "-n":
+      case "--dry-run":
+        env["-n"] = true;
+        env["--dry-run"] = true;
+        break;
+      case "-q":
+      case "--quiet":
+        env["-q"] = true;
+        env["--quiet"] = true;
+        break;
+      case "--version":
+        env["--version"] = true;
+        break;
+      default:
+        env["--targets"].push(arg);
+        break;
     }
   }
 }

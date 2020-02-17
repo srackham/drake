@@ -1,17 +1,28 @@
 // A thin CLI wrapper for the Drake library module.
 
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
+import { isAbsolute, sep } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { env, vers } from "./mod.ts";
 
-const drakefile = env["--drakefile"] ? env["--drakefile"] : "./Drakefile.ts";
 if (env["--help"]) {
   help();
 } else if (env["--version"]) {
   console.log(vers);
 } else {
-  if (!existsSync(drakefile)) {
-    throw new Error(`missing drakefile: ${drakefile}`);
+  let drakefile = env["--drakefile"] ? env["--drakefile"] : "./Drakefile.ts";
+  if (!existsSync(drakefile) || !Deno.statSync(drakefile).isFile()) {
+    throw new Error(`--drakefile missing or not a regular file: ${drakefile}`);
+  }
+  if (env["--directory"]) {
+    const dir = env["--directory"];
+    if (!existsSync(dir) || !Deno.statSync(dir).isDirectory()) {
+      throw new Error(`--directory missing or not a directory: ${dir}`);
+    }
+    Deno.chdir(dir);
+  }
+  if (!isAbsolute(drakefile) && !drakefile.startsWith(".")) {
+    drakefile = "." + sep + drakefile; // Conform to Deno module path convention.
   }
   import(drakefile);
 }
