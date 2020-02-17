@@ -165,20 +165,31 @@ class TaskRegistry extends Map<string, Task> {
       if (!this.env["--always-make"] && task.isUpToDate()) {
         continue;
       }
-      const startTime = new Date().getTime();
+      await this.execute(task.name);
+    }
+  }
+
+  // Execute named task action function.
+  async execute(name: string) {
+    const task = this.get(name);
+    if (task === undefined) {
+      abort(`missing task: ${name}`);
+    }
+    const startTime = new Date().getTime();
+    if (!this.env["--dry-run"]) {
       this.log(green(bold(`${task.name} started`)));
-      if (!this.env["--dry-run"]) {
-        if (task.action.constructor.name === "AsyncFunction") {
-          await task.action();
-        } else {
-          task.action();
-        }
-        const endTime = new Date().getTime();
-        this.log(
-          green(bold(`${task.name} finished`)) +
-            ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
-        );
+      if (task.action.constructor.name === "AsyncFunction") {
+        await task.action();
+      } else {
+        task.action();
       }
+      const endTime = new Date().getTime();
+      this.log(
+        green(bold(`${task.name} finished`)) +
+          ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
+      );
+    } else {
+      this.log(green(bold(`${task.name} skipped`)) + " (dry run)");
     }
   }
 }

@@ -1,7 +1,7 @@
 const vers = "0.0.1";
 
 export { abort, glob, sh } from "./lib/utils.ts";
-export { desc, run, task, log, env, vers };
+export { desc, execute, run, invoke, task, log, env, vers };
 
 import { Env, parseArgs } from "./lib/cli.ts";
 import { help } from "./lib/help.ts";
@@ -29,6 +29,7 @@ function log(message: string): void {
   taskRegistry.log(message);
 }
 
+// Run Drake command-line options and target tasks.
 async function run() {
   if (env["--help"]) {
     help();
@@ -43,4 +44,12 @@ async function run() {
     }
     await taskRegistry.run(env["--targets"]);
   }
+}
+
+async function execute(name: string) {
+  await taskRegistry.execute(name);
+}
+
+async function invoke(name: string) {
+  await taskRegistry.run([name]);
 }
