@@ -1,4 +1,5 @@
 export { Env, parseArgs };
+import { abort } from "./utils.ts";
 
 type Env = { [name: string]: any; "--targets"?: string[]; };
 
@@ -23,7 +24,7 @@ function parseArgs(args: string[], env: Env): void {
       case "--directory":
         arg = args.shift();
         if (arg === undefined) {
-          throw new Error("missing --directory option value");
+          abort("missing --directory option value");
         }
         env["-d"] = arg;
         env["--directory"] = arg;
@@ -32,7 +33,7 @@ function parseArgs(args: string[], env: Env): void {
       case "--drakefile":
         arg = args.shift();
         if (arg === undefined) {
-          throw new Error("missing --drakefile option value");
+          abort("missing --drakefile option value");
         }
         env["-f"] = arg;
         env["--drakefile"] = arg;

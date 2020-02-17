@@ -4,6 +4,7 @@ import { bold, green,
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
+import { abort } from "./utils.ts";
 
 type Action = () => any;
 
@@ -12,7 +13,7 @@ type Action = () => any;
 // Throw error is name contains wildcards.
 function isFileName(name: string): boolean {
   if (/[*?]/.test(name)) {
-    throw new Error(`wildcard names are not allowed: ${name}`);
+    abort(`wildcard names are not allowed: ${name}`);
   }
   return isAbsolute(name) || name.startsWith(".");
 }
@@ -38,7 +39,7 @@ class Task {
         continue;
       }
       if (!existsSync(name)) {
-        throw new Error(
+        abort(
           `task: ${this.name}: missing prerequisite path: ${name}`
         );
       }
@@ -76,7 +77,7 @@ class TaskRegistry extends Map<string, Task> {
 
   register(name: string, prereqs: string[], action?: Action): void {
     if (this.get(name) !== undefined) {
-      throw new Error(`task already exists: ${name}`);
+      abort(`task already exists: ${name}`);
     }
     const task = new Task();
     task.name = name;
@@ -106,7 +107,7 @@ class TaskRegistry extends Map<string, Task> {
         if (isFileName(name)) { // Allow missing file name prerequisite tasks.
           continue;
         }
-        throw new Error(`missing task: ${name}`);
+        abort(`missing task: ${name}`);
       }
       result.unshift(task);
       const prereqs = task.prereqs;
@@ -151,7 +152,7 @@ class TaskRegistry extends Map<string, Task> {
   async run(targets: string[]) {
     for (const name of targets) {
       if (this.get(name) === undefined) {
-        throw new Error(`missing task: ${name}`);
+        abort(`missing task: ${name}`);
       }
     }
     const tasks = this.resolveActions(targets);

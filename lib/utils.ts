@@ -1,7 +1,18 @@
-export { sh, glob };
+export { abort, sh, glob };
 
 import { walkSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { globToRegExp } from "https://deno.land/std@v0.33.0/path/mod.ts";
+
+class DrakeError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "DrakeError";
+  }
+}
+
+function abort(message: string): void {
+  throw new DrakeError(message);
+}
 
 // Return array of file names matching the glob patterns relative to the cwd.
 // e.g. glob("tmp/*.ts", "lib/*.ts", "mod.ts");
@@ -52,6 +63,6 @@ async function sh(cmds: string | string[]) {
     }
   }
   if (code !== 0) {
-    throw new Error(`sh: ${cmd}: error code: ${code}`);
+    abort(`sh: ${cmd}: error code: ${code}`);
   }
 }

@@ -3,6 +3,7 @@
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { isAbsolute, sep } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { help } from "./lib/help.ts";
+import { abort } from "./lib/utils.ts";
 import { env, vers } from "./mod.ts";
 
 if (env["--help"]) {
@@ -12,17 +13,17 @@ if (env["--help"]) {
 } else {
   let drakefile = env["--drakefile"] ? env["--drakefile"] : "./Drakefile.ts";
   if (!existsSync(drakefile) || !Deno.statSync(drakefile).isFile()) {
-    throw new Error(`--drakefile missing or not a regular file: ${drakefile}`);
+    abort(`--drakefile missing or not a regular file: ${drakefile}`);
   }
   if (env["--directory"]) {
     const dir = env["--directory"];
     if (!existsSync(dir) || !Deno.statSync(dir).isDirectory()) {
-      throw new Error(`--directory missing or not a directory: ${dir}`);
+      abort(`--directory missing or not a directory: ${dir}`);
     }
     Deno.chdir(dir);
   }
   if (!isAbsolute(drakefile) && !drakefile.startsWith(".")) {
-    drakefile = "." + sep + drakefile; // Conform to Deno module path convention.
+    drakefile = "." + sep + drakefile; // Conform to Deno module path name convention.
   }
   import(drakefile);
 }
