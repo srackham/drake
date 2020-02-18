@@ -1,10 +1,9 @@
 // A thin CLI wrapper for the Drake library module.
 
-import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
-import { isAbsolute, sep } from "https://deno.land/std@v0.33.0/path/mod.ts";
-import { help } from "./lib/help.ts";
-import { abort } from "./lib/utils.ts";
-import { env, vers } from "./mod.ts";
+import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts"
+import { help } from "./lib/help.ts"
+import { abort, moduleFileName } from "./lib/utils.ts"
+import { env, vers } from "./mod.ts"
 
 if (env["--help"]) {
   help();
@@ -22,8 +21,6 @@ if (env["--help"]) {
     }
     Deno.chdir(dir);
   }
-  if (!isAbsolute(drakefile) && !drakefile.startsWith(".")) {
-    drakefile = "." + sep + drakefile; // Conform to Deno module path name convention.
-  }
+  drakefile = moduleFileName(drakefile)
   import(drakefile);
 }

@@ -1,7 +1,7 @@
-export { abort, sh, glob };
+export { abort, sh, glob, moduleFileName }
 
-import { walkSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
-import { globToRegExp } from "https://deno.land/std@v0.33.0/path/mod.ts";
+  import { walkSync } from "https://deno.land/std@v0.33.0/fs/mod.ts"
+import { globToRegExp, isAbsolute, sep } from "https://deno.land/std@v0.33.0/path/mod.ts"
 
 class DrakeError extends Error {
   constructor(message?: string) {
@@ -14,12 +14,20 @@ function abort(message: string): void {
   throw new DrakeError(message);
 }
 
-// Return array of file names matching the glob patterns relative to the cwd.
+// Ensure file name confirms to Deno module path name convention.
+function moduleFileName(name: string): string {
+  if (!isAbsolute(name) && !name.startsWith(".")) {
+    return "." + sep + name;
+  }
+  return name;
+}
+
+// Return array of file names matching the glob patterns relative to the current working directory.
 // e.g. glob("tmp/*.ts", "lib/*.ts", "mod.ts");
 function glob(...patterns: string[]): string[] {
   const regexps = patterns.map(pat => globToRegExp(pat));
   const iter = walkSync(".", { match: regexps, includeDirs: false });
-  return Array.from(iter, info => info.filename);
+  return Array.from(iter, info => moduleFileName(info.filename));
 }
 
 // Start shell command and return status promise.
