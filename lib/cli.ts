@@ -62,9 +62,6 @@ function parseArgs(args: string[], env: Env): void {
         env["--version"] = true;
         break;
       default:
-        if (!/^[a-zA-Z]\w*$/.test(arg)) {
-          abort(`illegal option or task name: ${arg}`);
-        }
         env["--targets"].push(arg);
         break;
     }

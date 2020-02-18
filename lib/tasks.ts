@@ -1,24 +1,13 @@
-export { Action, Task, TaskRegistry };
 import { bold, green,
   yellow } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
-import { isAbsolute } from "https://deno.land/std@v0.33.0/path/mod.ts";
 import { Env } from "./cli.ts";
-import { abort } from "./utils.ts";
+import { abort, isTaskName, normalizePrereqs,
+  normalizeTarget } from "./utils.ts";
 
-type Action = () => any;
+export type Action = () => any;
 
-// Return true if name is a file task name i.e. an absolute file name path or a relative path
-// starting with '.'.
-// Throw error is name contains wildcards.
-function isFileName(name: string): boolean {
-  if (/[*?]/.test(name)) {
-    abort(`wildcard names are not allowed: ${name}`);
-  }
-  return isAbsolute(name) || name.startsWith(".");
-}
-
-class Task {
+export class Task {
   name: string;
   desc: string;
   prereqs: string[];
@@ -30,12 +19,13 @@ class Task {
   // otherwise return false.
   // Throw error if any prerequisite path does not exists.
   isUpToDate(): boolean {
-    if (!isFileName(this.name)) {
+    if (isTaskName(this.name)) {
       return false;
     }
     // Check all prerequisite paths exist.
-    for (const name of this.prereqs) {
-      if (!isFileName(name)) {
+    const prereqs = normalizePrereqs(this.prereqs);
+    for (const name of prereqs) {
+      if (isTaskName(name)) {
         continue;
       }
       if (!existsSync(name)) {
@@ -48,8 +38,8 @@ class Task {
       return false;
     }
     const target = Deno.statSync(this.name);
-    for (const name of this.prereqs) {
-      if (!isFileName(name)) {
+    for (const name of prereqs) {
+      if (isTaskName(name)) {
         continue;
       }
       const prereq = Deno.statSync(this.name);
@@ -61,7 +51,7 @@ class Task {
   }
 }
 
-class TaskRegistry extends Map<string, Task> {
+export class TaskRegistry extends Map<string, Task> {
   env: Env;
   lastDesc: string;
 
@@ -76,6 +66,7 @@ class TaskRegistry extends Map<string, Task> {
   }
 
   register(name: string, prereqs: string[], action?: Action): void {
+    name = normalizeTarget(name);
     if (this.get(name) !== undefined) {
       abort(`task already exists: ${name}`);
     }
@@ -83,7 +74,7 @@ class TaskRegistry extends Map<string, Task> {
     task.name = name;
     task.desc = this.lastDesc;
     this.lastDesc = ""; // Consume decription.
-    task.prereqs = prereqs;
+    task.prereqs = prereqs.slice();
     if (action) {
       task.action = action.bind(task);
     }
@@ -96,21 +87,22 @@ class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  // Recursively expand and flatten prerequisites into task names list.
+  // Recursively expand and flatten prerequisites into normalized task names list.
   // Throw error if non-file task is missing.
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
+    names = names.slice();
     names.reverse(); // Result maintains the same order as the list of names.
     for (const name of names) {
       const task = this.get(name);
       if (task === undefined) {
-        if (isFileName(name)) { // Allow missing file name prerequisite tasks.
+        if (!isTaskName(name)) { // Allow missing file prerequisite tasks.
           continue;
         }
         abort(`missing task: ${name}`);
       }
       result.unshift(task);
-      const prereqs = task.prereqs;
+      const prereqs = normalizePrereqs(task.prereqs);
       if (prereqs.length !== 0) {
         result = this.resolveActions(prereqs).concat(result);
       }
@@ -118,7 +110,7 @@ class TaskRegistry extends Map<string, Task> {
     return result;
   }
 
-  // Return a list of tasks and all dependent tasks, from the list of task names.
+  // Return a list of tasks and all dependent tasks, from the list of normalized task names.
   // Ordered in first to last execution order,
   resolveActions(names: string[]): Task[] {
     const result: Task[] = [];
@@ -150,6 +142,7 @@ class TaskRegistry extends Map<string, Task> {
 
   // Resolve task names and run tasks.
   async run(targets: string[]) {
+    targets = targets.map(name => normalizeTarget(name));
     for (const name of targets) {
       if (this.get(name) === undefined) {
         abort(`missing task: ${name}`);
@@ -171,6 +164,7 @@ class TaskRegistry extends Map<string, Task> {
 
   // Execute named task action function.
   async execute(name: string) {
+    name = normalizeTarget(name);
     const task = this.get(name);
     if (task === undefined) {
       abort(`missing task: ${name}`);

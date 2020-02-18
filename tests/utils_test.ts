@@ -3,13 +3,14 @@ import { glob, sh } from "../lib/utils.ts";
 
 Deno.test(
   function globTest() {
-    let files = glob("./mod.ts");
+    let files = glob("mod.ts");
     assertEquals(files.length, 1);
-    assertEquals(files[0], "mod.ts");
+    assertEquals(files[0], "./mod.ts");
     files = glob("./lib/*.ts");
     assertEquals(
       files.sort().toString(),
-      ["lib/tasks.ts", "lib/help.ts", "lib/utils.ts", "lib/cli.ts"].sort()
+      ["./lib/tasks.ts", "./lib/help.ts", "./lib/utils.ts", "./lib/cli.ts"]
+        .sort()
         .toString()
     );
   }

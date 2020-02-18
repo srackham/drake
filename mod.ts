@@ -15,7 +15,7 @@ for (const name of Object.getOwnPropertyNames(Deno.env())) {
 const taskRegistry = new TaskRegistry(env);
 parseArgs(Deno.args.slice(), env);
 
-// Set task description.
+// Set description of next registered task.
 function desc(description: string): void {
   taskRegistry.desc(description);
 }
