@@ -1,6 +1,6 @@
 const vers = "0.0.1";
 
-export { abort, glob, sh } from "./lib/utils.ts";
+export { abort, glob, quote, sh } from "./lib/utils.ts";
 export { desc, execute, run, invoke, task, log, env, vers };
 
 import { Env, parseArgs } from "./lib/cli.ts";

@@ -12,6 +12,14 @@ export function abort(message: string): void {
   throw new DrakeError(message);
 }
 
+// Double-quote and concatentate string array values with separator.
+// Escape double-quote characters with backspace.
+// Separator defaults to a space character.
+export function quote(values: string[], sep: string = " "): string {
+  values = values.map(value => `"${value.replace(/(")/g, "\\$1")}"`);
+  return values.join(sep);
+}
+
 // Return true if name is a normal task name i.e. not a file path.
 export function isTaskName(name: string): boolean {
   return /^[\w-]+$/.test(name);
