@@ -23,18 +23,24 @@ export function quote(values: string[], sep: string = " "): string {
   return values.join(sep);
 }
 
-/** Return true if name is a normal task name i.e. not a file path. */
-export function isTaskName(name: string): boolean {
-  return /^[\w-]+$/.test(name);
+/**
+ * Return true if name is a file task name. A task is a file task if its name contains characters
+ * that are not alphanumeric, underscore or dash characters.
+ */
+export function isFileTask(name: string): boolean {
+  return !/^[\w-]+$/.test(name);
 }
 
 /**
  * The path name is normalized and the relative path names are guaranteed to start with a `.`
  * character (to distinguish them from non-file task names).
  */
-export function normalizeModulePath(name: string): string {
+export function normalizePath(name: string): string {
+  name = path.normalize(name);
   if (!path.isAbsolute(name)) {
-    return "." + path.sep + path.normalize(name);
+    if (!name.startsWith(".")) {
+      name = "." + path.sep + name;
+    }
   }
   return name;
 }
@@ -44,8 +50,8 @@ export function normalizeTarget(name: string): string {
   if (path.isGlob(name)) {
     abort(`wildcard target not allowed: ${name}`);
   }
-  if (!isTaskName(name)) {
-    name = normalizeModulePath(name);
+  if (isFileTask(name)) {
+    name = normalizePath(name);
   }
   return name;
 }
@@ -57,12 +63,12 @@ export function normalizeTarget(name: string): string {
 export function normalizePrereqs(prereqs: string[]): string[] {
   const result: string[] = [];
   for (const prereq of prereqs) {
-    if (isTaskName(prereq)) {
+    if (!isFileTask(prereq)) {
       result.push(prereq);
     } else if (path.isGlob(prereq)) {
       result.push(...glob(prereq));
     } else {
-      result.push(normalizeModulePath(prereq));
+      result.push(normalizePath(prereq));
     }
   }
   return result;
@@ -75,7 +81,7 @@ export function normalizePrereqs(prereqs: string[]): string[] {
 export function glob(...patterns: string[]): string[] {
   const regexps = patterns.map(pat => path.globToRegExp(path.normalize(pat)));
   const iter = walkSync(".", { match: regexps, includeDirs: false });
-  return Array.from(iter, info => normalizeModulePath(info.filename));
+  return Array.from(iter, info => normalizePath(info.filename));
 }
 
 /** Start shell command and return status promise. */

@@ -2,7 +2,7 @@ import { bold, green,
   yellow } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
 import { Env } from "./cli.ts";
-import { abort, isTaskName, normalizePrereqs,
+import { abort, isFileTask, normalizePrereqs,
   normalizeTarget } from "./utils.ts";
 
 export type Action = () => any;
@@ -22,13 +22,13 @@ export class Task {
    * - Throw error if any prerequisite path does not exists.
    */
   isUpToDate(): boolean {
-    if (isTaskName(this.name)) {
+    if (!isFileTask(this.name)) {
       return false;
     }
     // Check all prerequisite paths exist.
     const prereqs = normalizePrereqs(this.prereqs);
     for (const name of prereqs) {
-      if (isTaskName(name)) {
+      if (!isFileTask(name)) {
         continue;
       }
       if (!existsSync(name)) {
@@ -42,7 +42,7 @@ export class Task {
     }
     const targetStat = Deno.statSync(this.name);
     for (const prereq of prereqs) {
-      if (isTaskName(prereq)) {
+      if (!isFileTask(prereq)) {
         continue;
       }
       const prereqStat = Deno.statSync(prereq);
@@ -104,7 +104,7 @@ export class TaskRegistry extends Map<string, Task> {
     for (const name of names) {
       const task = this.get(name);
       if (task === undefined) {
-        if (!isTaskName(name)) { // Allow missing file prerequisite tasks.
+        if (isFileTask(name)) { // Allow missing file prerequisite tasks.
           continue;
         }
         abort(`missing task: ${name}`);
