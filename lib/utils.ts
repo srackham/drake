@@ -8,25 +8,34 @@ class DrakeError extends Error {
   }
 }
 
+/**
+ * Throw `DrakeError` with error message to terminate execution.
+ */
 export function abort(message: string): void {
   throw new DrakeError(message);
 }
 
-// Double-quote and concatentate string array values with separator.
-// Escape double-quote characters with backspace.
-// Separator defaults to a space character.
+/**
+ * Quote string array values with double-quotes then join them with a separator.
+ * Double-quote characters are escaped with a backspace.
+ * The separator defaults to a space character.
+ */
 export function quote(values: string[], sep: string = " "): string {
-  values = values.map(value => `"${value.replace(/(")/g, "\\$1")}"`);
+  values = values.map(value => `"${value.replace(/"/g, "\\\"")}"`);
   return values.join(sep);
 }
 
-// Return true if name is a normal task name i.e. not a file path.
+/**
+ * Return true if name is a normal task name i.e. not a file path.
+ */
 export function isTaskName(name: string): boolean {
   return /^[\w-]+$/.test(name);
 }
 
-// Ensure file name confirms to Deno module path name convention
-// i.e. is an absolute file path or starts with a '.' character.
+/**
+ * Ensure file name confirms to Deno module path name convention
+ * i.e. is an absolute file path or starts with a '.' character.
+ */
 export function normalizeModulePath(name: string): string {
   if (!path.isAbsolute(name)) {
     return "." + path.sep + path.normalize(name);
@@ -34,7 +43,9 @@ export function normalizeModulePath(name: string): string {
   return name;
 }
 
-// Normalise the target name.
+/**
+ * Normalise Drake target name.
+ */
 export function normalizeTarget(name: string): string {
   if (path.isGlob(name)) {
     abort(`wildcard target not allowed: ${name}`);
@@ -45,7 +56,10 @@ export function normalizeTarget(name: string): string {
   return name;
 }
 
-// Return a list of normalized prerequisite names and expanded globs.
+/**
+ * Return a list of normalized prerequisite names.
+ * Globs are expanded.
+ */
 export function normalizePrereqs(prereqs: string[]): string[] {
   const result: string[] = [];
   for (const prereq of prereqs) {
@@ -60,22 +74,25 @@ export function normalizePrereqs(prereqs: string[]): string[] {
   return result;
 }
 
-// Return array of normalized file names matching the glob patterns.
-// e.g. glob("tmp/*.ts", "lib/*.ts", "mod.ts");
+/**
+ * Return array of normalized file names matching the glob patterns.
+ * e.g. `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
+ */
 export function glob(...patterns: string[]): string[] {
   const regexps = patterns.map(pat => path.globToRegExp(path.normalize(pat)));
   const iter = walkSync(".", { match: regexps, includeDirs: false });
   return Array.from(iter, info => normalizeModulePath(info.filename));
-  // return Array.from(iter, info => info.filename);
 }
 
-// Start shell command and return status promise.
-function launch(cmd: string): Promise<Deno.ProcessStatus> {
+/**
+ * Start shell command and return status promise.
+ */
+function launch(command: string): Promise<Deno.ProcessStatus> {
   let args: string[];
   if (Deno.build.os === "win") {
-    args = [Deno.env("COMSPEC"), "/C", cmd];
+    args = [Deno.env("COMSPEC"), "/C", command];
   } else {
-    args = [Deno.env("SHELL"), "-c", cmd];
+    args = [Deno.env("SHELL"), "-c", command];
   }
   // create subprocess
   const p = Deno.run({
@@ -85,24 +102,26 @@ function launch(cmd: string): Promise<Deno.ProcessStatus> {
   return p.status();
 }
 
-// Execute shell commands.
-// If 'cmds` is a string execute it in the command shell.
-// If 'cmds` is a string array execute each command in parallel.
-// If any command fails throw and error.
-export async function sh(cmds: string | string[]) {
+/**
+ * Execute shell commands.
+ * If `commands` is a string execute it in the command shell.
+ * If `commands` is an array of commands execute them in parallel.
+ * If any command fails throw an error.
+ */
+export async function sh(commands: string | string[]) {
   let cmd: string;
   let code: number;
-  if (typeof cmds === "string") {
-    cmd = cmds;
-    code = (await launch(cmds)).code;
+  if (typeof commands === "string") {
+    cmd = commands;
+    code = (await launch(commands)).code;
   } else {
     const promises = [];
-    for (const cmd of cmds) {
+    for (const cmd of commands) {
       promises.push(launch(cmd));
     }
     const results = await Promise.all(promises);
     for (const i in results) {
-      cmd = cmds[i];
+      cmd = commands[i];
       code = results[i].code;
       if (code !== 0) {
         break;
