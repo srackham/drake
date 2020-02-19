@@ -37,13 +37,13 @@ export class Task {
     if (!existsSync(this.name)) {
       return false;
     }
-    const target = Deno.statSync(this.name);
-    for (const name of prereqs) {
-      if (isTaskName(name)) {
+    const targetStat = Deno.statSync(this.name);
+    for (const prereq of prereqs) {
+      if (isTaskName(prereq)) {
         continue;
       }
-      const prereq = Deno.statSync(this.name);
-      if (target.modified < prereq.modified) {
+      const prereqStat = Deno.statSync(prereq);
+      if (targetStat.modified < prereqStat.modified) {
         return false;
       }
     }
