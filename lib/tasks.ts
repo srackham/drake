@@ -7,17 +7,20 @@ import { abort, isTaskName, normalizePrereqs,
 
 export type Action = () => any;
 
+/** Drake task. */
 export class Task {
   name: string;
   desc: string;
   prereqs: string[];
   action: Action;
 
-  // Return false if the task is not a file task.
-  // Return false if the task name file does not exist.
-  // Return true if the task name file exists and is newer than all prerequisite files
-  // otherwise return false.
-  // Throw error if any prerequisite path does not exists.
+  /**
+   * Return true if the task target file exists and is newer than all prerequisite files
+   * otherwise return false.
+   * 
+   * - Return false if the task is not a file task.
+   * - Throw error if any prerequisite path does not exists.
+   */
   isUpToDate(): boolean {
     if (isTaskName(this.name)) {
       return false;
@@ -51,6 +54,7 @@ export class Task {
   }
 }
 
+/** Task registry map. */
 export class TaskRegistry extends Map<string, Task> {
   env: Env;
   lastDesc: string;
@@ -61,10 +65,12 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = "";
   }
 
+  /** Set description of next registered task. */
   desc(description: string): void {
     this.lastDesc = description;
   }
 
+  /** Create and register a task. */
   register(name: string, prereqs: string[], action?: Action): void {
     name = normalizeTarget(name);
     if (this.get(name) !== undefined) {
@@ -87,8 +93,10 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  // Recursively expand and flatten prerequisites into normalized task names list.
-  // Throw error if non-file task is missing.
+  /**
+   * Recursively expand prerequisites and return a list of prerequisite tasks.
+   * Throw error if non-file task is missing.
+   */
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
     names = names.slice();
@@ -110,8 +118,10 @@ export class TaskRegistry extends Map<string, Task> {
     return result;
   }
 
-  // Return a list of tasks and all dependent tasks, from the list of normalized task names.
-  // Ordered in first to last execution order,
+  /**
+   * Return a list of tasks and all dependent tasks from the list of normalized task `names`.
+   * Ordered in first to last execution order,
+   */
   resolveActions(names: string[]): Task[] {
     const result: Task[] = [];
     for (const task of this.expand(names)) {
@@ -124,7 +134,7 @@ export class TaskRegistry extends Map<string, Task> {
     return result;
   }
 
-  // Print list of tasks and task descriptions.
+  /** Print list of tasks to the console. */
   list(): void {
     const keys = Array.from(this.keys());
     const maxLen = keys.reduce(function(a, b) {
@@ -140,7 +150,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  // Resolve task names and run tasks.
+  /** Run target tasks. */
   async run(targets: string[]) {
     targets = targets.map(name => normalizeTarget(name));
     for (const name of targets) {
@@ -162,7 +172,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  // Execute named task action function.
+  /** Execute named task action function. */
   async execute(name: string) {
     name = normalizeTarget(name);
     const task = this.get(name);

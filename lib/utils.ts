@@ -8,9 +8,7 @@ class DrakeError extends Error {
   }
 }
 
-/**
- * Throw `DrakeError` with error message to terminate execution.
- */
+/** Throw `DrakeError` with error message to terminate execution. */
 export function abort(message: string): void {
   throw new DrakeError(message);
 }
@@ -25,16 +23,14 @@ export function quote(values: string[], sep: string = " "): string {
   return values.join(sep);
 }
 
-/**
- * Return true if name is a normal task name i.e. not a file path.
- */
+/** Return true if name is a normal task name i.e. not a file path. */
 export function isTaskName(name: string): boolean {
   return /^[\w-]+$/.test(name);
 }
 
 /**
- * Ensure file name confirms to Deno module path name convention
- * i.e. is an absolute file path or starts with a '.' character.
+ * The path name is normalized and the relative path names are guaranteed to start with a `.`
+ * character (to distinguish them from non-file task names).
  */
 export function normalizeModulePath(name: string): string {
   if (!path.isAbsolute(name)) {
@@ -43,9 +39,7 @@ export function normalizeModulePath(name: string): string {
   return name;
 }
 
-/**
- * Normalise Drake target name.
- */
+/** Normalise Drake target name. */
 export function normalizeTarget(name: string): string {
   if (path.isGlob(name)) {
     abort(`wildcard target not allowed: ${name}`);
@@ -57,8 +51,8 @@ export function normalizeTarget(name: string): string {
 }
 
 /**
- * Return a list of normalized prerequisite names.
- * Globs are expanded.
+ * Return a list prerequisite task names.
+ * Globs are expanded and path names are normalized.
  */
 export function normalizePrereqs(prereqs: string[]): string[] {
   const result: string[] = [];
@@ -84,9 +78,7 @@ export function glob(...patterns: string[]): string[] {
   return Array.from(iter, info => normalizeModulePath(info.filename));
 }
 
-/**
- * Start shell command and return status promise.
- */
+/** Start shell command and return status promise. */
 function launch(command: string): Promise<Deno.ProcessStatus> {
   let args: string[];
   if (Deno.build.os === "win") {

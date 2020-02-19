@@ -11,12 +11,12 @@ import { TaskRegistry } from "./lib/tasks.ts";
 /**
  * The Drake `env` object contains:
  *
- * Options: Mostly command-line options e.g. `env["--dry-run"]`.
+ * _Options_: Mostly command-line options e.g. `env["--dry-run"]`.
  *
- * Command-line variables: For example `vers=1.0.1` on the command-line
- * is available as `env.vers`.
+ * _Command-line variables_: For example `vers=1.0.1` on the command-line
+ * is available as `env["vers"]` and `env.vers`.
  *
- * Shell variables: A read-only snapshot of the shell environment
+ * _Shell variables_: A read-only snapshot of the shell environment
  * variables e.g. `env["$HOME"]`.
  */
 const env: Env = {};
@@ -26,24 +26,18 @@ for (const name of Object.getOwnPropertyNames(Deno.env())) {
   env[`$${name}`] = Deno.env(name);
 }
 
-/**
- * Global task registry.
- */
+/** Global task registry. */
 const taskRegistry = new TaskRegistry(env);
 
 // Parse command-line options into Drake environment.
 parseArgs(Deno.args.slice(), env);
 
-/**
- * Set description of next registered task.
- */
+/** Set description of next registered task. */
 function desc(description: string): void {
   taskRegistry.desc(description);
 }
 
-/**
- * Register a task.
- */
+/** Create and register a task. */
 function task(
   name: string,
   prerequisites: string[] = [],
@@ -52,16 +46,12 @@ function task(
   taskRegistry.register(name, prerequisites, action);
 }
 
-/**
- * Log a message to the console. Do not log the message if the `--quiet` option is set.
- */
+/** Log a message to the console. Do not log the message if the `--quiet` option is set. */
 function log(message: string): void {
   taskRegistry.log(message);
 }
 
-/**
- * Execute Drake command-line options and target tasks.
- */
+/** Execute Drake command-line options and target tasks. */
 async function run() {
   if (env["--help"]) {
     help();
@@ -78,16 +68,12 @@ async function run() {
   }
 }
 
-/**
- * Execute the task along with its prerequisites.
- */
+/** Execute the task along with its prerequisites. */
 async function invoke(name: string) {
   await taskRegistry.run([name]);
 }
 
-/**
- * Unconditionally execute the task without its prerequisites.
- */
+/** Unconditionally execute the task without its prerequisites. */
 async function execute(name: string) {
   await taskRegistry.execute(name);
 }
