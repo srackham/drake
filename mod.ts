@@ -1,5 +1,6 @@
-const vers = "0.0.1";
+const vers = "0.1.0";
 
+// Drake API.
 export { abort, glob, quote, sh } from "./lib/utils.ts";
 export { desc, execute, run, invoke, task, log, env, vers };
 
@@ -39,8 +40,8 @@ async function run() {
     taskRegistry.list();
   } else {
     const tasks = env["--targets"];
-    if (tasks.length === 0 && env["--default-task"]) {
-      tasks.push(env["--default-task"]);
+    if (tasks.length === 0 && env["--default-target"]) {
+      tasks.push(env["--default-target"]);
     }
     await taskRegistry.run(env["--targets"]);
   }

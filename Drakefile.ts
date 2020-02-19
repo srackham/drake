@@ -1,6 +1,6 @@
-import { desc, env, glob, run, sh, task } from "./mod.ts";
+import { desc, env, glob, quote, run, sh, task } from "./mod.ts";
 
-env["--default-task"] = "test";
+env["--default-target"] = "test";
 const SRC_FILES = glob("**/*.ts");
 
 desc("Run tests");
@@ -10,7 +10,7 @@ task("test", ["fmt"], async function() {
 
 desc("Format source files");
 task("fmt", [], async function() {
-  await sh(`deno fmt ${SRC_FILES.join(" ")}`);
+  await sh(`deno fmt ${quote(SRC_FILES)}`);
 });
 
 desc("Install drake executable CLI wrapper");
@@ -20,8 +20,10 @@ task("install", ["test"], async function() {
 
 desc("Run examples drakefile");
 task("run", ["test"], async function() {
-  await sh(`cd ./examples
-            deno run -A ./Drakefile.ts prereqs pause "qux=Foo Bar" noop`);
+  await sh(`
+    cd ./examples
+    deno run -A ./Drakefile.ts prereqs pause "qux=Foo Bar" noop
+  `);
 });
 
 run();
