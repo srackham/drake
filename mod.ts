@@ -2,7 +2,7 @@ const vers = "0.1.0";
 
 // Drake API.
 export { abort, glob, quote, sh } from "./lib/utils.ts";
-export { desc, execute, run, invoke, task, log, env, vers };
+export { desc, execute, run, task, log, env, vers };
 
 import { Env, parseArgs } from "./lib/cli.ts";
 import { help } from "./lib/help.ts";
@@ -52,8 +52,11 @@ function log(message: string): void {
   taskRegistry.log(message);
 }
 
-/** Execute Drake command-line options and target tasks. */
-async function run() {
+/**
+ * Execute Drake command-line options and target tasks. If `targets` is omitted then the
+ * command-line targets are run or the default target is run.
+ */
+async function run(...targets: string[]) {
   if (env["--help"]) {
     help();
   } else if (env["--version"]) {
@@ -61,23 +64,20 @@ async function run() {
   } else if (env["--tasks"]) {
     taskRegistry.list();
   } else {
-    const tasks = env["--targets"];
-    if (tasks.length === 0 && env["--default-target"]) {
-      tasks.push(env["--default-target"]);
+    if (targets.length === 0) {
+      targets = env["--targets"];
+      if (targets.length === 0 && env["--default-target"]) {
+        targets.push(env["--default-target"]);
+      }
     }
-    if (tasks.length === 0) {
+    if (targets.length === 0) {
       abort("no target task specified");
     }
-    await taskRegistry.run(tasks);
+    await taskRegistry.run(targets);
   }
 }
 
-/** Execute the task along with its prerequisites. */
-async function invoke(name: string) {
-  await taskRegistry.run([name]);
-}
-
-/** Unconditionally execute the task without its prerequisites. */
-async function execute(name: string) {
-  await taskRegistry.execute(name);
+/** Unconditionally execute the target task without its prerequisites. */
+async function execute(target: string) {
+  await taskRegistry.execute(target);
 }

@@ -1,4 +1,4 @@
-import { desc, env, execute, invoke, run, sh, task } from "../mod.ts";
+import { desc, env, execute, run, sh, task } from "../mod.ts";
 
 desc("Actionless task with prerequisites");
 task("prereqs", ["noop", "pause"]);
@@ -63,9 +63,9 @@ task("execute", [], async function() {
   await execute("noop");
 });
 
-desc("invoke noop task");
-task("invoke", [], async function() {
-  await invoke("noop");
+desc("run noop and shell tasks");
+task("run", [], async function() {
+  await run("noop", "shell");
 });
 
 run();
