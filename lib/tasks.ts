@@ -26,8 +26,7 @@ export class Task {
       return false;
     }
     // Check all prerequisite paths exist.
-    const prereqs = normalizePrereqs(this.prereqs);
-    for (const name of prereqs) {
+    for (const name of this.prereqs) {
       if (!isFileTask(name)) {
         continue;
       }
@@ -41,7 +40,7 @@ export class Task {
       return false;
     }
     const targetStat = Deno.statSync(this.name);
-    for (const prereq of prereqs) {
+    for (const prereq of this.prereqs) {
       if (!isFileTask(prereq)) {
         continue;
       }
@@ -70,7 +69,10 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = description;
   }
 
-  /** Create and register a task. */
+  /**
+   * Create and register a task.
+   * Task target `name` and prerequisite names are normalized.
+   */
   register(name: string, prereqs: string[], action?: Action): void {
     name = normalizeTarget(name);
     if (this.get(name) !== undefined) {
@@ -80,7 +82,7 @@ export class TaskRegistry extends Map<string, Task> {
     task.name = name;
     task.desc = this.lastDesc;
     this.lastDesc = ""; // Consume decription.
-    task.prereqs = prereqs.slice();
+    task.prereqs = normalizePrereqs(prereqs);
     if (action) {
       task.action = action.bind(task);
     }
@@ -110,9 +112,8 @@ export class TaskRegistry extends Map<string, Task> {
         abort(`missing task: ${name}`);
       }
       result.unshift(task);
-      const prereqs = normalizePrereqs(task.prereqs);
-      if (prereqs.length !== 0) {
-        result = this.resolveActions(prereqs).concat(result);
+      if (task.prereqs.length !== 0) {
+        result = this.resolveActions(task.prereqs).concat(result);
       }
     }
     return result;
@@ -122,7 +123,7 @@ export class TaskRegistry extends Map<string, Task> {
    * Return a list of tasks and all dependent tasks from the list of normalized task `names`.
    * Ordered in first to last execution order,
    */
-  resolveActions(names: string[]): Task[] {
+  private resolveActions(names: string[]): Task[] {
     const result: Task[] = [];
     for (const task of this.expand(names)) {
       // Drop downstream dups.
