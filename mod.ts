@@ -7,6 +7,7 @@ export { desc, execute, run, invoke, task, log, env, vers };
 import { Env, parseArgs } from "./lib/cli.ts";
 import { help } from "./lib/help.ts";
 import { TaskRegistry } from "./lib/tasks.ts";
+import { abort } from "./lib/utils.ts";
 
 /**
  * The Drake `env` object contains:
@@ -64,7 +65,10 @@ async function run() {
     if (tasks.length === 0 && env["--default-target"]) {
       tasks.push(env["--default-target"]);
     }
-    await taskRegistry.run(env["--targets"]);
+    if (tasks.length === 0) {
+      abort("no target task specified");
+    }
+    await taskRegistry.run(tasks);
   }
 }
 
