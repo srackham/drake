@@ -47,6 +47,10 @@ export function normalizePath(name: string): string {
 
 /** Normalise Drake target name. */
 export function normalizeTarget(name: string): string {
+  name = name.trim();
+  if (name === "") {
+    abort("blank target name");
+  }
   if (path.isGlob(name)) {
     abort(`wildcard target not allowed: ${name}`);
   }
@@ -62,7 +66,11 @@ export function normalizeTarget(name: string): string {
  */
 export function normalizePrereqs(prereqs: string[]): string[] {
   const result: string[] = [];
-  for (const prereq of prereqs) {
+  for (let prereq of prereqs) {
+    prereq = prereq.trim();
+    if (prereq === "") {
+      abort("blank prerequisite name");
+    }
     if (!isFileTask(prereq)) {
       result.push(prereq);
     } else if (path.isGlob(prereq)) {
