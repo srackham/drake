@@ -33,7 +33,7 @@ export class Task {
    * otherwise return false.
    * 
    * - Return false if the task is not a file task.
-   * - Throw error if any prerequisite path does not exists.
+   * - Throw error if any prerequisite path does not exist.
    */
   isUpToDate(): boolean {
     if (!isFileTask(this.name)) {
@@ -141,10 +141,11 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Return a list of tasks and all dependent tasks from the list of normalized task `names`.
+   * Return a list of tasks and all dependent tasks from the list of task targets.
    * Ordered in first to last execution order,
    */
   resolveActions(names: string[]): Task[] {
+    names = names.map(name => normalizeTarget(name));
     const result: Task[] = [];
     for (const task of this.expand(names)) {
       // Drop downstream dups.
@@ -174,7 +175,6 @@ export class TaskRegistry extends Map<string, Task> {
 
   /** Run target tasks. */
   async run(targets: string[]) {
-    targets = targets.map(name => normalizeTarget(name));
     const tasks = this.resolveActions(targets);
     this.log(`${green(bold("resolved targets"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
