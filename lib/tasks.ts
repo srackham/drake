@@ -83,7 +83,7 @@ export class TaskRegistry extends Map<string, Task> {
 
   /**
    * Lookup task by target name.
-   * Throw error if it does not exist.
+   * Throw error if target task does not exist.
    */
   get(key: string): Task {
     key = normalizeTarget(key);
@@ -131,11 +131,12 @@ export class TaskRegistry extends Map<string, Task> {
     names = names.slice();
     names.reverse(); // Result maintains the same order as the list of names.
     for (const name of names) {
+      if (isFileTask(name) && !this.has(name)) {
+        continue; // Ignore prerequisite paths that don't have a task.
+      }
       const task = this.get(name);
       result.unshift(task);
-      if (task.prereqs.length !== 0) {
-        result = this.resolveActions(task.prereqs).concat(result);
-      }
+      result = this.resolveActions(task.prereqs).concat(result);
     }
     return result;
   }
