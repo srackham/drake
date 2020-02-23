@@ -1,10 +1,10 @@
-import { assertEquals } from "https://deno.land/std@v0.33.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 import { Env } from "../lib/cli.ts";
 import { TaskRegistry } from "../lib/tasks.ts";
 
 Deno.test(
   function resolveActionsTest() {
-    const env: Env = {};
+    const env: Env = { "--targets": [] };
     const taskRegistry = new TaskRegistry(env);
 
     taskRegistry.desc("Task 1");

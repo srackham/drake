@@ -1,9 +1,9 @@
-import { assertEquals } from "https://deno.land/std@v0.33.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 import { Env, parseArgs } from "../lib/cli.ts";
 
 Deno.test(
   function parseArgsTest() {
-    const env: Env = {};
+    const env: Env = { "--targets": [] };
     parseArgs(
       [
         "-h",

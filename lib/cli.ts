@@ -1,12 +1,9 @@
 export { Env, parseArgs };
 import { abort } from "./utils.ts";
 
-type Env = { [name: string]: any; "--targets"?: string[]; };
+type Env = { [name: string]: any; "--targets": string[]; };
 
 function parseArgs(args: string[], env: Env): void {
-  if (env["--targets"] === undefined) {
-    env["--targets"] = [];
-  }
   let arg: string | undefined;
   while (!!(arg = args.shift())) {
     const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);

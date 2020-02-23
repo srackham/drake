@@ -17,8 +17,11 @@ task("shell", [], async function() {
 desc("Execute multiple shell commands sequentially");
 task("sequential", [], async function() {
   await sh("echo Hello World");
+  await sh("sleep 1");
   await sh("ls");
+  await sh("sleep 1");
   await sh("wc Drakefile.ts");
+  await sh("sleep 1");
 });
 
 desc("Execute multiple shell commands concurrently");

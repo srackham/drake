@@ -4,11 +4,11 @@ const vers = "0.1.0";
 export { abort, glob, quote, sh } from "./lib/utils.ts";
 export { desc, execute, run, task, log, env, vers };
 
-import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.33.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.34.0/path/mod.ts";
 import { Env, parseArgs } from "./lib/cli.ts";
 import { help } from "./lib/help.ts";
-import { TaskRegistry } from "./lib/tasks.ts";
+import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort } from "./lib/utils.ts";
 
 /**
@@ -22,7 +22,7 @@ import { abort } from "./lib/utils.ts";
  * _Shell variables_: A read-only snapshot of the shell environment
  * variables e.g. `env["$HOME"]`.
  */
-const env: Env = {};
+const env: Env = { "--targets": [] };
 
 // Copy shell environment variables into Drake environment.
 for (const name of Object.getOwnPropertyNames(Deno.env())) {
@@ -65,7 +65,7 @@ function desc(description: string): void {
 function task(
   name: string,
   prerequisites: string[] = [],
-  action?: () => any
+  action?: Action
 ): void {
   taskRegistry.register(name, prerequisites, action);
 }

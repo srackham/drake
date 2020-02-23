@@ -1,18 +1,32 @@
 import { bold, green,
-  yellow } from "https://deno.land/std@v0.33.0/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
+  yellow } from "https://deno.land/std@v0.34.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
 import { Env } from "./cli.ts";
 import { abort, isFileTask, normalizePrereqs,
   normalizeTarget } from "./utils.ts";
 
-export type Action = () => any;
+export type Action = (this: Task) => any;
 
 /** Drake task. */
 export class Task {
   name: string;
   desc: string;
   prereqs: string[];
-  action: Action;
+  action?: Action;
+
+  /**
+   * Create a new task.
+   * Task target `name` and prerequisite names are normalized.
+   */
+  constructor(name: string, desc: string, prereqs: string[], action?: Action) {
+    name = normalizeTarget(name);
+    this.name = name;
+    this.desc = desc;
+    this.prereqs = normalizePrereqs(prereqs);
+    if (action) {
+      this.action = action.bind(this);
+    }
+  }
 
   /**
    * Return true if the task target file exists and is newer than all prerequisite files
@@ -45,6 +59,9 @@ export class Task {
         continue;
       }
       const prereqStat = Deno.statSync(prereq);
+      if (!targetStat.modified || !prereqStat.modified) {
+        continue;
+      }
       if (targetStat.modified < prereqStat.modified) {
         return false;
       }
@@ -64,29 +81,39 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = "";
   }
 
+  /**
+   * Lookup task by target name.
+   * Throw error if it does not exist.
+   */
+  get(key: string): Task {
+    key = normalizeTarget(key);
+    if (!this.has(key)) {
+      abort(`missing task: ${key}`);
+    }
+    return super.get(key) as Task;
+  }
+
+  /**
+   * Lookup task by target name.
+   * Throw error if task is already registered.
+   */
+  set(key: string, value: Task) {
+    key = normalizeTarget(key);
+    if (this.has(key)) {
+      abort(`task already exists: ${key}`);
+    }
+    return super.set(key, value);
+  }
+
   /** Set description of next registered task. */
   desc(description: string): void {
     this.lastDesc = description;
   }
 
-  /**
-   * Create and register a task.
-   * Task target `name` and prerequisite names are normalized.
-   */
+  /** Create and register a task. */
   register(name: string, prereqs: string[], action?: Action): void {
-    name = normalizeTarget(name);
-    if (this.get(name) !== undefined) {
-      abort(`task already exists: ${name}`);
-    }
-    const task = new Task();
-    task.name = name;
-    task.desc = this.lastDesc;
+    this.set(name, new Task(name, this.lastDesc, prereqs, action));
     this.lastDesc = ""; // Consume decription.
-    task.prereqs = normalizePrereqs(prereqs);
-    if (action) {
-      task.action = action.bind(task);
-    }
-    this.set(name, task);
   }
 
   log(message: string): void {
@@ -105,12 +132,6 @@ export class TaskRegistry extends Map<string, Task> {
     names.reverse(); // Result maintains the same order as the list of names.
     for (const name of names) {
       const task = this.get(name);
-      if (task === undefined) {
-        if (isFileTask(name)) { // Allow missing file prerequisite tasks.
-          continue;
-        }
-        abort(`missing task: ${name}`);
-      }
       result.unshift(task);
       if (task.prereqs.length !== 0) {
         result = this.resolveActions(task.prereqs).concat(result);
@@ -123,7 +144,7 @@ export class TaskRegistry extends Map<string, Task> {
    * Return a list of tasks and all dependent tasks from the list of normalized task `names`.
    * Ordered in first to last execution order,
    */
-  private resolveActions(names: string[]): Task[] {
+  resolveActions(names: string[]): Task[] {
     const result: Task[] = [];
     for (const task of this.expand(names)) {
       // Drop downstream dups.
@@ -154,11 +175,6 @@ export class TaskRegistry extends Map<string, Task> {
   /** Run target tasks. */
   async run(targets: string[]) {
     targets = targets.map(name => normalizeTarget(name));
-    for (const name of targets) {
-      if (this.get(name) === undefined) {
-        abort(`missing task: ${name}`);
-      }
-    }
     const tasks = this.resolveActions(targets);
     this.log(`${green(bold("resolved targets"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
@@ -173,12 +189,14 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  /** Execute named task action function. */
+  /**
+   * Execute named task action function.
+   * Silently return is there is no task action.
+   */
   async execute(name: string) {
-    name = normalizeTarget(name);
     const task = this.get(name);
-    if (task === undefined) {
-      abort(`missing task: ${name}`);
+    if (!task.action) {
+      return;
     }
     const startTime = new Date().getTime();
     if (!this.env["--dry-run"]) {

@@ -1,5 +1,5 @@
-import { walkSync } from "https://deno.land/std@v0.33.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.33.0/path/mod.ts";
+import { walkSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.34.0/path/mod.ts";
 
 class DrakeError extends Error {
   constructor(message?: string) {
@@ -19,7 +19,7 @@ export function abort(message: string): void {
  * The separator defaults to a space character.
  */
 export function quote(values: string[], sep: string = " "): string {
-  values = values.map(value => `"${value.replace(/"/g, "\\\"")}"`);
+  values = values.map(value => `"${value.replace(/"/g, '\\"')}"`);
   return values.join(sep);
 }
 
@@ -95,10 +95,15 @@ export function glob(...patterns: string[]): string[] {
 /** Start shell command and return status promise. */
 function launch(command: string): Promise<Deno.ProcessStatus> {
   let args: string[];
+  const shellVar = Deno.build.os === "win" ? "COMSPEC" : "SHELL";
+  const shellExe = Deno.env(shellVar) as string;
+  if (!shellExe) {
+    abort(`cannot locate shell: missing ${shellVar} environment variable`);
+  }
   if (Deno.build.os === "win") {
-    args = [Deno.env("COMSPEC"), "/C", command];
+    args = [shellExe, "/C", command];
   } else {
-    args = [Deno.env("SHELL"), "-c", command];
+    args = [shellExe, "-c", command];
   }
   // create subprocess
   const p = Deno.run({
@@ -109,32 +114,28 @@ function launch(command: string): Promise<Deno.ProcessStatus> {
 }
 
 /**
- * Execute shell commands.
- * If `commands` is a string execute it in the command shell.
+ * Execute commands in the command shell.
+ * If `commands` is a string execute it.
  * If `commands` is an array of commands execute them in parallel.
  * If any command fails throw an error.
  */
 export async function sh(commands: string | string[]) {
-  let cmd: string;
-  let code: number;
   if (typeof commands === "string") {
-    cmd = commands;
-    code = (await launch(commands)).code;
-  } else {
-    const promises = [];
-    for (const cmd of commands) {
-      promises.push(launch(cmd));
-    }
-    const results = await Promise.all(promises);
-    for (const i in results) {
-      cmd = commands[i];
-      code = results[i].code;
-      if (code !== 0) {
-        break;
-      }
-    }
+    commands = [commands];
   }
-  if (code !== 0) {
-    abort(`sh: ${cmd}: error code: ${code}`);
+  const promises = [];
+  for (const cmd of commands) {
+    promises.push(launch(cmd));
+  }
+  const results = await Promise.all(promises);
+  for (const i in results) {
+    const cmd = commands[i];
+    const code = results[i].code;
+    if (code === undefined) {
+      abort(`sh: ${cmd}: undefined exit code`);
+    }
+    if (code !== 0) {
+      abort(`sh: ${cmd}: error code: ${code}`);
+    }
   }
 }
