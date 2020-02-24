@@ -1,7 +1,7 @@
 const vers = "0.1.0";
 
 // Drake API.
-export { abort, glob, quote, sh } from "./lib/utils.ts";
+export { abort, glob, quote, readFile, sh, writeFile } from "./lib/utils.ts";
 export { desc, execute, run, task, log, env, vers };
 
 import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";

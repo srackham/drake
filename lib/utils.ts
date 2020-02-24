@@ -23,6 +23,16 @@ export function quote(values: string[], sep: string = " "): string {
   return values.join(sep);
 }
 
+/** Read the entire contents of a file synchronously to a UTF-8 string. */
+export function readFile(filename: string): string {
+  return new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
+}
+
+/** Write text to a new file with given filename synchronously. */
+export function writeFile(filename: string, text: string): void {
+  Deno.writeFileSync(filename, new TextEncoder().encode(text));
+}
+
 /**
  * Return true if name is a file task name. A task is a file task if its name contains characters
  * that are not alphanumeric, underscore or dash characters.
