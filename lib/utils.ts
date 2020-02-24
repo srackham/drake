@@ -96,9 +96,13 @@ export function glob(...patterns: string[]): string[] {
 function launch(command: string): Promise<Deno.ProcessStatus> {
   let args: string[];
   const shellVar = Deno.build.os === "win" ? "COMSPEC" : "SHELL";
-  const shellExe = Deno.env(shellVar) as string;
-  if (!shellExe) {
+  let shellExe = Deno.env(shellVar);
+  if (shellExe === undefined) {
     abort(`cannot locate shell: missing ${shellVar} environment variable`);
+  }
+  shellExe = (shellExe as string).trim();
+  if (!shellExe) {
+    abort(`cannot locate shell: blank ${shellVar} environment variable`);
   }
   if (Deno.build.os === "win") {
     args = [shellExe, "/C", command];
