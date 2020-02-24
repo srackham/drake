@@ -33,6 +33,15 @@ export function writeFile(filename: string, text: string): void {
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }
 
+/** Find and replace in text file synchronously. */
+export function updateFile(
+  filename: string,
+  find: RegExp,
+  replace: string
+): void {
+  writeFile(filename, readFile(filename).replace(find, replace));
+}
+
 /**
  * Return true if name is a file task name. A task is a file task if its name contains characters
  * that are not alphanumeric, underscore or dash characters.
