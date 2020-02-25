@@ -23,7 +23,7 @@ import { abort } from "./lib/utils.ts";
  * _Shell variables_: A read-only snapshot of the shell environment
  * variables e.g. `env["$HOME"]`.
  */
-const env: Env = { "--targets": [] };
+const env: Env = { "--tasks": [] };
 
 // Copy shell environment variables into Drake environment.
 for (const name of Object.getOwnPropertyNames(Deno.env())) {
@@ -77,30 +77,30 @@ function log(message: string): void {
 }
 
 /**
- * Execute Drake command-line options and target tasks. If `targets` is omitted then the
- * command-line targets are run or the default target is run.
+ * Execute Drake command-line options and tasks. If `names` is omitted then the command-line tasks
+ * are run. If there are no command-line tasks the default task is run.
  */
-async function run(...targets: string[]) {
+async function run(...names: string[]) {
   if (env["--help"] || env["--version"]) {
     return;
   }
-  if (env["--tasks"]) {
+  if (env["--list-tasks"]) {
     taskRegistry.list();
   } else {
-    if (targets.length === 0) {
-      targets = env["--targets"];
-      if (targets.length === 0 && env["--default-target"]) {
-        targets.push(env["--default-target"]);
+    if (names.length === 0) {
+      names = env["--tasks"];
+      if (names.length === 0 && env["--default-task"]) {
+        names.push(env["--default-task"]);
       }
     }
-    if (targets.length === 0) {
-      abort("no target task specified");
+    if (names.length === 0) {
+      abort("no task specified");
     }
-    await taskRegistry.run(targets);
+    await taskRegistry.run(names);
   }
 }
 
-/** Unconditionally execute the target task without its prerequisites. */
-async function execute(target: string) {
-  await taskRegistry.execute(target);
+/** Unconditionally execute the named task without its prerequisites. */
+async function execute(name: string) {
+  await taskRegistry.execute(name);
 }

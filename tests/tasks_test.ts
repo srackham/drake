@@ -4,7 +4,7 @@ import { TaskRegistry } from "../lib/tasks.ts";
 
 Deno.test(
   function resolveActionsTest() {
-    const env: Env = { "--targets": [] };
+    const env: Env = { "--tasks": [] };
     const taskRegistry = new TaskRegistry(env);
 
     taskRegistry.desc("Task 1");
@@ -18,7 +18,7 @@ Deno.test(
 
     assertEquals(taskRegistry.get("1").desc, "Task 1");
     assertEquals(
-      taskRegistry.resolveActions(["1", "3", "2"]).map(task => task.name),
+      taskRegistry.resolveDependencies(["1", "3", "2"]).map(task => task.name),
       ["3", "2", "1"]
     );
   }

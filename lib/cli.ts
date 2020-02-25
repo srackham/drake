@@ -1,7 +1,7 @@
 export { Env, parseArgs };
 import { abort } from "./utils.ts";
 
-type Env = { [name: string]: any; "--targets": string[]; };
+type Env = { [name: string]: any; "--tasks": string[]; };
 
 function parseArgs(args: string[], env: Env): void {
   let arg: string | undefined;
@@ -40,10 +40,10 @@ function parseArgs(args: string[], env: Env): void {
         env["-h"] = true;
         env["--help"] = true;
         break;
-      case "-t":
-      case "--tasks":
-        env["-t"] = true;
-        env["--tasks"] = true;
+      case "-l":
+      case "--list-tasks":
+        env["-l"] = true;
+        env["--list-tasks"] = true;
         break;
       case "-n":
       case "--dry-run":
@@ -59,7 +59,7 @@ function parseArgs(args: string[], env: Env): void {
         env["--version"] = true;
         break;
       default:
-        env["--targets"].push(arg);
+        env["--tasks"].push(arg);
         break;
     }
   }

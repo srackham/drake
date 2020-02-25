@@ -43,8 +43,15 @@ export function updateFile(
 }
 
 /**
- * Return true if name is a file task name. A task is a file task if its name contains characters
- * that are not alphanumeric, underscore or dash characters.
+ * Return true if `name` is a file task name. A task is a file task if its name is a valid file path
+ * name containing one or more characters that are not alphanumeric, underscore or dash characters.
+ * Conversly, any name containing only alphanumeric, underscore or dash characters identifies a
+ * normal (non-file) task. Examples:
+ * 
+ *     isFileTask("lib/io.ts")      // true
+ *     isFileTask("hello-world")    // false
+ *     isFileTask("./hello-world")  // true
+ * 
  */
 export function isFileTask(name: string): boolean {
   return !/^[\w-]+$/.test(name);
@@ -53,6 +60,9 @@ export function isFileTask(name: string): boolean {
 /**
  * The path name is normalized and the relative path names are guaranteed to start with a `.`
  * character (to distinguish them from non-file task names).
+ * 
+ *     normalizePath("hello-world")   // "./hello-world"
+ *     normalizePath("lib/io.ts")     // "./lib/io.ts"
  */
 export function normalizePath(name: string): string {
   name = path.normalize(name);
@@ -64,14 +74,16 @@ export function normalizePath(name: string): string {
   return name;
 }
 
-/** Normalise Drake target name. */
-export function normalizeTarget(name: string): string {
+/** Normalise Drake task name. Throw an error if the name is blank or it contains wildcard
+ * characters.
+ */
+export function normalizeTaskName(name: string): string {
   name = name.trim();
   if (name === "") {
-    abort("blank target name");
+    abort("blank task name");
   }
   if (path.isGlob(name)) {
-    abort(`wildcard target not allowed: ${name}`);
+    abort(`wildcard task name not allowed: ${name}`);
   }
   if (isFileTask(name)) {
     name = normalizePath(name);

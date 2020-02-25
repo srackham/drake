@@ -3,12 +3,13 @@ import { bold, green,
 import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
 import { Env } from "./cli.ts";
 import { abort, isFileTask, normalizePrereqs,
-  normalizeTarget } from "./utils.ts";
+  normalizeTaskName } from "./utils.ts";
 
 export type Action = (this: Task) => any;
 
 /** Drake task. */
 export class Task {
+  /** Unique task name or file path */
   name: string;
   desc: string;
   prereqs: string[];
@@ -16,10 +17,10 @@ export class Task {
 
   /**
    * Create a new task.
-   * Task target `name` and prerequisite names are normalized.
+   * Task name and prerequisite names are normalized.
    */
   constructor(name: string, desc: string, prereqs: string[], action?: Action) {
-    name = normalizeTarget(name);
+    name = normalizeTaskName(name);
     this.name = name;
     this.desc = desc;
     this.prereqs = normalizePrereqs(prereqs);
@@ -82,27 +83,27 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Lookup task by target name.
-   * Throw error if target task does not exist.
+   * Lookup task by task name.
+   * Throw error if task does not exist.
    */
-  get(key: string): Task {
-    key = normalizeTarget(key);
-    if (!this.has(key)) {
-      abort(`missing task: ${key}`);
+  get(name: string): Task {
+    name = normalizeTaskName(name);
+    if (!this.has(name)) {
+      abort(`missing task: ${name}`);
     }
-    return super.get(key) as Task;
+    return super.get(name) as Task;
   }
 
   /**
-   * Lookup task by target name.
+   * Add task to registry.
    * Throw error if task is already registered.
    */
-  set(key: string, value: Task) {
-    key = normalizeTarget(key);
-    if (this.has(key)) {
-      abort(`task already exists: ${key}`);
+  set(name: string, task: Task) {
+    name = normalizeTaskName(name);
+    if (this.has(name)) {
+      abort(`task already exists: ${name}`);
     }
-    return super.set(key, value);
+    return super.set(name, task);
   }
 
   /** Set description of next registered task. */
@@ -122,42 +123,6 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  /**
-   * Recursively expand prerequisites and return a list of prerequisite tasks.
-   * Throw error if non-file task is missing.
-   */
-  private expand(names: string[]): Task[] {
-    let result: Task[] = [];
-    names = names.slice();
-    names.reverse(); // Result maintains the same order as the list of names.
-    for (const name of names) {
-      if (isFileTask(name) && !this.has(name)) {
-        continue; // Ignore prerequisite paths that don't have a task.
-      }
-      const task = this.get(name);
-      result.unshift(task);
-      result = this.resolveActions(task.prereqs).concat(result);
-    }
-    return result;
-  }
-
-  /**
-   * Return a list of tasks and all dependent tasks from the list of task targets.
-   * Ordered in first to last execution order,
-   */
-  resolveActions(names: string[]): Task[] {
-    names = names.map(name => normalizeTarget(name));
-    const result: Task[] = [];
-    for (const task of this.expand(names)) {
-      // Drop downstream dups.
-      if (result.find(t => t.name === task.name)) {
-        continue;
-      }
-      result.push(task);
-    }
-    return result;
-  }
-
   /** Print list of tasks to the console. */
   list(): void {
     const keys = Array.from(this.keys());
@@ -174,9 +139,45 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  /** Run target tasks. */
-  async run(targets: string[]) {
-    const tasks = this.resolveActions(targets);
+  /**
+   * Recursively expand prerequisites and return a list of prerequisite tasks.
+   * Throw error if non-file task is missing.
+   */
+  private expand(names: string[]): Task[] {
+    let result: Task[] = [];
+    names = names.slice();
+    names.reverse(); // Result maintains the same order as the list of names.
+    for (const name of names) {
+      if (isFileTask(name) && !this.has(name)) {
+        continue; // Ignore prerequisite paths that don't have a task.
+      }
+      const task = this.get(name);
+      result.unshift(task);
+      result = this.resolveDependencies(task.prereqs).concat(result);
+    }
+    return result;
+  }
+
+  /**
+   * Return a list of tasks and all dependent tasks from the list of task names.
+   * Ordered in first to last execution order,
+   */
+  resolveDependencies(names: string[]): Task[] {
+    names = names.map(name => normalizeTaskName(name));
+    const result: Task[] = [];
+    for (const task of this.expand(names)) {
+      // Drop downstream dups.
+      if (result.find(t => t.name === task.name)) {
+        continue;
+      }
+      result.push(task);
+    }
+    return result;
+  }
+
+  /** Run tasks and prerequisite tasks in the correct dependency order. */
+  async run(names: string[]) {
+    const tasks = this.resolveDependencies(names);
     this.log(`${green(bold("resolved targets"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
@@ -191,7 +192,7 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Execute named task action function.
+   * Unconditionally execute the task action function. Ignore task prerequisites.
    * Silently return is there is no task action.
    */
   async execute(name: string) {

@@ -1,6 +1,6 @@
 import { desc, env, glob, quote, run, sh, task } from "./mod.ts";
 
-env["--default-target"] = "test";
+env["--default-task"] = "test";
 const SRC_FILES = glob("**/*.ts");
 
 desc("Run tests");
