@@ -43,18 +43,28 @@ export function updateFile(
 }
 
 /**
- * Return true if `name` is a file task name. A task is a file task if its name is a valid file path
- * name containing one or more characters that are not alphanumeric, underscore or dash characters.
- * Conversly, any name containing only alphanumeric, underscore or dash characters identifies a
- * normal (non-file) task. Examples:
+ * Return true if `name` is a normal task name. Normal task names contain one or more alphanumeric,
+ * underscore and hyphen characters and cannot start with a hyphen.
+ *
+ *     isNormalTask("hello-world")    // true
+ *     isNormalTask("io.ts")          // false
+ *     isNormalTask("./hello-world")  // false
+ *
+ */
+export function isNormalTask(name: string): boolean {
+  return /^\w[\w-]*$/.test(name);
+}
+
+/**
+ * Return true if `name` is a file task name. File task names are valid file paths.
  * 
- *     isFileTask("lib/io.ts")      // true
+ *     isFileTask("io.ts")          // true
  *     isFileTask("hello-world")    // false
  *     isFileTask("./hello-world")  // true
  * 
  */
 export function isFileTask(name: string): boolean {
-  return !/^[\w-]+$/.test(name);
+  return !isNormalTask(name);
 }
 
 /**

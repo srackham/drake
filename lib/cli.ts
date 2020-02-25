@@ -59,6 +59,9 @@ function parseArgs(args: string[], env: Env): void {
         env["--version"] = true;
         break;
       default:
+        if (arg.startsWith("-")) {
+          abort(`illegal option: ${arg}`);
+        }
         env["--tasks"].push(arg);
         break;
     }
