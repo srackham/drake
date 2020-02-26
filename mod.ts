@@ -15,20 +15,12 @@ import { abort } from "./lib/utils.ts";
 /**
  * The Drake `env` object contains:
  *
- * _Options_: Mostly command-line options e.g. `env["--dry-run"]`.
+ * _Options_: Command-line options e.g. `env["--dry-run"]`.
  *
  * _Command-line variables_: For example `vers=1.0.1` on the command-line
  * is available as `env["vers"]` and `env.vers`.
- *
- * _Shell variables_: A read-only snapshot of the shell environment
- * variables e.g. `env["$HOME"]`.
  */
 const env: Env = { "--tasks": [] };
-
-// Copy shell environment variables into Drake environment.
-for (const name of Object.getOwnPropertyNames(Deno.env())) {
-  env[`$${name}`] = Deno.env(name);
-}
 
 // Parse command-line options into Drake environment.
 parseArgs(Deno.args.slice(), env);
