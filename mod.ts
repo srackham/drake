@@ -36,6 +36,7 @@ parseArgs(Deno.args.slice(), env);
 if (env["--help"]) {
   help();
 } else if (env["--version"]) {
+  env["--version"] = vers;
   console.log(vers);
 }
 
