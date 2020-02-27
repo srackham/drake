@@ -28,7 +28,7 @@ export function readFile(filename: string): string {
   return new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
 }
 
-/** Write text to a new file with given filename synchronously. */
+/* Write text to a file synchronously. If the file exists it will be overwritten. */
 export function writeFile(filename: string, text: string): void {
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }

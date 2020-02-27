@@ -178,7 +178,7 @@ export class TaskRegistry extends Map<string, Task> {
   /** Run tasks and prerequisite tasks in the correct dependency order. */
   async run(names: string[]) {
     const tasks = this.resolveDependencies(names);
-    this.log(`${green(bold("resolved targets"))}: ${tasks.map(t => t.name)}`);
+    this.log(`${green(bold("task queue"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
       if (!task.action) {

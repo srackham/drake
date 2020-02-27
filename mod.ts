@@ -1,4 +1,5 @@
-const vers = "0.1.0";
+/** The Drake version number. */
+const vers: string = "0.1.0";
 
 // Drake API.
 export { abort, glob, quote, readFile, sh, updateFile,
@@ -13,13 +14,17 @@ import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort } from "./lib/utils.ts";
 
 /**
- * The Drake `env` object contains:
- *
- * _Options_: Command-line options e.g. `env["--dry-run"]`.
- *
- * _Command-line variables_: For example `vers=1.0.1` on the command-line
- * is available as `env["vers"]` and `env.vers`.
- */
+  * The Drake `env` object contains the command-line options, tasks an variables:
+  *
+  * Options are keyed by their long option name e.g.  `env["--dry-run"]`. Unspecified flag options
+  * are undefined; unspecified value options are assigned their default value.
+  *
+  * Tasks names are stored in the `env["--tasks"]` string array. A default task can be specified by
+  * setting `env["--default-task"]` to the task name.
+  *
+  * Variable values are keyed by name. For example `vers=1.0.1` on the command-line is available as
+  * `env["vers"]` and `env.vers`.
+  */
 const env: Env = { "--tasks": [] };
 
 // Parse command-line options into Drake environment.
@@ -28,7 +33,6 @@ parseArgs(Deno.args.slice(), env);
 if (env["--help"]) {
   help();
 } else if (env["--version"]) {
-  env["--version"] = vers;
   console.log(vers);
 }
 
@@ -55,23 +59,34 @@ function desc(description: string): void {
   taskRegistry.desc(description);
 }
 
-/** Create and register a task. */
+/**
+ * Create and register a task.
+ * @param name - A unique task name.
+ * @param prereqs - An array of prerequisite task names i.e. the names of tasks to be run prior to executing the task action function.
+ * @param action - An optional function that is run if the task is selected for execution.
+ */
 function task(
   name: string,
-  prerequisites: string[] = [],
+  prereqs: string[] = [],
   action?: Action
 ): void {
-  taskRegistry.register(name, prerequisites, action);
+  taskRegistry.register(name, prereqs, action);
 }
 
-/** Log a message to the console. Do not log the message if the `--quiet` option is set. */
+/** Log a message to the console. Do not log the message if the `--quiet` command-line option is
+ * set.
+ */
 function log(message: string): void {
   taskRegistry.log(message);
 }
 
 /**
- * Execute Drake command-line options and tasks. If `names` is omitted then the command-line tasks
- * are run. If there are no command-line tasks the default task is run.
+ * Execute named tasks along with their prerequisite tasks (direct and indirect). If no `names` are
+ * specified then the the command-line tasks are run. If no command-line tasks were specified the
+ * default task (set in `env["--default-task"]`) is run.
+ *
+ * Task execution is ordered such that prerequisite tasks are executed prior to parent tasks. The
+ * same task is never run twice.
  */
 async function run(...names: string[]) {
   if (env["--help"] || env["--version"]) {

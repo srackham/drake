@@ -1,4 +1,4 @@
-import { desc, execute, run, sh, task } from "../mod.ts";
+import { desc, env, execute, run, sh, task } from "../mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -10,6 +10,7 @@ task("prereqs", ["noop", "pause"]);
 
 desc("Synchronous task that does nothing");
 task("noop", ["pause"], function() {
+  console.log(env);
   console.log(`${this.desc} executing in ${Deno.cwd()}`);
   console.log(`$HOME=${Deno.env("HOME")}`);
 });
