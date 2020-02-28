@@ -185,6 +185,7 @@ export class TaskRegistry extends Map<string, Task> {
         continue;
       }
       if (!this.env["--always-make"] && task.isUpToDate()) {
+        this.log(yellow(`${task.name} skipped`) + " (up to date)");
         continue;
       }
       await this.execute(task.name);
@@ -214,7 +215,7 @@ export class TaskRegistry extends Map<string, Task> {
           ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
       );
     } else {
-      this.log(green(bold(`${task.name} skipped`)) + " (dry run)");
+      this.log(yellow(`${task.name} skipped`) + " (dry run)");
     }
   }
 }
