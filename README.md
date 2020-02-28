@@ -8,7 +8,7 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 **NOTE**: This is a development release. A production release will
 follow once Deno has reached 1.0.
 
-Tested with Deno 0.34.0
+Tested with Deno 0.34.0 running on Ubuntu 18.04.
 
 
 ## Drakefiles
