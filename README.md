@@ -47,7 +47,7 @@ The `drake` CLI is a thin wrapper for executing a drakefile.
 
 To install the `drake` CLI executable:
 
-    deno install --force -A https://raw.github.com/srackham/drake/master/drake.ts
+    deno install --force -A drake https://raw.github.com/srackham/drake/master/drake.ts
 
 Run it with e.g.
 
