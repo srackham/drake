@@ -1,7 +1,7 @@
 # Drake &mdash; a task runner for Deno
 
-Drake a make-like task runner for [Deno](https://deno.land/) inspired
-by [Make](https://en.wikipedia.org/wiki/Make_(software)),
+Drake is a make-like task runner for [Deno](https://deno.land/)
+inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 [Rake](https://github.com/ruby/rake) and
 [Jake](https://github.com/jakejs/jake).
 
