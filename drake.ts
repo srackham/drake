@@ -8,5 +8,5 @@ if (!env["--help"] && !env["--version"]) {
   if (!existsSync(drakefile) || !Deno.statSync(drakefile).isFile()) {
     abort(`--drakefile missing or not a regular file: ${drakefile}`);
   }
-  import(env["--drakefile"]);
+  import("file://" + env["--drakefile"]);
 }
