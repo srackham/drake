@@ -1,9 +1,15 @@
 # Drake &mdash; a task runner for Deno
 
-Drake is a make-like task runner for [Deno](https://deno.land/)
+Drake is a Make-like task runner for [Deno](https://deno.land/)
 inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 [Rake](https://github.com/ruby/rake) and
 [Jake](https://github.com/jakejs/jake).
+
+- Drakefiles (c.f. Makefiles) are Deno TypeScript modules.
+- Optional task prerequisites (dependencies).
+- File tasks and non-file tasks.
+- Drake API functions for defining, registering and running tasks.
+- `drake` CLI.
 
 **NOTE**: This is a development release. A production release will
 follow once Deno has reached 1.0.
