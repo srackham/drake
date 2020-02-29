@@ -1,5 +1,5 @@
 /** The Drake version number. */
-const vers: string = "0.1.0";
+const vers: string = "0.2.1";
 
 // Drake API.
 export { abort, glob, quote, readFile, sh, updateFile,
