@@ -48,21 +48,6 @@ Here are a couple of real-world examples:
 - https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
 
 
-## drake CLI
-The `drake` CLI is a thin wrapper for executing a drakefile.
-
-To install the `drake` CLI executable:
-
-    deno install --force -A drake https://raw.github.com/srackham/drake/master/drake.ts
-
-Run it with e.g.
-
-    $HOME/.deno/bin/drake --help
-
-The `drake` CLI is handy, but you can also run drakefiles directly
-with the `deno run` command.
-
-
 ## Tasks
 There are two types of task: _Normal tasks_ and _File tasks_.
 
@@ -129,7 +114,21 @@ has even started.
 Of course you are free to run code asynchronously if that makes sense.
 
 
-## Drake man page
+## drake CLI
+The `drake` CLI is a thin wrapper for executing a drakefile.
+
+To install the `drake` CLI executable:
+
+    deno install --force -A drake https://raw.github.com/srackham/drake/master/drake.ts
+
+Run it with e.g.
+
+    $HOME/.deno/bin/drake --help
+
+The `drake` CLI is handy, but you can also run drakefiles directly
+with the `deno run` command.
+
+### drake man page
 ```
 NAME
   drake - a make-like task runner for Deno.
