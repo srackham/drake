@@ -156,9 +156,10 @@ function launch(command: string): Promise<Deno.ProcessStatus> {
 
 /**
  * Execute commands in the command shell.
- * If `commands` is a string execute it.
- * If `commands` is an array of commands execute them in parallel.
- * If any command fails throw an error.
+ * 
+ * - If `commands` is a string execute it.
+ * - If `commands` is an array of commands execute them asynchronously.
+ * - If any command fails throw an error.
  */
 export async function sh(commands: string | string[]) {
   if (typeof commands === "string") {

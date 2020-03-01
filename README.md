@@ -26,7 +26,7 @@ A drakefile is a TypeScript module that:
 
 Example drakefile:
 
-```
+``` typescript
 import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
 
 desc("Minimal Drake task");
@@ -62,8 +62,8 @@ executed if it is out of date i.e. either the task name file does not
 exist or one or more prerequisite files has a more recent modification
 time.
 
-Task names and task prerequisite names are normalized at task
-registration.
+File path task names and file task prerequisite names are normalized
+at task registration.
 
 ### Task properties
 **name**:
@@ -90,7 +90,7 @@ function through the `this` object e.g. `this.prereqs` returns the
 task's prerequisite names array.
 
 
-## Asynchronous task actions
+### Asynchronous task actions
 Normally you will want tasks to execute sequentially i.e. the next
 task should not start until the current task has finished.  To ensure
 this happens action functions that call asynchronous functions should:
@@ -101,7 +101,7 @@ this happens action functions that call asynchronous functions should:
 For example, the following task does not return until the shell
 command has successfully executed:
 
-```
+``` typescript
 task("shell", [], async function() {
   await sh("echo Hello World");
 });
@@ -247,7 +247,7 @@ prior to parent tasks. The same task is never run twice.
 
 Execute commands in the command shell.
 If `commands` is a string execute it.
-If `commands` is an array of commands execute them in parallel.
+If `commands` is an array of commands execute them asynchronously.
 If any command fails throw an error.
 
 ### task
@@ -300,15 +300,15 @@ The Drake version number.
 - The Drake `sh` API can be used to run multi-line template string
   bash scripts e.g.
 
-        await sh(`set -e  # Exit immediately on error.
-            echo Hello World
-            if [ "$EUID" -eq 0 ]; then
-                echo "Running as root"
-            else
-                echo "Running as $USER"
-            fi
-            ls
-            wc Drakefile.ts`);
+      await sh(`set -e  # Exit immediately on error.
+          echo Hello World
+          if [ "$EUID" -eq 0 ]; then
+              echo "Running as root"
+          else
+              echo "Running as $USER"
+          fi
+          ls
+          wc Drakefile.ts`);
 
 - The built-in [Deno API](https://deno.land/typedoc/) has many useful
   functions e.g.
