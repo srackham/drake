@@ -1,7 +1,7 @@
 export { Env, parseArgs };
 import { abort } from "./utils.ts";
 
-type Env = { [name: string]: any; "--tasks": string[]; };
+type Env = { [name: string]: any; "--tasks": string[] };
 
 function parseArgs(args: string[], env: Env): void {
   let arg: string | undefined;

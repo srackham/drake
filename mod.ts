@@ -2,12 +2,19 @@
 const vers: string = "0.2.1";
 
 // Drake API.
-export { abort, glob, quote, readFile, sh, updateFile,
-  writeFile } from "./lib/utils.ts";
+export {
+  abort,
+  glob,
+  quote,
+  readFile,
+  sh,
+  updateFile,
+  writeFile
+} from "./lib/utils.ts";
 export { desc, execute, run, task, log, env, vers };
 
-import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.34.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 import { Env, parseArgs } from "./lib/cli.ts";
 import { help } from "./lib/help.ts";
 import { Action, TaskRegistry } from "./lib/tasks.ts";

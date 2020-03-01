@@ -1,3 +1,4 @@
+// import { desc, env, execute, run, sh, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
 import { desc, env, execute, run, sh, task } from "../mod.ts";
 
 desc("Minimal Drake task");

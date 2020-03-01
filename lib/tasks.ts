@@ -1,9 +1,16 @@
-import { bold, green,
-  yellow } from "https://deno.land/std@v0.34.0/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.34.0/fs/mod.ts";
+import {
+  bold,
+  green,
+  yellow
+} from "https://deno.land/std@v0.35.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import { Env } from "./cli.ts";
-import { abort, isFileTask, normalizePrereqs,
-  normalizeTaskName } from "./utils.ts";
+import {
+  abort,
+  isFileTask,
+  normalizePrereqs,
+  normalizeTaskName
+} from "./utils.ts";
 
 export type Action = (this: Task) => any;
 
