@@ -9,6 +9,7 @@ import { DrakeError } from "../lib/utils.ts";
 Deno.test(
   async function taskRegistryTests() {
     const env: Env = { "--tasks": [] };
+    env["--quiet"] = true;
     const taskRegistry = new TaskRegistry(env);
 
     assertThrows(

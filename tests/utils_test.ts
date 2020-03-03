@@ -126,6 +126,6 @@ Deno.test(
 
 Deno.test(
   async function shTest() {
-    await sh("echo Hello");
+    await sh("echo Hello > /dev/null");
   }
 );
