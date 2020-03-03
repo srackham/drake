@@ -1,13 +1,21 @@
 import {
-  assertEquals
+  assertEquals,
+  assertThrows
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import { Env } from "../lib/cli.ts";
 import { TaskRegistry } from "../lib/tasks.ts";
+import { DrakeError } from "../lib/utils.ts";
 
 Deno.test(
-  function resolveActionsTest() {
+  function taskRegistryTests() {
     const env: Env = { "--tasks": [] };
     const taskRegistry = new TaskRegistry(env);
+
+    assertThrows(
+      () => taskRegistry.get("quux"),
+      DrakeError,
+      "missing task: quux"
+    );
 
     taskRegistry.desc("Task 1");
     taskRegistry.register("1", ["2", "3"], () => {});

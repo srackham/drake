@@ -1,7 +1,7 @@
 import { walkSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 
-class DrakeError extends Error {
+export class DrakeError extends Error {
   constructor(message?: string) {
     super(message);
     this.name = "DrakeError";

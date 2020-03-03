@@ -1,10 +1,11 @@
 import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 import {
-  assert,
-  assertEquals
+  assertEquals,
+  assertThrows
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import {
   abort,
+  DrakeError,
   glob,
   isFileTask,
   isNormalTask,
@@ -17,31 +18,12 @@ import {
   writeFile
 } from "../lib/utils.ts";
 
-function shouldThrow(
-  errName: string,
-  errMsg: string,
-  thrower: () => any
-): boolean {
-  let didThrow = false;
-  try {
-    thrower();
-  } catch (e) {
-    assertEquals(e.name, errName);
-    assertEquals(e.message, errMsg);
-    didThrow = true;
-  }
-  return didThrow;
-}
-
 Deno.test(
   function abortTest() {
-    assert(
-      shouldThrow(
-        "DrakeError",
-        "Abort test",
-        () => abort("Abort test")
-      ),
-      "abort() should throw exception"
+    assertThrows(
+      () => abort("Abort test"),
+      DrakeError,
+      "Abort test"
     );
   }
 );
@@ -122,22 +104,16 @@ Deno.test(
     for (let [name, expected] of tests) {
       assertEquals(normalizeTaskName(name), expected);
     }
-    assert(
-      shouldThrow(
-        "DrakeError",
-        "blank task name",
-        () => normalizeTaskName(" ")
-      ),
-      "blank task name should throw exception"
+    assertThrows(
+      () => normalizeTaskName(" "),
+      DrakeError,
+      "blank task name"
     );
     const name = "**/*.ts";
-    assert(
-      shouldThrow(
-        "DrakeError",
-        `wildcard task name not allowed: ${name}`,
-        () => normalizeTaskName(name)
-      ),
-      "wildcard task name should throw exception"
+    assertThrows(
+      () => normalizeTaskName(name),
+      DrakeError,
+      `wildcard task name not allowed: ${name}`
     );
   }
 );
