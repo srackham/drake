@@ -1,6 +1,7 @@
 import {
   assertEquals,
-  assertThrows
+  assertThrows,
+  assertThrowsAsync
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import { Env } from "../lib/cli.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
@@ -39,5 +40,14 @@ Deno.test(
     );
     await taskRegistry.run("1", "2", "3");
     assertEquals(log, ["3", "2", "1"], "execution log mismatch");
+
+    taskRegistry.desc("Task 4");
+    taskRegistry.register("4", ["4"], action);
+    await assertThrowsAsync(
+      async () => await taskRegistry.run("4"),
+      RangeError,
+      "Maximum call stack size exceeded",
+      "circular dependency should blow stack"
+    );
   }
 );
