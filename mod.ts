@@ -111,7 +111,7 @@ async function run(...names: string[]) {
     if (names.length === 0) {
       abort("no task specified");
     }
-    await taskRegistry.run(names);
+    await taskRegistry.run(...names);
   }
 }
 

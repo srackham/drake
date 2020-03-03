@@ -56,5 +56,3 @@ Deno.test(
     );
   }
 );
-
-await Deno.runTests();

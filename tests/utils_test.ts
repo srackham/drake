@@ -129,5 +129,3 @@ Deno.test(
     await sh("echo Hello");
   }
 );
-
-await Deno.runTests();
