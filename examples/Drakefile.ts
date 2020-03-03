@@ -33,7 +33,9 @@ task("sequential", [], async function() {
 
 desc("Execute multiple shell commands concurrently");
 task("concurrent", [], async function() {
-  await sh(["sleep 1", "sleep 1", "sleep 1"]);
+  await sh(
+    ["echo one && sleep 1", "echo two && sleep 1", "echo three && sleep 1"]
+  );
 });
 
 desc("Execute bash shell script");
@@ -71,6 +73,11 @@ task("shell2", ["shell"], async function() {
 desc("execute noop action function");
 task("execute", [], async function() {
   await execute("noop");
+});
+
+desc("execute actions asynchronously");
+task("async-execute", [], async function() {
+  await execute(["noop", "shell2", "pause", "hello"]);
 });
 
 desc("run noop and shell tasks");

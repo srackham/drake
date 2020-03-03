@@ -200,29 +200,40 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Unconditionally execute the task action function. Ignore task prerequisites.
-   * Silently return is there is no task action.
+   * Unconditionally execute task action functions ignoring task prerequisites.
+   *
+   * - If `names` is a task name string execute the task action.
+   * - If `names` is an array of task names execute their actions asynchronously.
+   * - Silently skip tasks that have no action function.
    */
-  async execute(name: string) {
-    const task = this.get(name);
-    if (!task.action) {
+  async execute(names: string | string[]) {
+    if (typeof names === "string") {
+      names = [names];
+    }
+    names = names.map(name => normalizeTaskName(name));
+    if (this.env["--dry-run"]) {
+      this.log(yellow(`${names} skipped`) + " (dry run)");
       return;
     }
+    this.log(green(bold(`${names} started`)));
     const startTime = new Date().getTime();
-    if (!this.env["--dry-run"]) {
-      this.log(green(bold(`${task.name} started`)));
+    const promises: Promise<any>[] = [];
+    for (const name of names) {
+      const task = this.get(name);
+      if (!task.action) {
+        continue;
+      }
       if (task.action.constructor.name === "AsyncFunction") {
-        await task.action();
+        promises.push(task.action());
       } else {
         task.action();
       }
-      const endTime = new Date().getTime();
-      this.log(
-        green(bold(`${task.name} finished`)) +
-          ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
-      );
-    } else {
-      this.log(yellow(`${task.name} skipped`) + " (dry run)");
     }
+    await Promise.all(promises);
+    const endTime = new Date().getTime();
+    this.log(
+      green(bold(`${names} finished`)) +
+        ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
+    );
   }
 }
