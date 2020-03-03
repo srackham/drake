@@ -1,7 +1,9 @@
 import {
-  assertEquals
+  assertEquals,
+  assertThrows
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import { Env, parseArgs } from "../lib/cli.ts";
+import { DrakeError } from "../lib/utils.ts";
 
 Deno.test(
   function parseArgsTest() {
@@ -16,7 +18,11 @@ Deno.test(
         "task1",
         "qux=42",
         "foo_bar=Foo & Bar",
-        "task2"
+        "task2",
+        "--directory",
+        "tmp",
+        "-f",
+        "foo.ts"
       ],
       env
     );
@@ -30,6 +36,24 @@ Deno.test(
     assertEquals(env["--tasks"][1], "task2");
     assertEquals(env.foo_bar, "Foo & Bar");
     assertEquals(env.qux, "42");
+    assertEquals(env["--directory"], "tmp");
+    assertEquals(env["--drakefile"], "foo.ts");
+
+    assertThrows(
+      () => parseArgs(["-f"], env),
+      DrakeError,
+      "missing --drakefile option value"
+    );
+    assertThrows(
+      () => parseArgs(["-d"], env),
+      DrakeError,
+      "missing --directory option value"
+    );
+    assertThrows(
+      () => parseArgs(["-z"], env),
+      DrakeError,
+      "illegal option: -z"
+    );
   }
 );
 
