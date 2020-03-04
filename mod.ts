@@ -1,5 +1,5 @@
 /** The Drake version number. */
-const vers: string = "0.2.2";
+const vers: string = "0.3.0";
 
 // Drake API.
 export {
@@ -92,8 +92,8 @@ function log(message: string): void {
  * specified then the the command-line tasks are run. If no command-line tasks were specified the
  * default task (set in `env["--default-task"]`) is run.
  *
- * Task execution is ordered such that prerequisite tasks are executed prior to parent tasks. The
- * same task is never run twice.
+ * Task execution is ordered such that prerequisite tasks are executed prior to their parent task.
+ * The same task is never run twice.
  */
 async function run(...names: string[]) {
   if (env["--help"] || env["--version"]) {
