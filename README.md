@@ -111,7 +111,8 @@ Without the `await` operator `sh("echo Hello World")` will return
 immediately and the action function will exit before the shell command
 has even started.
 
-Of course you are free to run code asynchronously if that makes sense.
+Of course you are free to eschew `await` and use the promises
+returned by asynchronous functions in any way that makes sense.
 
 
 ## drake CLI
@@ -188,19 +189,20 @@ Throw `DrakeError` with error message to terminate execution.
 Set description of next registered task.
 
 ### env
-The Drake `env` object contains the command-line options, tasks and
-variables:
+The Drake `env` object stores command-line options, task names and
+variables.
 
 Options are keyed by their long option name e.g.  `env["--dry-run"]`.
 Unspecified flag options are undefined; unspecified value options
-assume their default value.
+are assigned their default value.
 
 Task names are stored in the `env["--tasks"]` string array. A default
 task can be specified by setting `env["--default-task"]` to the task
 name.
 
-Variable values are keyed by name. For example `vers=1.0.1` on the
-command-line is available as `env["vers"]` and `env.vers`.
+Command-line variable values are keyed by name. For example
+`vers=1.0.1` on the command-line is available as `env["vers"]` and
+`env.vers`.
 
 ### execute
 `async function execute(names: string | string[]);`

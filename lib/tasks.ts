@@ -185,7 +185,6 @@ export class TaskRegistry extends Map<string, Task> {
 
   /** Throw error if there are one or more task dependency cycles. */
   checkForCycles(): void {
-    // Contruct tasks directed graph.
     const graph = new Graph();
     for (const task of this.keys()) {
       graph.addNode(task, this.get(task).prereqs.filter(p => this.has(p)));
