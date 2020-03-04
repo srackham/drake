@@ -6,7 +6,7 @@ import { readFile } from "./lib/utils.ts";
 import { abort, desc, env, glob, quote, run, sh, task } from "./mod.ts";
 
 env["--default-task"] = "test";
-const SRC_FILES = glob("**/*.ts");
+const TS_FILES = glob("**/*.ts").filter(p => !p.endsWith(".d.ts"));
 
 desc("Run tests");
 task("test", ["fmt"], async function() {
@@ -15,7 +15,7 @@ task("test", ["fmt"], async function() {
 
 desc("Format source files");
 task("fmt", [], async function() {
-  await sh(`deno fmt ${quote(SRC_FILES)}`);
+  await sh(`deno fmt ${quote(TS_FILES)}`);
 });
 
 desc("Install drake executable CLI wrapper");
