@@ -203,9 +203,13 @@ Variable values are keyed by name. For example `vers=1.0.1` on the
 command-line is available as `env["vers"]` and `env.vers`.
 
 ### execute
-`async function execute(name: string);`
+`async function execute(names: string | string[]);`
 
-Unconditionally execute the named task without its prerequisites.
+Unconditionally execute task action functions ignoring task prerequisites.
+
+- If `names` is a task name string execute the task action.
+- If `names` is an array of task names execute their actions asynchronously.
+- Silently skip tasks that have no action function.
 
 ### glob
 `function glob(...patterns: string[]): string[];`
@@ -240,15 +244,16 @@ are run. If no command-line tasks were specified the default task (set
 in `env["--default-task"]`) is run.
 
 Task execution is ordered such that prerequisite tasks are executed
-prior to parent tasks. The same task is never run twice.
+prior to their parent task. The same task is never run twice.
 
 ### sh
 `async function sh(commands: string | string[]);`
 
 Execute commands in the command shell.
-If `commands` is a string execute it.
-If `commands` is an array of commands execute them asynchronously.
-If any command fails throw an error.
+
+- If `commands` is a string execute it.
+- If `commands` is an array of commands execute them asynchronously.
+- If any command fails throw an error.
 
 ### task
 `function task( name: string, prereqs: string[] = [], action?: Action): void;`
