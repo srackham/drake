@@ -52,7 +52,7 @@ Deno.test(
     files = glob("./lib/*.ts");
     assertEquals(
       files.sort().toString(),
-      ["./lib/tasks.ts", "./lib/help.ts", "./lib/utils.ts", "./lib/cli.ts"]
+      ["./lib/cli.ts,./lib/graph.ts,./lib/help.ts,./lib/tasks.ts,./lib/utils.ts"]
         .sort()
         .toString()
     );

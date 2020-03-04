@@ -5,6 +5,7 @@ import {
 } from "https://deno.land/std@v0.35.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import { Env } from "./cli.ts";
+import { Graph } from "./graph.ts";
 import {
   abort,
   isFileTask,
@@ -182,8 +183,22 @@ export class TaskRegistry extends Map<string, Task> {
     return result;
   }
 
+  /** Throw error if there are one or more task dependency cycles. */
+  checkForCycles(): void {
+    // Contruct tasks directed graph.
+    const graph = new Graph();
+    for (const task of this.keys()) {
+      graph.addNode(task, this.get(task).prereqs.filter(p => this.has(p)));
+    }
+    graph.searchForCycles();
+    if (graph.errors.length > 0) {
+      abort(graph.errors.join(", "));
+    }
+  }
+
   /** Run tasks and prerequisite tasks in the correct dependency order. */
   async run(...names: string[]) {
+    this.checkForCycles();
     const tasks = this.resolveDependencies(names);
     this.log(`${green(bold("task queue"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.

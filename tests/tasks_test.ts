@@ -42,12 +42,13 @@ Deno.test(
     assertEquals(log, ["3", "2", "1"], "execution log mismatch");
 
     taskRegistry.desc("Task 4");
-    taskRegistry.register("4", ["4"], action);
+    taskRegistry.register("4", ["1", "4"], action);
+    taskRegistry.get("2").prereqs.push("4");
     await assertThrowsAsync(
       async () => await taskRegistry.run("4"),
-      RangeError,
-      "Maximum call stack size exceeded",
-      "circular dependency should blow stack"
+      DrakeError,
+      "cyclic dependency between 4 and 1, cyclic dependency between 4 and 4",
+      "cyclic dependency should throw error"
     );
   }
 );
