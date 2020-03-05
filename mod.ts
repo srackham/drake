@@ -34,6 +34,9 @@ import { abort } from "./lib/utils.ts";
   */
 const env: Env = { "--tasks": [] };
 
+/** Global task registry. */
+const taskRegistry = new TaskRegistry(env);
+
 // Parse command-line options into Drake environment.
 parseArgs(Deno.args.slice(), env);
 
@@ -57,9 +60,6 @@ if (env["--directory"]) {
   }
   Deno.chdir(dir);
 }
-
-/** Global task registry. */
-const taskRegistry = new TaskRegistry(env);
 
 /** Set description of next registered task. */
 function desc(description: string): void {
