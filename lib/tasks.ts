@@ -4,11 +4,12 @@ import {
   yellow
 } from "https://deno.land/std@v0.35.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
-import { Env } from "./cli.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
+  env,
   isFileTask,
+  log,
   normalizePrereqs,
   normalizeTaskName
 } from "./utils.ts";
@@ -81,12 +82,10 @@ export class Task {
 
 /** Task registry map. */
 export class TaskRegistry extends Map<string, Task> {
-  env: Env;
   lastDesc: string;
 
-  constructor(env: Env) {
+  constructor() {
     super();
-    this.env = env;
     this.lastDesc = "";
   }
 
@@ -123,12 +122,6 @@ export class TaskRegistry extends Map<string, Task> {
   register(name: string, prereqs: string[], action?: Action): void {
     this.set(name, new Task(name, this.lastDesc, prereqs, action));
     this.lastDesc = ""; // Consume decription.
-  }
-
-  log(message: string): void {
-    if (!this.env["--quiet"]) {
-      console.log(message);
-    }
   }
 
   /** Print list of tasks to the console. */
@@ -199,14 +192,14 @@ export class TaskRegistry extends Map<string, Task> {
   async run(...names: string[]) {
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    this.log(`${green(bold("task queue"))}: ${tasks.map(t => t.name)}`);
+    log(`${green(bold("task queue"))}: ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
       if (!task.action) {
         continue;
       }
-      if (!this.env["--always-make"] && task.isUpToDate()) {
-        this.log(yellow(`${task.name} skipped`) + " (up to date)");
+      if (!env["--always-make"] && task.isUpToDate()) {
+        log(yellow(`${task.name} skipped`) + " (up to date)");
         continue;
       }
       await this.execute(task.name);
@@ -225,11 +218,11 @@ export class TaskRegistry extends Map<string, Task> {
       names = [names];
     }
     names = names.map(name => normalizeTaskName(name));
-    if (this.env["--dry-run"]) {
-      this.log(yellow(`${names} skipped`) + " (dry run)");
+    if (env["--dry-run"]) {
+      log(yellow(`${names} skipped`) + " (dry run)");
       return;
     }
-    this.log(green(bold(`${names} started`)));
+    log(green(bold(`${names} started`)));
     const startTime = new Date().getTime();
     const promises: Promise<any>[] = [];
     for (const name of names) {
@@ -245,7 +238,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
     await Promise.all(promises);
     const endTime = new Date().getTime();
-    this.log(
+    log(
       green(bold(`${names} finished`)) +
         ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
     );

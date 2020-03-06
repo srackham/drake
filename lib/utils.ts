@@ -1,3 +1,4 @@
+import { bold, red } from "https://deno.land/std@v0.35.0/fmt/colors.ts";
 import { walkSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 
@@ -8,9 +9,98 @@ export class DrakeError extends Error {
   }
 }
 
-/** Throw `DrakeError` with error message to terminate execution. */
+type Env = { [name: string]: any; "--tasks": string[] };
+
+/**
+  * The Drake `env` object contains the command-line options, tasks an variables:
+  *
+  * Options are keyed by their long option name e.g.  `env["--dry-run"]`. Unspecified flag options
+  * are undefined; unspecified value options are assigned their default value.
+  *
+  * Tasks names are stored in the `env["--tasks"]` string array. A default task can be specified by
+  * setting `env["--default-task"]` to the task name.
+  *
+  * Variable values are keyed by name. For example `vers=1.0.1` on the command-line is available as
+  * `env["vers"]` and `env.vers`.
+  */
+export const env: Env = { "--tasks": [] };
+
+export function parseEnv(args: string[], env: Env): void {
+  let arg: string | undefined;
+  while (!!(arg = args.shift())) {
+    const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
+    if (match) {
+      env[match[1]] = match[2];
+      continue;
+    }
+    switch (arg) {
+      case "-a":
+      case "--always-make":
+        env["-a"] = true;
+        env["--always-make"] = true;
+        break;
+      case "-d":
+      case "--directory":
+        arg = args.shift();
+        if (arg === undefined) {
+          abort("missing --directory option value");
+        }
+        env["--directory"] = arg;
+        break;
+      case "-f":
+      case "--drakefile":
+        arg = args.shift();
+        if (arg === undefined) {
+          abort("missing --drakefile option value");
+        }
+        env["--drakefile"] = arg;
+        break;
+      case "-h":
+      case "--help":
+        env["--help"] = true;
+        break;
+      case "-l":
+      case "--list-tasks":
+        env["--list-tasks"] = true;
+        break;
+      case "-n":
+      case "--dry-run":
+        env["--dry-run"] = true;
+        break;
+      case "-q":
+      case "--quiet":
+        env["--quiet"] = true;
+        break;
+      case "--version":
+        env["--version"] = true;
+        break;
+      default:
+        if (arg.startsWith("-")) {
+          abort(`illegal option: ${arg}`);
+        }
+        env["--tasks"].push(arg);
+        break;
+    }
+  }
+}
+
+/** Print error message to to stdout and terminate execution. */
 export function abort(message: string): void {
-  throw new DrakeError(message);
+  if (env["--debug"]) {
+    throw new DrakeError(message);
+  } else {
+    console.log(`${red(bold("drake error:"))} ${message}`);
+    Deno.exit(1);
+  }
+}
+
+/**
+ * Log a message to the console. Do not log the message if the `--quiet` command-line option is set.
+ */
+export function log(message: string): void {
+  if (!env["--quiet"]) {
+    console.log(message);
+  }
 }
 
 /**

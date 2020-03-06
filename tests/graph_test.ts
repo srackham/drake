@@ -16,8 +16,8 @@ Deno.test(
     assertEquals(
       g.errors,
       [
-        "cyclic dependency between x and v",
-        "cyclic dependency between z and z"
+        "cyclic dependency between 'x' and 'v'",
+        "cyclic dependency between 'z' and 'z'"
       ]
     );
   }

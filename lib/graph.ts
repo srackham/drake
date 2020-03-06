@@ -36,7 +36,7 @@ export class Graph {
       // Detect cycles.
       if (discovered.has(adjacent)) {
         this.errors.push(
-          `cyclic dependency between ${node} and ${adjacent}`
+          `cyclic dependency between '${node}' and '${adjacent}'`
         );
       }
       // Recurse into DFS tree.

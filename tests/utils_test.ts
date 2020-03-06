@@ -6,6 +6,7 @@ import {
 import {
   abort,
   DrakeError,
+  env,
   glob,
   isFileTask,
   isNormalTask,
@@ -17,6 +18,8 @@ import {
   updateFile,
   writeFile
 } from "../lib/utils.ts";
+
+env["--debug"] = true;
 
 Deno.test(
   function abortTest() {
@@ -52,7 +55,7 @@ Deno.test(
     files = glob("./lib/*.ts");
     assertEquals(
       files.sort().toString(),
-      ["./lib/cli.ts,./lib/graph.ts,./lib/help.ts,./lib/tasks.ts,./lib/utils.ts"]
+      ["./lib/graph.ts,./lib/help.ts,./lib/tasks.ts,./lib/utils.ts"]
         .sort()
         .toString()
     );

@@ -3,15 +3,15 @@ import {
   assertThrows,
   assertThrowsAsync
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
-import { Env } from "../lib/cli.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError } from "../lib/utils.ts";
+import { DrakeError, env } from "../lib/utils.ts";
+
+env["--debug"] = true;
 
 Deno.test(
   async function taskRegistryTests() {
-    const env: Env = { "--tasks": [] };
     env["--quiet"] = true;
-    const taskRegistry = new TaskRegistry(env);
+    const taskRegistry = new TaskRegistry();
 
     assertThrows(
       () => taskRegistry.get("quux"),
@@ -47,7 +47,7 @@ Deno.test(
     await assertThrowsAsync(
       async () => await taskRegistry.run("4"),
       DrakeError,
-      "cyclic dependency between 4 and 1, cyclic dependency between 4 and 4",
+      "cyclic dependency between '4' and '1', cyclic dependency between '4' and '4'",
       "cyclic dependency should throw error"
     );
   }
