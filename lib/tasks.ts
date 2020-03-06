@@ -192,7 +192,7 @@ export class TaskRegistry extends Map<string, Task> {
   async run(...names: string[]) {
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    log(`${green(bold("task queue"))}: ${tasks.map(t => t.name)}`);
+    log(`${green(bold("task queue:"))} ${tasks.map(t => t.name)}`);
     // Run tasks.
     for (const task of tasks) {
       if (!task.action) {

@@ -21,6 +21,10 @@ import {
 
 env["--debug"] = true;
 
+export function touch(path: string): void {
+  Deno.openSync(path, "w");
+}
+
 Deno.test(
   function abortTest() {
     assertThrows(
@@ -49,16 +53,43 @@ Deno.test(
 
 Deno.test(
   function globTest() {
-    let files = glob("mod.ts");
-    assertEquals(files.length, 1);
-    assertEquals(files[0], "./mod.ts");
-    files = glob("./lib/*.ts");
+    let files = glob("./mod.ts", "./lib/*.ts");
     assertEquals(
-      files.sort().toString(),
-      ["./lib/graph.ts,./lib/help.ts,./lib/tasks.ts,./lib/utils.ts"]
-        .sort()
-        .toString()
+      files,
+      ["lib/graph.ts", "lib/help.ts", "lib/tasks.ts", "lib/utils.ts", "mod.ts"]
     );
+    files = glob("./mod.ts", "./lib/!(graph|utils).ts");
+    assertEquals(
+      files,
+      ["lib/help.ts", "lib/tasks.ts", "mod.ts"]
+    );
+    const dir = Deno.makeTempDirSync();
+    try {
+      Deno.mkdirSync(dir + "/a/b", { recursive: true });
+      const fixtures = ["a/b/z.ts", "a/y.ts", "x.ts"].map(f =>
+        path.join(dir, f)
+      );
+      for (const f of fixtures) {
+        touch(f);
+      }
+      files = glob(path.join(dir, "**/*.ts"));
+      assertEquals(files, fixtures);
+      const saved = Deno.cwd();
+      try {
+        Deno.chdir(dir);
+        files = glob("./**/*.ts");
+        assertEquals(files, ["a/b/z.ts", "a/y.ts", "x.ts"]);
+        files = glob("./**/@(x|y).ts");
+        assertEquals(files, ["a/y.ts", "x.ts"]);
+        Deno.chdir("a");
+        files = glob("../**/*.ts");
+        assertEquals(files, ["../a/b/z.ts", "../a/y.ts", "../x.ts"]);
+      } finally {
+        Deno.chdir(saved);
+      }
+    } finally {
+      Deno.removeSync(dir, { recursive: true });
+    }
   }
 );
 

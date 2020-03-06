@@ -214,13 +214,27 @@ export function normalizePrereqs(prereqs: string[]): string[] {
 }
 
 /**
- * Return array of normalized file names matching the glob patterns.
+ * Return a  sorted array of normalized file names matching the wildcard patterns.
+ * Wildcard patterns can include the `**` (globstar) pattern.
  * e.g. `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
  */
 export function glob(...patterns: string[]): string[] {
-  const regexps = patterns.map(pat => path.globToRegExp(path.normalize(pat)));
-  const iter = walkSync(".", { match: regexps, includeDirs: false });
-  return Array.from(iter, info => normalizePath(info.filename));
+  function glob1(pattern: string): string[] {
+    const globOptions = { extended: true, globstar: true };
+    pattern = path.normalizeGlob(pattern, globOptions);
+    let root = path.dirname(pattern);
+    while (root !== "." && path.isGlob(root)) {
+      root = path.dirname(root);
+    }
+    const regexp = path.globToRegExp(pattern, globOptions);
+    const iter = walkSync(root, { match: [regexp], includeDirs: false });
+    return Array.from(iter, info => info.filename);
+  }
+  let result: string[] = [];
+  for (const pattern of patterns) {
+    result = [...result, ...glob1(pattern)];
+  }
+  return [...new Set(result)].sort(); // Drop dups.
 }
 
 /** Start shell command and return status promise. */
@@ -236,7 +250,6 @@ function launch(command: string): Promise<Deno.ProcessStatus> {
   } else {
     args = [shellExe, "-c", command];
   }
-  // create subprocess
   const p = Deno.run({
     args: args,
     stdout: "inherit"
