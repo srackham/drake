@@ -181,7 +181,7 @@ The Drake library module exports the following objects and functions:
 ### abort
 `function abort(message: string): void;`
 
-Throw `DrakeError` with error message to terminate execution.
+Print error message to to stdout and terminate execution.
 
 ### desc
 `function desc(description: string): void;`
@@ -258,15 +258,15 @@ Execute commands in the command shell.
 - If any command fails throw an error.
 
 ### task
-`function task( name: string, prereqs: string[] = [], action?: Action): void;`
+`function task(name: string, prereqs: string[] = [], action?: Action): void;`
 
 Create and register a task.
 
 - `name` is a unique task name.
 - `prereqs` is an array of prerequisite task names i.e. the names of
   tasks to be run prior to executing the task action function.
-- `action` is an optional function that is run if the task is selected
-  for execution.
+- `action` is an optional function (`type Action = (this: Task) =>
+  any;`) that is run if the task is selected for execution.
 
 ### writeFile
 `function writeFile(filename: string, text: string): void;`
