@@ -216,8 +216,9 @@ Unconditionally execute task action functions ignoring task prerequisites.
 ### glob
 `function glob(...patterns: string[]): string[];`
 
-Return array of normalized file names matching the glob patterns.
-e.g. `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
+Return a sorted array of normalized file names matching the wildcard patterns.
+Wildcard patterns can include the `**` (globstar) pattern.
+e.g. `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 
 ### log
 `function log(message: string): void;`
