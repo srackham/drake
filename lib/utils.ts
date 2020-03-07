@@ -158,18 +158,16 @@ export function isFileTask(name: string): boolean {
 }
 
 /**
- * The path name is normalized and the relative path names are guaranteed to start with a `.`
- * character (to distinguish them from non-file task names).
- * 
+ * The path name is normalized and, if necessary, prefixed with a period and path separator to
+ * distinguish it from non-file task name.
+ *
  *     normalizePath("hello-world")   // "./hello-world"
- *     normalizePath("lib/io.ts")     // "./lib/io.ts"
+ *     normalizePath("./lib/io.ts")   // "lib/io.ts"
  */
 export function normalizePath(name: string): string {
   name = path.normalize(name);
-  if (!path.isAbsolute(name)) {
-    if (!name.startsWith(".")) {
-      name = "." + path.sep + name;
-    }
+  if (isNormalTask(name)) {
+    name = "." + path.sep + name;
   }
   return name;
 }
@@ -234,7 +232,8 @@ export function glob(...patterns: string[]): string[] {
   for (const pattern of patterns) {
     result = [...result, ...glob1(pattern)];
   }
-  return [...new Set(result)].sort(); // Drop dups.
+  // Drop dups, normalise and sort paths.
+  return [...new Set(result)].map(p => normalizePath(p)).sort();
 }
 
 /** Start shell command and return status promise. */

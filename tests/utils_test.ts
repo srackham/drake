@@ -67,19 +67,19 @@ Deno.test(
     const dir = Deno.makeTempDirSync();
     try {
       Deno.mkdirSync(dir + "/a/b", { recursive: true });
-      const fixtures = ["a/b/z.ts", "a/y.ts", "x.ts"].map(f =>
+      const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map(f =>
         path.join(dir, f)
       );
       for (const f of fixtures) {
         touch(f);
       }
-      files = glob(path.join(dir, "**/*.ts"));
+      files = glob(dir + "/**/*.ts", dir + "/u");
       assertEquals(files, fixtures);
       const saved = Deno.cwd();
       try {
         Deno.chdir(dir);
-        files = glob("./**/*.ts");
-        assertEquals(files, ["a/b/z.ts", "a/y.ts", "x.ts"]);
+        files = glob("./**/*.ts", "u");
+        assertEquals(files, ["./u", "a/b/z.ts", "a/y.ts", "x.ts"]);
         files = glob("./**/@(x|y).ts");
         assertEquals(files, ["a/y.ts", "x.ts"]);
         Deno.chdir("a");
@@ -119,7 +119,7 @@ Deno.test(
   function normalizePathTest() {
     const tests: [string, string][] = [
       ["foobar", "./foobar"],
-      ["lib/io.ts", "./lib/io.ts"],
+      ["lib/io.ts", "lib/io.ts"],
       ["/tmp//foobar", "/tmp/foobar"],
       ["/tmp/./foobar", "/tmp/foobar"],
       ["/tmp/../foobar", "/foobar"]
@@ -134,7 +134,7 @@ Deno.test(
   function normalizeTaskNameTest() {
     const tests: [string, string][] = [
       [" foobar", "foobar"],
-      ["lib/io.ts", "./lib/io.ts"]
+      ["lib/io.ts", "lib/io.ts"]
     ];
     for (let [name, expected] of tests) {
       assertEquals(normalizeTaskName(name), expected);
@@ -165,8 +165,7 @@ Deno.test(
     await assertThrowsAsync(
       async () => await sh("non-existent-command 2>/dev/null"),
       DrakeError,
-      "sh: non-existent-command 2>/dev/null: error code:",
-      "non-existent shell command throws error"
+      "sh: non-existent-command 2>/dev/null: error code:"
     );
   }
 );
