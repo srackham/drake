@@ -1,7 +1,8 @@
 import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 import {
   assertEquals,
-  assertThrows
+  assertThrows,
+  assertThrowsAsync
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import {
   abort,
@@ -161,5 +162,11 @@ Deno.test(
 Deno.test(
   async function shTest() {
     await sh("echo Hello > /dev/null");
+    await assertThrowsAsync(
+      async () => await sh("non-existent-command 2>/dev/null"),
+      DrakeError,
+      "sh: non-existent-command 2>/dev/null: error code:",
+      "non-existent shell command throws error"
+    );
   }
 );
