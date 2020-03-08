@@ -22,7 +22,7 @@ A drakefile is a TypeScript module that:
 
 1. Imports the Drake module.
 2. Defines and registers tasks.
-3. Runs tasks plus prerequisite tasks.
+3. Runs tasks.
 
 Example drakefile:
 
@@ -61,6 +61,13 @@ A _Normal task_ executes unconditionally.  A _File task_ is only
 executed if it is out of date i.e. either the task name file does not
 exist or one or more prerequisite files has a more recent modification
 time.
+
+If a _File task_ execution error occurs the following precautions are
+taken to ensure the task remains out of date:
+
+- If a new target file has been created then it is deleted.
+- If an existing target file modification date has changed then it is
+  reverted to the prior date.
 
 File path task names and file task prerequisite names are normalized
 at task registration.
@@ -331,6 +338,13 @@ The Drake version number.
   * `\\` translates to `\`
   * `` \` `` translates to `` ` ``
   * `\${` translates to `${` 
+
+- You can use the `utils.ts` module in non-Drakefiles.  The utility
+  functions manifest errors by throwing `DrakeError` exceptions.
+  Useable functions include: `abort`, `glob`, `log`, `quote`,
+  `readFile`, `sh`, `updateFile`, `writeFile`.  For example:
+
+      import { glob, sh } from "https://raw.github.com/srackham/drake/master/lib/utils.ts";
 
 - A drakefile can be run directly with the `deno run` command and can
   also be installed as an executable using the `deno install` command.
