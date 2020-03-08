@@ -32,7 +32,7 @@ export class Graph {
     finished: Set<string>
   ) {
     discovered.add(node);
-    for (let adjacent of (this.nodes.get(node) as string[])) {
+    for (let adjacent of this.nodes.get(node)!) {
       // Detect cycles.
       if (discovered.has(adjacent)) {
         this.errors.push(

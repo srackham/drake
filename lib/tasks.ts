@@ -98,7 +98,7 @@ export class TaskRegistry extends Map<string, Task> {
     if (!this.has(name)) {
       abort(`missing task: ${name}`);
     }
-    return super.get(name) as Task;
+    return super.get(name)!;
   }
 
   /**
