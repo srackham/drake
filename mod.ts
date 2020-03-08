@@ -24,6 +24,8 @@ const vers: string = "0.5.0";
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
 
+env["--abort-exits"] = true;
+
 // Parse command-line options into Drake environment.
 parseEnv(Deno.args.slice(), env);
 

@@ -7,7 +7,6 @@ import {
 import {
   abort,
   DrakeError,
-  env,
   glob,
   isFileTask,
   isNormalTask,
@@ -19,8 +18,6 @@ import {
   updateFile,
   writeFile
 } from "../lib/utils.ts";
-
-env["--debug"] = true;
 
 export function touch(path: string): void {
   Deno.openSync(path, "w");

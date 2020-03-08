@@ -6,8 +6,6 @@ import {
 import { Task, TaskRegistry } from "../lib/tasks.ts";
 import { DrakeError, env } from "../lib/utils.ts";
 
-env["--debug"] = true;
-
 Deno.test(
   async function taskRegistryTests() {
     env["--quiet"] = true;
