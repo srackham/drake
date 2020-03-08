@@ -7,8 +7,10 @@ import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
+  DrakeError,
   env,
   isFileTask,
+  isNormalTask,
   log,
   normalizePrereqs,
   normalizeTaskName
@@ -39,15 +41,15 @@ export class Task {
   }
 
   /**
-   * Return true if the task target file exists and is newer than all prerequisite files
-   * otherwise return false.
-   * 
-   * - Return false if the task is not a file task.
+   * Return true if either the task name file does not exist or one or more prerequisite files has a
+   * more recent modification time. Otherwise return false.
+   *
+   * - Return true if the task is not a file task.
    * - Throw error if any prerequisite path does not exist.
    */
-  isUpToDate(): boolean {
+  isOutOfDate(): boolean {
     if (!isFileTask(this.name)) {
-      return false;
+      return true;
     }
     // Check all prerequisite paths exist.
     for (const name of this.prereqs) {
@@ -61,7 +63,7 @@ export class Task {
       }
     }
     if (!existsSync(this.name)) {
-      return false;
+      return true;
     }
     const targetStat = Deno.statSync(this.name);
     for (const prereq of this.prereqs) {
@@ -72,11 +74,11 @@ export class Task {
       if (!targetStat.modified || !prereqStat.modified) {
         continue;
       }
-      if (targetStat.modified < prereqStat.modified) {
-        return false;
+      if (targetStat.modified <= prereqStat.modified) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 }
 
@@ -193,16 +195,15 @@ export class TaskRegistry extends Map<string, Task> {
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
     log(`${green(bold("task queue:"))} ${tasks.map(t => t.name)}`);
-    // Run tasks.
     for (const task of tasks) {
       if (!task.action) {
         continue;
       }
-      if (!env["--always-make"] && task.isUpToDate()) {
-        log(yellow(`${task.name} skipped`) + " (up to date)");
-        continue;
+      if (isNormalTask(task.name)) {
+        await this.execute(task.name);
+      } else {
+        await this.executeFileTask(task);
       }
-      await this.execute(task.name);
     }
   }
 
@@ -242,5 +243,44 @@ export class TaskRegistry extends Map<string, Task> {
       green(bold(`${names} finished`)) +
         ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
     );
+  }
+
+  /**
+   * Execute file task if it is out of date. If an error occurs the following precautions are taken
+   * to ensure the task remains out of date:
+   *
+   * - If a new target file has been created then it is deleted.
+   * - If an existing target file modification date has changed then it is reverted to the prior
+   *   date.
+   */
+  async executeFileTask(task: Task) {
+    if (!env["--always-make"] && !task.isOutOfDate()) {
+      log(yellow(`${task.name} skipped`) + " (up to date)");
+      return;
+    }
+    const oldInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
+    const savedAbortExits = env["--abort-exits"];
+    env["--abort-exits"] = false;
+    try {
+      await this.execute(task.name);
+    } catch (e) {
+      env["--abort-exits"] = savedAbortExits;
+      const newInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
+      if (!oldInfo && newInfo) {
+        Deno.removeSync(task.name); // Delete newly created target file.
+      } else if (newInfo && oldInfo &&
+        newInfo.modified! > oldInfo.modified!)
+      {
+        // Reset target timestamps to ensure task executes when next run.
+        Deno.utimeSync(task.name, oldInfo.accessed!, oldInfo.modified!);
+      }
+      if (e instanceof DrakeError) {
+        abort(e.message);
+      } else {
+        throw e;
+      }
+    } finally {
+      env["--abort-exits"] = savedAbortExits;
+    }
   }
 }

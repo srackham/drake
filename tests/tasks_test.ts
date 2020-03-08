@@ -1,10 +1,16 @@
+import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
 import {
+  assert,
   assertEquals,
   assertThrows,
   assertThrowsAsync
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
 import { DrakeError, env } from "../lib/utils.ts";
+
+export function touch(path: string): void {
+  Deno.openSync(path, "w");
+}
 
 Deno.test(
   async function taskRegistryTests() {
@@ -48,5 +54,67 @@ Deno.test(
       "cyclic dependency between '4' and '1', cyclic dependency between '4' and '4'",
       "cyclic dependency should throw error"
     );
+  }
+);
+
+Deno.test(
+  async function fileTaskTest() {
+    env["--quiet"] = true;
+    const taskRegistry = new TaskRegistry();
+
+    const target = "./target";
+    const prereq = "./prereq";
+    taskRegistry.register(target, [prereq], function() {
+      touch(target);
+      throw new DrakeError("file task failure");
+    });
+
+    const dir = Deno.makeTempDirSync();
+    const savedCwd = Deno.cwd();
+    try {
+      Deno.chdir(dir);
+      touch(prereq);
+      let didThrow = false;
+      try {
+        await taskRegistry.run(target);
+      } catch (e) {
+        didThrow = true;
+        assertEquals(e.message, "file task failure");
+        assert(existsSync(prereq));
+        assert(!existsSync(target), "target should have been deleted");
+      }
+      assert(didThrow, "should have thrown error");
+
+      touch(target);
+      const info = Deno.statSync(target);
+      didThrow = false;
+      try {
+        await taskRegistry.run(target);
+      } catch (e) {
+        didThrow = true;
+        assertEquals(e.message, "file task failure");
+        assert(existsSync(target));
+        assert(existsSync(prereq));
+        assertEquals(
+          Deno.statSync(target),
+          info,
+          "target timestamps should have been reverted"
+        );
+      }
+      assert(didThrow, "should have thrown error");
+
+      // Bump target timestamps to guarantee the file task is up to date.
+      Deno.utimeSync(target, info.accessed! + 1, info.modified! + 1);
+      didThrow = false;
+      try {
+        await taskRegistry.run(target);
+      } catch (e) {
+        didThrow = true;
+      }
+      assert(!didThrow, "should be up to date and skipped execution");
+    } finally {
+      Deno.chdir(savedCwd);
+      Deno.removeSync(dir, { recursive: true });
+    }
   }
 );
