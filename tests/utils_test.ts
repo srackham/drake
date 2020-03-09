@@ -55,11 +55,12 @@ Deno.test(
     assertEquals(
       files,
       ["lib/graph.ts", "lib/help.ts", "lib/tasks.ts", "lib/utils.ts", "mod.ts"]
+        .map(p => normalizePath(p))
     );
     files = glob("./mod.ts", "./lib/!(graph|utils).ts");
     assertEquals(
       files,
-      ["lib/help.ts", "lib/tasks.ts", "mod.ts"]
+      ["lib/help.ts", "lib/tasks.ts", "mod.ts"].map(p => normalizePath(p))
     );
     const dir = Deno.makeTempDirSync();
     try {
@@ -76,12 +77,18 @@ Deno.test(
       try {
         Deno.chdir(dir);
         files = glob("./**/*.ts", "u");
-        assertEquals(files, ["./u", "a/b/z.ts", "a/y.ts", "x.ts"]);
+        assertEquals(
+          files,
+          ["./u", "a/b/z.ts", "a/y.ts", "x.ts"].map(p => normalizePath(p))
+        );
         files = glob("./**/@(x|y).ts");
-        assertEquals(files, ["a/y.ts", "x.ts"]);
+        assertEquals(files, ["a/y.ts", "x.ts"].map(p => normalizePath(p)));
         Deno.chdir("a");
         files = glob("../**/*.ts");
-        assertEquals(files, ["../a/b/z.ts", "../a/y.ts", "../x.ts"]);
+        assertEquals(
+          files,
+          ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map(p => normalizePath(p))
+        );
       } finally {
         Deno.chdir(saved);
       }
@@ -122,16 +129,16 @@ Deno.test(
       ["/tmp/../foobar", "/foobar"]
     ];
     for (let [name, expected] of tests) {
-      assertEquals(normalizePath(name), expected);
+      assertEquals(normalizePath(name), normalizePath(expected));
     }
   }
 );
 
 Deno.test(
   function normalizeTaskNameTest() {
-    const tests: [string, string][] = [
+    const tests = [
       [" foobar", "foobar"],
-      ["lib/io.ts", "lib/io.ts"]
+      ["lib/io.ts", "lib/io.ts"].map(p => normalizePath(p))
     ];
     for (let [name, expected] of tests) {
       assertEquals(normalizeTaskName(name), expected);
@@ -158,11 +165,11 @@ Deno.test(
 
 Deno.test(
   async function shTest() {
-    await sh("echo Hello > /dev/null");
+    await sh("echo Hello");
     await assertThrowsAsync(
-      async () => await sh("non-existent-command 2>/dev/null"),
+      async () => await sh("non-existent-command"),
       DrakeError,
-      "sh: non-existent-command 2>/dev/null: error code:"
+      "sh: non-existent-command: error code:"
     );
   }
 );
