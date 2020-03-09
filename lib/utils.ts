@@ -256,7 +256,7 @@ export async function sh(commands: string | string[]) {
         { prefix: "drake_", suffix: ".bat" }
       );
       tempFiles.push(cmdFile);
-      writeFile(cmdFile, cmd);
+      writeFile(cmdFile, `@echo off\n${cmd}`);
       args = [cmdFile];
     } else {
       const shellExe = Deno.env("SHELL")!;
