@@ -39,7 +39,7 @@ if (env["--help"]) {
   if (!path.isAbsolute(drakefile)) {
     drakefile = path.join(Deno.cwd(), drakefile);
   }
-  env["--drakefile"] = drakefile;
+  env["--drakefile"] = path.normalize(drakefile);
 
   if (env["--directory"]) {
     const dir = env["--directory"];
