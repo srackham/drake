@@ -190,15 +190,15 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  /** Run tasks and prerequisite tasks in the correct dependency order. */
+  /**
+   * Run tasks and prerequisite tasks in the correct dependency order.
+   * Tasks without an action function are skipped.
+   */
   async run(...names: string[]) {
     this.checkForCycles();
-    const tasks = this.resolveDependencies(names);
+    const tasks = this.resolveDependencies(names).filter(t => t.action);
     log(`${green(bold("task queue:"))} ${tasks.map(t => t.name)}`);
     for (const task of tasks) {
-      if (!task.action) {
-        continue;
-      }
       if (isNormalTask(task.name)) {
         await this.execute(task.name);
       } else {
