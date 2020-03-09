@@ -236,26 +236,6 @@ export function glob(...patterns: string[]): string[] {
   return [...new Set(result)].map(p => normalizePath(p)).sort();
 }
 
-/** Start shell command and return status promise. */
-function launch(command: string): Promise<Deno.ProcessStatus> {
-  let args: string[];
-  const shellVar = Deno.build.os === "win" ? "COMSPEC" : "SHELL";
-  const shellExe = Deno.env(shellVar)!;
-  if (!shellExe) {
-    abort(`cannot locate shell: missing ${shellVar} environment variable`);
-  }
-  if (Deno.build.os === "win") {
-    args = [shellExe, "/C", command];
-  } else {
-    args = [shellExe, "-c", command];
-  }
-  const p = Deno.run({
-    args: args,
-    stdout: "inherit"
-  });
-  return p.status();
-}
-
 /**
  * Execute commands in the command shell.
  * 
@@ -267,11 +247,34 @@ export async function sh(commands: string | string[]) {
   if (typeof commands === "string") {
     commands = [commands];
   }
+  const tempFiles: string[] = [];
   const promises = [];
   for (const cmd of commands) {
-    promises.push(launch(cmd));
+    let args: string[];
+    if (Deno.build.os === "win") {
+      const cmdFile = Deno.makeTempFileSync(
+        { prefix: "drake_", suffix: ".bat" }
+      );
+      tempFiles.push(cmdFile);
+      writeFile(cmdFile, cmd);
+      args = [cmdFile];
+    } else {
+      const shellExe = Deno.env("SHELL")!;
+      if (!shellExe) {
+        abort(`cannot locate shell: missing SHELL environment variable`);
+      }
+      args = [shellExe, "-c", cmd];
+    }
+    const p = Deno.run({
+      args: args,
+      stdout: "inherit"
+    });
+    promises.push(p.status());
   }
   const results = await Promise.all(promises);
+  for (const f of tempFiles) {
+    Deno.removeSync(f);
+  }
   for (const i in results) {
     const cmd = commands[i];
     const code = results[i].code;
