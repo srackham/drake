@@ -35,11 +35,11 @@ if (env["--help"]) {
   console.log(vers);
 } else {
   // Caclulate drakefile path relative to cwd prior to processing --directory option.
-  let drakefile = env["--drakefile"] ? env["--drakefile"] : "./Drakefile.ts";
+  let drakefile = env["--drakefile"] ?? "Drakefile.ts";
   if (!path.isAbsolute(drakefile)) {
     drakefile = path.join(Deno.cwd(), drakefile);
   }
-  env["--drakefile"] = path.normalize(drakefile);
+  env["--drakefile"] = drakefile;
 
   if (env["--directory"]) {
     const dir = env["--directory"];
