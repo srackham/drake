@@ -10,7 +10,7 @@ const TS_FILES = glob("**/*.ts").filter(p => !p.endsWith(".d.ts"));
 
 desc("Run tests");
 task("test", ["fmt"], async function() {
-  await sh("deno test -A tests/*.ts");
+  await sh("deno test -A tests");
 });
 
 desc("Format source files");
