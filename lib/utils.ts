@@ -236,6 +236,25 @@ export function glob(...patterns: string[]): string[] {
   return [...new Set(result)].map(p => normalizePath(p)).sort();
 }
 
+function shArgs(command: string): [string[], string | undefined] {
+  let args: string[];
+  let cmdFile: string | undefined;
+  if (Deno.build.os === "win") {
+    cmdFile = Deno.makeTempFileSync(
+      { prefix: "drake_", suffix: ".bat" }
+    );
+    writeFile(cmdFile, `@echo off\n${command}`);
+    args = [cmdFile];
+  } else {
+    const shellExe = Deno.env("SHELL")!;
+    if (!shellExe) {
+      abort(`cannot locate shell: missing SHELL environment variable`);
+    }
+    args = [shellExe, "-c", command];
+  }
+  return [args, cmdFile];
+}
+
 /**
  * Execute commands in the command shell.
  * 
@@ -251,20 +270,9 @@ export async function sh(commands: string | string[]) {
   const promises = [];
   for (const cmd of commands) {
     let args: string[];
-    if (Deno.build.os === "win") {
-      const cmdFile = Deno.makeTempFileSync(
-        { prefix: "drake_", suffix: ".bat" }
-      );
-      tempFiles.push(cmdFile);
-      writeFile(cmdFile, `@echo off\n${cmd}`);
-      args = [cmdFile];
-    } else {
-      const shellExe = Deno.env("SHELL")!;
-      if (!shellExe) {
-        abort(`cannot locate shell: missing SHELL environment variable`);
-      }
-      args = [shellExe, "-c", cmd];
-    }
+    let cmdFile: string | undefined;
+    [args, cmdFile] = shArgs(cmd);
+    if (cmdFile) tempFiles.push(cmdFile);
     const p = Deno.run({
       args: args,
       stdout: "inherit"
@@ -300,19 +308,7 @@ export type Shout = {
 export async function shio(command: string, stdin?: string) {
   let args: string[];
   let cmdFile: string | undefined;
-  if (Deno.build.os === "win") {
-    cmdFile = Deno.makeTempFileSync(
-      { prefix: "drake_", suffix: ".bat" }
-    );
-    writeFile(cmdFile, `@echo off\n${command}`);
-    args = [cmdFile];
-  } else {
-    const shellExe = Deno.env("SHELL")!;
-    if (!shellExe) {
-      abort(`cannot locate shell: missing SHELL environment variable`);
-    }
-    args = [shellExe, "-c", command];
-  }
+  [args, cmdFile] = shArgs(command);
   const p = Deno.run({
     args: args,
     stdin: stdin !== undefined ? "piped" : undefined,
