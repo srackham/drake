@@ -182,7 +182,7 @@ Deno.test(
   async function shioTest() {
     let { code, stdout, stderr } = await shio("echo Hello");
     assertEquals(code, 0);
-    assertEquals(stdout, "Hello\n");
+    assertEquals(stdout.trimRight(), "Hello");
     assertEquals(stderr, "");
 
     ({ code, stdout, stderr } = await shio("a-nonexistent-command"));
@@ -190,11 +190,10 @@ Deno.test(
     assertEquals(stdout, "");
     assertStrContains(stderr, "a-nonexistent-command");
 
-    const inToOutCmd = Deno.build.os === "win" ? "findstr x*" : "cat";
-    ({ code, stdout, stderr } = await shio(inToOutCmd, "Hello"));
-    console.log(code, stdout, stderr);
+    const cat = Deno.build.os === "win" ? "findstr x*" : "cat";
+    ({ code, stdout, stderr } = await shio(cat, "Hello"));
     assertEquals(code, 0);
-    assertEquals(stdout, "Hello");
+    assertEquals(stdout.trimRight(), "Hello");
     assertStrContains(stderr, "");
   }
 );
