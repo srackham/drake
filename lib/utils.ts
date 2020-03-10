@@ -295,28 +295,37 @@ export async function sh(commands: string | string[]) {
   }
 }
 
-export type Shout = {
+export type ShOutput = {
   code: number | undefined;
   stdout: string;
   stderr: string;
 };
 
+export interface ShCaptureOpts {
+  cwd?: string;
+  env?: { [key: string]: string };
+  stdin?: string;
+}
+
 /**
- * Execute command in the command shell.
- * 
+ * Execute command in the command shell and return a promise for resulting the exit code, stdout and
+ * stderr.
+ *
  */
-export async function shio(command: string, stdin?: string) {
+export async function shCapture(command: string, opts?: ShCaptureOpts): Promise<ShOutput>  {
   let args: string[];
   let cmdFile: string | undefined;
   [args, cmdFile] = shArgs(command);
   const p = Deno.run({
     args: args,
-    stdin: stdin !== undefined ? "piped" : undefined,
+    cwd: opts?.cwd,
+    env: opts?.env,
+    stdin: opts?.stdin !== undefined ? "piped" : undefined,
     stdout: "piped",
     stderr: "piped"
   });
   if (p.stdin) {
-    await p.stdin.write(new TextEncoder().encode(stdin));
+    await p.stdin.write(new TextEncoder().encode(opts?.stdin));
     p.stdin.close();
   }
   const [status, stdout, stderr] = await Promise.all(

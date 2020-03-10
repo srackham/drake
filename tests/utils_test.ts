@@ -17,7 +17,7 @@ import {
   quote,
   readFile,
   sh,
-  shio,
+  shCapture,
   updateFile,
   writeFile
 } from "../lib/utils.ts";
@@ -179,19 +179,19 @@ Deno.test(
 );
 
 Deno.test(
-  async function shioTest() {
-    let { code, stdout, stderr } = await shio("echo Hello");
+  async function shCaptureTest() {
+    let { code, stdout, stderr } = await shCapture("echo Hello");
     assertEquals(code, 0);
     assertEquals(stdout.trimRight(), "Hello");
     assertEquals(stderr, "");
 
-    ({ code, stdout, stderr } = await shio("a-nonexistent-command"));
+    ({ code, stdout, stderr } = await shCapture("a-nonexistent-command"));
     assertNotEquals(code, 0);
     assertEquals(stdout, "");
     assertStrContains(stderr, "a-nonexistent-command");
 
     const cat = Deno.build.os === "win" ? "findstr x*" : "cat";
-    ({ code, stdout, stderr } = await shio(cat, "Hello"));
+    ({ code, stdout, stderr } = await shCapture(cat, { stdin: "Hello" }));
     assertEquals(code, 0);
     assertEquals(stdout.trimRight(), "Hello");
     assertStrContains(stderr, "");
