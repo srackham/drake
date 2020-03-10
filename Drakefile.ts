@@ -38,15 +38,15 @@ task("tag", ["test"], async function() {
   if (!env.vers) {
     abort("'vers' command-line variable not set e.g. drake tag vers=1.0.0");
   }
-  if (!/^\d+\.\d+\.\d+/.test(env.vers!)) {
+  if (!/^\d+\.\d+\.\d+/.test(env.vers)) {
     abort(`illegal semantic version number: ${env.vers}`);
   }
   let match = readFile("mod.ts").match(/^const vers: string = "(.+)"/m);
   if (!match) {
     abort(`missing 'vers' declaration in mod.ts`);
   }
-  if (match![1] !== env.vers) {
-    abort(`${env.vers} does not match version ${match![1]} in mod.ts`);
+  if (match[1] !== env.vers) {
+    abort(`${env.vers} does not match version ${match[1]} in mod.ts`);
   }
   const tag = `v${env.vers}`;
   console.log(`tag: ${tag}`);
