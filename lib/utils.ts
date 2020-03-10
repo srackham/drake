@@ -85,7 +85,7 @@ export function parseEnv(args: string[], env: Env): void {
 }
 
 /** Print error message to to stdout and terminate execution. */
-export function abort(message: string): void {
+export function abort(message: string): never {
   if (env["--abort-exits"]) {
     console.log(`${red(bold("drake error:"))} ${message}`);
     Deno.exit(1);
@@ -285,4 +285,51 @@ export async function sh(commands: string | string[]) {
       abort(`sh: ${cmd}: error code: ${code}`);
     }
   }
+}
+
+export type Shout = {
+  code: number | undefined;
+  stdout: string;
+  stderr: string;
+};
+
+/**
+ * Execute command in the command shell.
+ * 
+ */
+export async function shio(command: string, stdin?: string) {
+  let args: string[];
+  let cmdFile: string | undefined;
+  if (Deno.build.os === "win") {
+    cmdFile = Deno.makeTempFileSync(
+      { prefix: "drake_", suffix: ".bat" }
+    );
+    writeFile(cmdFile, `@echo off\n${command}`);
+    args = [cmdFile];
+  } else {
+    const shellExe = Deno.env("SHELL")!;
+    if (!shellExe) {
+      abort(`cannot locate shell: missing SHELL environment variable`);
+    }
+    args = [shellExe, "-c", command];
+  }
+  const p = Deno.run({
+    args: args,
+    stdin: stdin !== undefined ? "piped" : undefined,
+    stdout: "piped",
+    stderr: "piped"
+  });
+  if (p.stdin) {
+    await p.stdin.write(new TextEncoder().encode(stdin));
+    p.stdin.close();
+  }
+  const [status, stdout, stderr] = await Promise.all(
+    [p.status(), p.output(), p.stderrOutput()]
+  );
+  if (cmdFile) Deno.removeSync(cmdFile);
+  return {
+    code: status.code,
+    stdout: new TextDecoder().decode(stdout),
+    stderr: new TextDecoder().decode(stderr)
+  };
 }

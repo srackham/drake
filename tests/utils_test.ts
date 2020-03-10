@@ -1,6 +1,8 @@
 import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
 import {
   assertEquals,
+  assertNotEquals,
+  assertStrContains,
   assertThrows,
   assertThrowsAsync
 } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
@@ -15,6 +17,7 @@ import {
   quote,
   readFile,
   sh,
+  shio,
   updateFile,
   writeFile
 } from "../lib/utils.ts";
@@ -171,5 +174,27 @@ Deno.test(
       DrakeError,
       "sh: non-existent-command: error code:"
     );
+    await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
+  }
+);
+
+Deno.test(
+  async function shioTest() {
+    let { code, stdout, stderr } = await shio("echo Hello");
+    assertEquals(code, 0);
+    assertEquals(stdout, "Hello\n");
+    assertEquals(stderr, "");
+
+    ({ code, stdout, stderr } = await shio("a-nonexistent-command"));
+    assertNotEquals(code, 0);
+    assertEquals(stdout, "");
+    assertStrContains(stderr, "a-nonexistent-command");
+
+    const inToOutCmd = Deno.build.os === "win" ? "findstr x*" : "cat";
+    ({ code, stdout, stderr } = await shio(inToOutCmd, "Hello"));
+    console.log(code, stdout, stderr);
+    assertEquals(code, 0);
+    assertEquals(stdout, "Hello");
+    assertStrContains(stderr, "");
   }
 );

@@ -7,6 +7,7 @@ export {
   quote,
   readFile,
   sh,
+  shio,
   updateFile,
   writeFile
 } from "./lib/utils.ts";
