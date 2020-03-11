@@ -168,13 +168,16 @@ Deno.test(
 
 Deno.test(
   async function shTest() {
-    await sh("echo Hello");
+    await sh("echo Hello", { stdout: "null" });
     await assertThrowsAsync(
-      async () => await sh("non-existent-command"),
+      async () => await sh("non-existent-command", { stderr: "null" }),
       DrakeError,
       "sh: non-existent-command: error code:"
     );
-    await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
+    await sh(
+      ["echo Hello 1", "echo Hello 2", "echo Hello 3"],
+      { stdout: "null" }
+    );
   }
 );
 

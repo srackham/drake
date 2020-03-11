@@ -255,6 +255,13 @@ function shArgs(command: string): [string[], string | undefined] {
   return [args, cmdFile];
 }
 
+export interface ShOpts {
+  cwd?: string;
+  env?: { [key: string]: string };
+  stdout?: "null";
+  stderr?: "null";
+}
+
 /**
  * Execute commands in the command shell.
  * 
@@ -262,7 +269,7 @@ function shArgs(command: string): [string[], string | undefined] {
  * - If `commands` is an array of commands execute them asynchronously.
  * - If any command fails throw an error.
  */
-export async function sh(commands: string | string[]) {
+export async function sh(commands: string | string[], opts?: ShOpts) {
   if (typeof commands === "string") {
     commands = [commands];
   }
@@ -275,7 +282,10 @@ export async function sh(commands: string | string[]) {
     if (cmdFile) tempFiles.push(cmdFile);
     const p = Deno.run({
       args: args,
-      stdout: "inherit"
+      cwd: opts?.cwd,
+      env: opts?.env,
+      stdout: opts?.stdout ?? "inherit",
+      stderr: opts?.stderr ?? "inherit"
     });
     promises.push(p.status());
   }
@@ -312,7 +322,10 @@ export interface ShCaptureOpts {
  * stderr.
  *
  */
-export async function shCapture(command: string, opts?: ShCaptureOpts): Promise<ShOutput>  {
+export async function shCapture(
+  command: string,
+  opts?: ShCaptureOpts
+): Promise<ShOutput> {
   let args: string[];
   let cmdFile: string | undefined;
   [args, cmdFile] = shArgs(command);
