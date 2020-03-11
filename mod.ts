@@ -72,7 +72,7 @@ function task(
 
 /**
  * Execute named tasks along with their prerequisite tasks (direct and indirect). If no `names` are
- * specified then the the command-line tasks are run. If no command-line tasks were specified the
+ * specified then the command-line tasks are run. If no command-line tasks were specified the
  * default task (set in `env["--default-task"]`) is run.
  *
  * Task execution is ordered such that prerequisite tasks are executed prior to their parent task.

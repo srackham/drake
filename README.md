@@ -249,7 +249,7 @@ Read the entire contents of a file synchronously to a UTF-8 string.
 `async function run(...names: string[]);`
 
 Execute named tasks along with their prerequisite tasks (direct and
-indirect). If no `names` are specified then the the command-line tasks
+indirect). If no `names` are specified then the command-line tasks
 are run. If no command-line tasks were specified the default task (set
 in `env["--default-task"]`) is run.
 
@@ -257,13 +257,38 @@ Task execution is ordered such that prerequisite tasks are executed
 prior to their parent task. The same task is never run twice.
 
 ### sh
-`async function sh(commands: string | string[]);`
+`async function sh(commands: string | string[], opts?: ShOpts);`
 
 Execute commands in the command shell.
 
 - If `commands` is a string execute it.
 - If `commands` is an array of commands execute them asynchronously.
 - If any command fails throw an error.
+- If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are ignored.
+- `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+
+Examples:
+
+``` typescript
+await sh("echo Hello World");
+await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
+await sh("echo Hello World", { stdout: "null" });
+```
+
+### shCapture
+`async function shCapture(command: string, opts?: ShCaptureOpts): Promise<ShOutput>;`
+
+Execute command in the command shell and return a promise for the exit code, stdout and
+stderr.
+
+- If the `opts.stdin` string has been defined then it is piped to the shell stdin.
+- `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+
+Examples:
+
+``` typescript
+const { code, stdout, stderr } = await shCapture("echo Hello"); 
+```
 
 ### task
 `function task(name: string, prereqs: string[] = [], action?: Action): void;`

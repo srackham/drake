@@ -268,6 +268,14 @@ export interface ShOpts {
  * - If `commands` is a string execute it.
  * - If `commands` is an array of commands execute them asynchronously.
  * - If any command fails throw an error.
+ * - If `opts.stdout` or `opts.stderr` is set to "null" then the respective outputs are ignored.
+ * - `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+ * 
+ * Examples:
+ * 
+ *     await sh("echo Hello World");
+ *     await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
+ *     await sh("echo Hello World", { stdout: "null" });
  */
 export async function sh(commands: string | string[], opts?: ShOpts) {
   if (typeof commands === "string") {
@@ -318,9 +326,15 @@ export interface ShCaptureOpts {
 }
 
 /**
- * Execute command in the command shell and return a promise for resulting the exit code, stdout and
+ * Execute command in the command shell and return a promise for the exit code, stdout and
  * stderr.
- *
+ * 
+ * - If the `opts.stdin` string has been defined then it is piped to the shell stdin.
+ * - `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+ * 
+ * Examples:
+ * 
+ *     const { code, stdout, stderr } = await shCapture("echo Hello"); 
  */
 export async function shCapture(
   command: string,
