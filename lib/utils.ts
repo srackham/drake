@@ -258,8 +258,8 @@ function shArgs(command: string): [string[], string | undefined] {
 export interface ShOpts {
   cwd?: string;
   env?: { [key: string]: string };
-  stdout?: "null";
-  stderr?: "null";
+  stdout?: Deno.ProcessStdio;
+  stderr?: Deno.ProcessStdio;
 }
 
 /**
@@ -319,9 +319,7 @@ export type ShOutput = {
   stderr: string;
 };
 
-export interface ShCaptureOpts {
-  cwd?: string;
-  env?: { [key: string]: string };
+export interface ShCaptureOpts extends ShOpts {
   stdin?: string;
 }
 
@@ -348,8 +346,8 @@ export async function shCapture(
     cwd: opts?.cwd,
     env: opts?.env,
     stdin: opts?.stdin !== undefined ? "piped" : undefined,
-    stdout: "piped",
-    stderr: "piped"
+    stdout: opts?.stdout ?? "piped",
+    stderr: opts?.stderr ?? "piped"
   });
   if (p.stdin) {
     await p.stdin.write(new TextEncoder().encode(opts?.stdin));
