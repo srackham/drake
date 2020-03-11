@@ -87,7 +87,7 @@ export function parseEnv(args: string[], env: Env): void {
 /** Print error message to to stdout and terminate execution. */
 export function abort(message: string): never {
   if (env["--abort-exits"]) {
-    console.log(`${red(bold("drake error:"))} ${message}`);
+    console.error(`${red(bold("drake error:"))} ${message}`);
     Deno.exit(1);
   } else {
     throw new DrakeError(message);
