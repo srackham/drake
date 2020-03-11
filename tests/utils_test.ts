@@ -193,10 +193,16 @@ Deno.test(
     assertEquals(stdout, "");
     assertStrContains(stderr, "a-nonexistent-command");
 
-    const cat = Deno.build.os === "win" ? "findstr x*" : "cat";
+    const cat: string = `deno eval "Deno.copy(Deno.stdout, Deno.stdin)"`;
     ({ code, stdout, stderr } = await shCapture(cat, { stdin: "Hello" }));
     assertEquals(code, 0);
-    assertEquals(stdout.trimRight(), "Hello");
-    assertStrContains(stderr, "");
+    assertEquals(stdout, "Hello");
+    assertEquals(stderr, "");
+
+    const text = readFile("Drakefile.ts");
+    ({ code, stdout, stderr } = await shCapture(cat, { stdin: text }));
+    assertEquals(code, 0);
+    assertEquals(stdout, text);
+    assertEquals(stderr, "");
   }
 );
