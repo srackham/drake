@@ -277,7 +277,7 @@ export interface ShOpts {
  *     await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
  *     await sh("echo Hello World", { stdout: "null" });
  */
-export async function sh(commands: string | string[], opts?: ShOpts) {
+export async function sh(commands: string | string[], opts: ShOpts = {}) {
   if (typeof commands === "string") {
     commands = [commands];
   }
@@ -290,10 +290,10 @@ export async function sh(commands: string | string[], opts?: ShOpts) {
     if (cmdFile) tempFiles.push(cmdFile);
     const p = Deno.run({
       args: args,
-      cwd: opts?.cwd,
-      env: opts?.env,
-      stdout: opts?.stdout ?? "inherit",
-      stderr: opts?.stderr ?? "inherit"
+      cwd: opts.cwd,
+      env: opts.env,
+      stdout: opts.stdout ?? "inherit",
+      stderr: opts.stderr ?? "inherit"
     });
     promises.push(p.status());
   }
@@ -336,21 +336,21 @@ export interface ShCaptureOpts extends ShOpts {
  */
 export async function shCapture(
   command: string,
-  opts?: ShCaptureOpts
+  opts: ShCaptureOpts = {}
 ): Promise<ShOutput> {
   let args: string[];
   let cmdFile: string | undefined;
   [args, cmdFile] = shArgs(command);
   const p = Deno.run({
     args: args,
-    cwd: opts?.cwd,
-    env: opts?.env,
-    stdin: opts?.stdin !== undefined ? "piped" : undefined,
-    stdout: opts?.stdout ?? "piped",
-    stderr: opts?.stderr ?? "piped"
+    cwd: opts.cwd,
+    env: opts.env,
+    stdin: opts.stdin !== undefined ? "piped" : undefined,
+    stdout: opts.stdout ?? "piped",
+    stderr: opts.stderr ?? "piped"
   });
   if (p.stdin) {
-    await p.stdin.write(new TextEncoder().encode(opts?.stdin));
+    await p.stdin.write(new TextEncoder().encode(opts.stdin));
     p.stdin.close();
   }
   const [status, stdout, stderr] = await Promise.all(
