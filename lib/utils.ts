@@ -84,7 +84,7 @@ export function parseEnv(args: string[], env: Env): void {
   }
 }
 
-/** Print error message to to stdout and terminate execution. */
+/** Print error message to to `stderr` and terminate execution. */
 export function abort(message: string): never {
   if (env["--abort-exits"]) {
     console.error(`${red(bold("drake error:"))} ${message}`);
@@ -268,8 +268,9 @@ export interface ShOpts {
  * - If `commands` is a string execute it.
  * - If `commands` is an array of commands execute them asynchronously.
  * - If any command fails throw an error.
- * - If `opts.stdout` or `opts.stderr` is set to "null" then the respective outputs are ignored.
- * - `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+ * - If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are ignored.
+ * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
+ * - The `opts.env` mapping passes additional environment variables to the shell.
  * 
  * Examples:
  * 
@@ -327,8 +328,10 @@ export interface ShCaptureOpts extends ShOpts {
  * Execute command in the command shell and return a promise for the exit code, stdout and
  * stderr.
  * 
- * - If the `opts.stdin` string has been defined then it is piped to the shell stdin.
- * - `opts.cwd` and `opts.env` are passed to the `Deno.run` API.
+ * - If the `opts.stdin` string has been assigned then it is piped to the shell `stdin`.
+ * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
+ * - The `opts.env` mapping passes additional environment variables to the shell.
+ * - `opts.stdout` and `opts.stdin` have `Deno.ProcessStdio` semantics and default to `"piped"`.
  * 
  * Examples:
  * 
