@@ -14,7 +14,6 @@ Deno.test(
     );
     assertEquals(code, 0);
     assertEquals(output.trimRight(), vers);
-    assertEquals(error, "");
 
     ({ code, output, error } = await shCapture(
       `${drake} --help`
