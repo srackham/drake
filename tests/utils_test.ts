@@ -204,5 +204,21 @@ Deno.test(
     assertEquals(code, 0);
     assertEquals(stdout, text);
     assertEquals(stderr, "");
+
+    ({ code, stdout, stderr } = await shCapture(
+      `deno eval "console.log(Deno.cwd())"`,
+      { cwd: "lib" }
+    ));
+    assertEquals(code, 0);
+    assertEquals(stdout.trimRight(), path.join(Deno.cwd(), "lib"));
+    assertEquals(stderr, "");
+
+    ({ code, stdout, stderr } = await shCapture(
+      `deno eval "console.log(Deno.env('FOO')+Deno.env('BAR'))"`,
+      { env: { FOO: "foo", BAR: "bar" } }
+    ));
+    assertEquals(code, 0);
+    assertEquals(stdout.trimRight(), "foobar");
+    assertEquals(stderr, "");
   }
 );
