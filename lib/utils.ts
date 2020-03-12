@@ -316,25 +316,26 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
 
 export type ShOutput = {
   code: number | undefined;
-  stdout: string;
-  stderr: string;
+  output: string;
+  error: string;
 };
 
 export interface ShCaptureOpts extends ShOpts {
-  stdin?: string;
+  input?: string;
 }
 
 /**
- * Execute command in the command shell and return a promise for the exit code, stdout and
- * stderr.
- * 
- * - If the `opts.stdin` string has been assigned then it is piped to the shell `stdin`.
- * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
+ * Execute `command` in the command shell and return a promise for the exit `code`, `output` (the
+ * stdout output) and `error` (the stderr output).
+ *
+ * - If the `opts.input` string has been assigned then it is piped to the shell `stdin`.
+ * - `opts.cwd` sets the shell current working directory (defaults to the parent process working
+ *   directory).
  * - The `opts.env` mapping passes additional environment variables to the shell.
- * - `opts.stdout` and `opts.stdin` have `Deno.ProcessStdio` semantics and default to `"piped"`.
- * 
+ * - `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics and default to `"piped"`.
+ *
  * Examples:
- * 
+ *
  *     const { code, stdout, stderr } = await shCapture("echo Hello"); 
  */
 export async function shCapture(
@@ -348,12 +349,12 @@ export async function shCapture(
     args: args,
     cwd: opts.cwd,
     env: opts.env,
-    stdin: opts.stdin !== undefined ? "piped" : undefined,
+    stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
     stderr: opts.stderr ?? "piped"
   });
   if (p.stdin) {
-    await p.stdin.write(new TextEncoder().encode(opts.stdin));
+    await p.stdin.write(new TextEncoder().encode(opts.input));
     p.stdin.close();
   }
   const [status, stdout, stderr] = await Promise.all(
@@ -362,7 +363,7 @@ export async function shCapture(
   if (cmdFile) Deno.removeSync(cmdFile);
   return {
     code: status.code,
-    stdout: new TextDecoder().decode(stdout),
-    stderr: new TextDecoder().decode(stderr)
+    output: new TextDecoder().decode(stdout),
+    error: new TextDecoder().decode(stderr)
   };
 }

@@ -183,42 +183,42 @@ Deno.test(
 
 Deno.test(
   async function shCaptureTest() {
-    let { code, stdout, stderr } = await shCapture("echo Hello");
+    let { code, output, error } = await shCapture("echo Hello");
     assertEquals(code, 0);
-    assertEquals(stdout.trimRight(), "Hello");
-    assertEquals(stderr, "");
+    assertEquals(output.trimRight(), "Hello");
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture("a-nonexistent-command"));
+    ({ code, output, error } = await shCapture("a-nonexistent-command"));
     assertNotEquals(code, 0);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "a-nonexistent-command");
+    assertEquals(output, "");
+    assertStrContains(error, "a-nonexistent-command");
 
     const cat: string = `deno eval "Deno.copy(Deno.stdout, Deno.stdin)"`;
-    ({ code, stdout, stderr } = await shCapture(cat, { stdin: "Hello" }));
+    ({ code, output, error } = await shCapture(cat, { input: "Hello" }));
     assertEquals(code, 0);
-    assertEquals(stdout, "Hello");
-    assertEquals(stderr, "");
+    assertEquals(output, "Hello");
+    assertEquals(error, "");
 
     const text = readFile("Drakefile.ts");
-    ({ code, stdout, stderr } = await shCapture(cat, { stdin: text }));
+    ({ code, output, error } = await shCapture(cat, { input: text }));
     assertEquals(code, 0);
-    assertEquals(stdout, text);
-    assertEquals(stderr, "");
+    assertEquals(output, text);
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture(
+    ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.cwd())"`,
       { cwd: "lib" }
     ));
     assertEquals(code, 0);
-    assertEquals(stdout.trimRight(), path.join(Deno.cwd(), "lib"));
-    assertEquals(stderr, "");
+    assertEquals(output.trimRight(), path.join(Deno.cwd(), "lib"));
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture(
+    ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.env('FOO')+Deno.env('BAR'))"`,
       { env: { FOO: "foo", BAR: "bar" } }
     ));
     assertEquals(code, 0);
-    assertEquals(stdout.trimRight(), "foobar");
-    assertEquals(stderr, "");
+    assertEquals(output.trimRight(), "foobar");
+    assertEquals(error, "");
   }
 );

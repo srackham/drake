@@ -9,51 +9,61 @@ env["--abort-exits"] = false;
 Deno.test(
   async function cliTest() {
     const drake = "deno run -A drake.ts";
-    let { code, stdout, stderr } = await shCapture(`${drake} --version`);
+    let { code, output, error } = await shCapture(
+      `${drake} --version`
+    );
     assertEquals(code, 0);
-    assertEquals(stdout.trimRight(), vers);
-    assertEquals(stderr, "");
+    assertEquals(output.trimRight(), vers);
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture(`${drake} --help`));
+    ({ code, output, error } = await shCapture(
+      `${drake} --help`
+    ));
     assertEquals(code, 0);
-    assertStrContains(stdout, "drake - a make-like task runner for Deno.");
-    assertEquals(stderr, "");
+    assertStrContains(output, "drake - a make-like task runner for Deno.");
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture(
+    ({ code, output, error } = await shCapture(
       `${drake} --list-tasks`,
       { env: { "NO_COLOR": "true" } }
     ));
     assertEquals(code, 0);
-    assertStrContains(stdout, "Push changes to Github [test]");
-    assertEquals(stderr, "");
+    assertStrContains(output, "Push changes to Github [test]");
+    assertEquals(error, "");
 
-    ({ code, stdout, stderr } = await shCapture(`${drake} --foobar`));
+    ({ code, output, error } = await shCapture(
+      `${drake} --foobar`
+    ));
     assertEquals(code, 1);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "illegal option: --foobar");
+    assertEquals(output, "");
+    assertStrContains(error, "illegal option: --foobar");
 
-    ({ code, stdout, stderr } = await shCapture(`${drake} nonexistent-task`));
+    ({ code, output, error } = await shCapture(
+      `${drake} nonexistent-task`
+    ));
     assertEquals(code, 1);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "missing task: nonexistent-task");
+    assertEquals(output, "");
+    assertStrContains(error, "missing task: nonexistent-task");
 
-    ({ code, stdout, stderr } = await shCapture(`${drake} nonexistent-task`));
+    ({ code, output, error } = await shCapture(
+      `${drake} nonexistent-task`
+    ));
     assertEquals(code, 1);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "missing task: nonexistent-task");
+    assertEquals(output, "");
+    assertStrContains(error, "missing task: nonexistent-task");
 
-    ({ code, stdout, stderr } = await shCapture(
+    ({ code, output, error } = await shCapture(
       `${drake} -f missing-drakefile.ts`
     ));
     assertEquals(code, 1);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "--drakefile missing or not a regular file");
+    assertEquals(output, "");
+    assertStrContains(error, "--drakefile missing or not a regular file");
 
-    ({ code, stdout, stderr } = await shCapture(
+    ({ code, output, error } = await shCapture(
       `${drake} -d missing-directory`
     ));
     assertEquals(code, 1);
-    assertEquals(stdout, "");
-    assertStrContains(stderr, "--directory missing or not a directory");
+    assertEquals(output, "");
+    assertStrContains(error, "--directory missing or not a directory");
   }
 );

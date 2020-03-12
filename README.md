@@ -279,18 +279,18 @@ await sh("echo Hello World", { stdout: "null" });
 ### shCapture
 `async function shCapture(command: string, opts: ShCaptureOpts = {}): Promise<ShOutput>;`
 
-Execute command in the command shell and return a promise for the exit code, stdout and
-stderr.
+Execute `command` in the command shell and return a promise for the exit `code`,
+`output` (the stdout output) and `error` (the stderr output).
 
-- If the `opts.stdin` string has been defined then it is piped to the shell `stdin`.
+- If the `opts.input` string has been assigned then it is piped to the shell `stdin`.
 - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
 - The `opts.env` mapping passes additional environment variables to the shell.
-- `opts.stdout` and `opts.stdin` have `Deno.ProcessStdio` semantics and default to `"piped"`.
+- `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics and default to `"piped"`.
 
 Examples:
 
 ``` typescript
-const { code, stdout, stderr } = await shCapture("echo Hello"); 
+const { code, output, error } = await shCapture("echo Hello"); 
 ```
 
 ### task
