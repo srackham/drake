@@ -20,7 +20,7 @@ import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
 /** The Drake version number. */
-const vers: string = "0.7.0";
+const vers: string = "0.8.0";
 
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
