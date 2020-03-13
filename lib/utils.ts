@@ -241,7 +241,7 @@ function shArgs(command: string): [string[], string | undefined] {
   let cmdFile: string | undefined;
   if (Deno.build.os === "win") {
     cmdFile = Deno.makeTempFileSync(
-      { prefix: "drake_", suffix: ".bat" }
+      { prefix: "drake_", suffix: ".cmd" }
     );
     writeFile(cmdFile, `@echo off\n${command}`);
     args = [cmdFile];
