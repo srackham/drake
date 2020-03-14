@@ -1,11 +1,11 @@
-import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
+import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
 import {
   assertEquals,
   assertNotEquals,
   assertStrContains,
   assertThrows,
   assertThrowsAsync
-} from "https://deno.land/std@v0.35.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.36.0/testing/asserts.ts";
 import {
   abort,
   DrakeError,

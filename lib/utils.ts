@@ -1,6 +1,6 @@
-import { bold, red } from "https://deno.land/std@v0.35.0/fmt/colors.ts";
-import { walkSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.35.0/path/mod.ts";
+import { bold, red } from "https://deno.land/std@v0.36.0/fmt/colors.ts";
+import { walkSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {

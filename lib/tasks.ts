@@ -2,8 +2,8 @@ import {
   bold,
   green,
   yellow
-} from "https://deno.land/std@v0.35.0/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.35.0/fs/mod.ts";
+} from "https://deno.land/std@v0.36.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -268,9 +268,10 @@ export class TaskRegistry extends Map<string, Task> {
       const newInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
       if (!oldInfo && newInfo) {
         Deno.removeSync(task.name); // Delete newly created target file.
-      } else if (newInfo && oldInfo &&
-        newInfo.modified! > oldInfo.modified!)
-      {
+      } else if (
+        newInfo && oldInfo &&
+        newInfo.modified! > oldInfo.modified!
+      ) {
         // Reset target timestamps to ensure task executes when next run.
         Deno.utimeSync(task.name, oldInfo.accessed!, oldInfo.modified!);
       }

@@ -1,7 +1,7 @@
 import {
   assertEquals,
   assertStrContains
-} from "https://deno.land/std@v0.35.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.36.0/testing/asserts.ts";
 import { env, shCapture, vers } from "../mod.ts";
 
 env["--abort-exits"] = false;
