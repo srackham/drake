@@ -44,7 +44,11 @@ API executes the tasks that were specified on the command-line along
 with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
-Here are a couple of real-world examples:
+You can either run the drakefile directly with Deno e.g. `deno run -A
+Drakefile.ts` or with the [drake CLI](#drake-cli) e.g. `drake`
+
+    
+Here are a couple of real-world drakefiles:
 
 - https://github.com/srackham/drake/blob/master/Drakefile.ts
 - https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
@@ -343,7 +347,7 @@ The Drake version number.
         await sh(["echo foo", "echo bar"]);
 
 - The Drake `sh` API can be used to run multi-line template string
-  bash scripts e.g.
+  scripts e.g.
 
       await sh(`set -e  # Exit immediately on error.
           echo Hello World
@@ -361,6 +365,7 @@ The Drake version number.
       Deno.mkdirSync(dirname);
       const tempDir= Deno.makeTempDirSync();
       const modTime = Deno.statSync(filename).modified;
+      Deno.copyFileSync(from, to);
 
 - Escape backslash and backtick characters and placeholders in
   template string literals with a backslash:
