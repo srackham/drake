@@ -184,9 +184,7 @@ Deno.test(
 Deno.test(
   async function shCaptureTest() {
     let { code, output, error } = await shCapture("echo Hello");
-    assertEquals(code, 0);
-    assertEquals(output.trimRight(), "Hello");
-    assertEquals(error, "");
+    assertEquals([code, output.trimRight(), error], [0, "Hello", ""]);
 
     ({ code, output, error } = await shCapture("a-nonexistent-command"));
     assertNotEquals(code, 0);
@@ -195,30 +193,40 @@ Deno.test(
 
     const cat: string = `deno eval "Deno.copy(Deno.stdout, Deno.stdin)"`;
     ({ code, output, error } = await shCapture(cat, { input: "Hello" }));
-    assertEquals(code, 0);
-    assertEquals(output, "Hello");
-    assertEquals(error, "");
+    assertEquals([code, output, error], [0, "Hello", ""]);
+
+    ({ code, output, error } = await shCapture(cat, { input: "" }));
+    assertEquals([code, output, error], [0, "", ""]);
 
     const text = readFile("Drakefile.ts");
     ({ code, output, error } = await shCapture(cat, { input: text }));
-    assertEquals(code, 0);
-    assertEquals(output, text);
-    assertEquals(error, "");
+    assertEquals([code, output, error], [0, text, ""]);
 
     ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.cwd())"`,
       { cwd: "lib" }
     ));
-    assertEquals(code, 0);
-    assertEquals(output.trimRight(), path.join(Deno.cwd(), "lib"));
-    assertEquals(error, "");
+    assertEquals(
+      [code, output.trimRight(), error],
+      [0, path.join(Deno.cwd(), "lib"), ""]
+    );
 
     ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.env('FOO')+Deno.env('BAR'))"`,
       { env: { FOO: "foo", BAR: "bar" } }
     ));
-    assertEquals(code, 0);
-    assertEquals(output.trimRight(), "foobar");
-    assertEquals(error, "");
+    assertEquals([code, output.trimRight(), error], [0, "foobar", ""]);
+
+    ({ code, output, error } = await shCapture(
+      "echo Hello",
+      { stdout: "null", stderr: "null" }
+    ));
+    assertEquals([code, output, error], [0, "", ""]);
+
+    ({ code, output, error } = await shCapture(
+      cat,
+      { input: "", stdout: "inherit", stderr: "inherit" }
+    ));
+    assertEquals([code, output, error], [0, "", ""]);
   }
 );

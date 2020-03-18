@@ -358,7 +358,11 @@ export async function shCapture(
     p.stdin.close();
   }
   const [status, stdout, stderr] = await Promise.all(
-    [p.status(), p.output(), p.stderrOutput()]
+    [
+      p.status(),
+      p.stdout ? p.output() : Promise.resolve(new Uint8Array()),
+      p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array())
+    ]
   );
   if (cmdFile) Deno.removeSync(cmdFile);
   return {
