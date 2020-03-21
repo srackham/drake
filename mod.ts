@@ -1,6 +1,7 @@
 // Drake API.
 export {
   abort,
+  DrakeError,
   env,
   glob,
   log,
@@ -8,6 +9,9 @@ export {
   readFile,
   sh,
   shCapture,
+  ShCaptureOpts,
+  ShOpts,
+  ShOutput,
   updateFile,
   writeFile
 } from "./lib/utils.ts";
