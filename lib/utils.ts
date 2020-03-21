@@ -1,5 +1,5 @@
 import { bold, red } from "https://deno.land/std@v0.36.0/fmt/colors.ts";
-import { walkSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
+import { existsSync, walkSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
 
 export class DrakeError extends Error {
@@ -133,6 +133,27 @@ export function updateFile(
   replace: string
 ): void {
   writeFile(filename, readFile(filename).replace(find, replace));
+}
+
+/**
+ * Return `true` if either the target file does not exist or one or more prerequisite files has a
+ * more recent modification time. Otherwise return `false`.
+ */
+export function outOfDate(target: string, prereqs: string[]): boolean {
+  if (!existsSync(target)) {
+    return true;
+  }
+  const targetStat = Deno.statSync(target);
+  for (const prereq of prereqs) {
+    const prereqStat = Deno.statSync(prereq);
+    if (!targetStat.modified || !prereqStat.modified) {
+      continue;
+    }
+    if (targetStat.modified <= prereqStat.modified) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**

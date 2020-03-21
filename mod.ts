@@ -5,6 +5,7 @@ export {
   env,
   glob,
   log,
+  outOfDate,
   quote,
   readFile,
   sh,

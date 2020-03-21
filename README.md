@@ -241,6 +241,13 @@ e.g. `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 Log a message to the console. Do not log the message if the `--quiet`
 command-line option is set.
 
+### outOfDate
+`function outOfDate(target: string, prereqs: string[]): boolean;`
+
+Return `true` if either the target file does not exist or one or more
+prerequisite files has a more recent modification time. Otherwise
+return `false`.
+
 ### quote
 `function quote(values: string[], sep: string = " "): string;`
 
@@ -378,8 +385,9 @@ The Drake version number.
 
 - You can use the `utils.ts` module in non-Drakefiles.  The utility
   functions manifest errors by throwing `DrakeError` exceptions.
-  Useable functions include: `abort`, `glob`, `log`, `quote`,
-  `readFile`, `sh`, `shCapture`, `updateFile`, `writeFile`.  For example:
+  Useable functions include: `abort`, `glob`, `log`, `outOfDate`,
+  `quote`, `readFile`, `sh`, `shCapture`, `updateFile`, `writeFile`.
+  For example:
 
       import { glob, sh } from "https://raw.github.com/srackham/drake/master/lib/utils.ts";
 

@@ -1,5 +1,6 @@
 import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
 import {
+  assert,
   assertEquals,
   assertNotEquals,
   assertStrContains,
@@ -14,6 +15,7 @@ import {
   isNormalTask,
   normalizePath,
   normalizeTaskName,
+  outOfDate,
   quote,
   readFile,
   sh,
@@ -46,6 +48,34 @@ Deno.test(
       assertEquals(readFile(filename), text);
       updateFile(filename, /o/g, "O!");
       assertEquals(readFile(filename), "fO!O!bar");
+    } finally {
+      Deno.removeSync(dir, { recursive: true });
+    }
+  }
+);
+
+Deno.test(
+  function outOfDateTest() {
+    const dir = Deno.makeTempDirSync();
+    try {
+      Deno.mkdirSync(dir + "/a/b", { recursive: true });
+      const prereqs = ["a/b/z.ts", "a/y.ts", "u", "target.ts"].map(f =>
+        path.join(dir, f)
+      );
+      for (const f of prereqs) {
+        touch(f);
+      }
+      const target = prereqs.pop()!;
+      const info = Deno.statSync(target);
+      // Reduce target timestamps to guarantee out of date.
+      Deno.utimeSync(target, info.accessed! - 10, info.modified! - 10);
+      assert(outOfDate(target, prereqs));
+      // Bump target timestamps to guarantee up to date.
+      Deno.utimeSync(target, info.accessed! + 20, info.modified! + 20);
+      assert(!outOfDate(target, prereqs));
+      // Delete target to guarantee out of date.
+      Deno.removeSync(target);
+      assert(outOfDate(target, prereqs));
     } finally {
       Deno.removeSync(dir, { recursive: true });
     }

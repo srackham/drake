@@ -13,7 +13,8 @@ import {
   isNormalTask,
   log,
   normalizePrereqs,
-  normalizeTaskName
+  normalizeTaskName,
+  outOfDate
 } from "./utils.ts";
 
 export type Action = (this: Task) => any;
@@ -51,6 +52,7 @@ export class Task {
     if (!isFileTask(this.name)) {
       return true;
     }
+    const prereqs: string[] = [];
     // Check all prerequisite paths exist.
     for (const prereq of this.prereqs) {
       if (!isFileTask(prereq)) {
@@ -65,24 +67,9 @@ export class Task {
           `task: ${this.name}: missing prerequisite path: ${prereq}`
         );
       }
+      prereqs.push(prereq);
     }
-    if (!existsSync(this.name)) {
-      return true;
-    }
-    const targetStat = Deno.statSync(this.name);
-    for (const prereq of this.prereqs) {
-      if (!isFileTask(prereq)) {
-        continue;
-      }
-      const prereqStat = Deno.statSync(prereq);
-      if (!targetStat.modified || !prereqStat.modified) {
-        continue;
-      }
-      if (targetStat.modified <= prereqStat.modified) {
-        return true;
-      }
-    }
-    return false;
+    return outOfDate(this.name, prereqs);
   }
 }
 
