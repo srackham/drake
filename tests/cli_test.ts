@@ -27,6 +27,14 @@ Deno.test(
       { env: { "NO_COLOR": "true" } }
     ));
     assertEquals(code, 0);
+    assertStrContains(output, "Push changes to Github");
+    assertEquals(error, "");
+
+    ({ code, output, error } = await shCapture(
+      `${drake} -L`,
+      { env: { "NO_COLOR": "true" } }
+    ));
+    assertEquals(code, 0);
     assertStrContains(output, "Push changes to Github [test]");
     assertEquals(error, "");
 

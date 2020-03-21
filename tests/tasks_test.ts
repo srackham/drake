@@ -45,6 +45,28 @@ Deno.test(
     await taskRegistry.run("1", "2", "3");
     assertEquals(log, ["3", "2", "1"], "execution log mismatch");
 
+    assertEquals(
+      taskRegistry.list().map(s => s.slice(-6)),
+      ["Task 1", "Task 2", "Task 3"],
+      "task list should have descriptions"
+    );
+    taskRegistry.get("2").desc = "";
+    assertEquals(
+      taskRegistry.list().map(s => s.slice(-6)),
+      ["Task 1", "Task 3"],
+      "hidden tasks are not listed"
+    );
+    env["--list-all"] = true;
+    try {
+      assertEquals(
+        taskRegistry.list().length,
+        3,
+        "--list-all lists hidden tasks"
+      );
+    } finally {
+      env["--list-all"] = undefined;
+    }
+
     taskRegistry.desc("Task 4");
     taskRegistry.register("4", ["1", "4"], action);
     taskRegistry.get("2").prereqs.push("4");

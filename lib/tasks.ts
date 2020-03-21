@@ -130,20 +130,30 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = ""; // Consume decription.
   }
 
-  /** Print list of tasks to the console. */
-  list(): void {
-    const keys = Array.from(this.keys());
+  /** Create a prinable list of tasks. */
+  list(): string[] {
+    let keys = Array.from(this.keys());
+    if (!env["--list-all"]) {
+      keys = keys.filter(k => this.get(k).desc); // Drop "hidden" tasks.
+    }
     const maxLen = keys.reduce(function(a, b) {
       return a.length > b.length ? a : b;
     }).length;
+    const result: string[] = [];
     for (const k of keys.sort()) {
       const task = this.get(k);
-      console.log(
-        `${green(bold(task.name.padEnd(maxLen)))} ${task.desc} ${yellow(
-          `[${task.prereqs}]`
-        )}`
-      );
+      let msg = task.name.padEnd(maxLen);
+      if (task.desc) {
+        msg = `${green(bold(msg))} ${task.desc}`;
+      } else {
+        msg = green(msg);
+      }
+      if (env["--list-all"]) {
+        msg += ` ${yellow(`[${task.prereqs}]`)}`;
+      }
+      result.push(msg);
     }
+    return result;
   }
 
   /**

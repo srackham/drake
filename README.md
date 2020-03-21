@@ -166,7 +166,7 @@ OPTIONS
   -d, --directory DIR   Change to directory DIR before running drakefile.
   -f, --drakefile FILE  Use FILE as drakefile (default: './Drakefile.ts').
   -h, --help            Display this help message.
-  -l, --list-tasks      Display task names, descriptions and prerequisites.
+  -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.
   -q, --quiet           Do not log drake messages to standard output.
   --version             Display the drake version.
@@ -199,7 +199,9 @@ Print error message to to `stdout` and terminate execution.
 ### desc
 `function desc(description: string): void;`
 
-Set description of next registered task.
+Set description of next registered task. If a task has no description
+then it won't be displayed in the CLI tasks list unless the `-L`
+option is used.
 
 ### env
 The Drake `env` object stores command-line options, task names and

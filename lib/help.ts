@@ -27,7 +27,7 @@ OPTIONS
   -d, --directory DIR   Change to directory DIR before running drakefile.
   -f, --drakefile FILE  Use FILE as drakefile (default: './Drakefile.ts').
   -h, --help            Display this help message.
-  -l, --list-tasks      Display task names, descriptions and prerequisites.
+  -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.
   -q, --quiet           Do not log drake messages to standard output.
   --version             Display the drake version.

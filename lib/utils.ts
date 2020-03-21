@@ -63,6 +63,9 @@ export function parseEnv(args: string[], env: Env): void {
       case "--list-tasks":
         env["--list-tasks"] = true;
         break;
+      case "-L":
+        env["--list-all"] = true;
+        break;
       case "-n":
       case "--dry-run":
         env["--dry-run"] = true;

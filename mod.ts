@@ -86,8 +86,8 @@ async function run(...names: string[]) {
   if (env["--help"] || env["--version"]) {
     return;
   }
-  if (env["--list-tasks"]) {
-    taskRegistry.list();
+  if (env["--list-tasks"] || env["--list-all"]) {
+    taskRegistry.list().forEach(t => console.log(t));
   } else {
     if (names.length === 0) {
       names = env["--tasks"];
