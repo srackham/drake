@@ -112,6 +112,22 @@ Deno.test(
         didThrow = true;
       }
       assert(!didThrow, "should be up to date and skipped execution");
+
+      Deno.removeSync(prereq);
+      await assertThrowsAsync(
+        async () => await taskRegistry.run(target),
+        DrakeError,
+        "task: ./target: missing prerequisite path: ./prereq",
+        "missing prerequisite file should throw error"
+      );
+
+      env["--dry-run"] = true;
+      try {
+        // Missing prerequisite should not throw error if --dry-run.
+        await taskRegistry.run(target);
+      } finally {
+        env["--dry-run"] = undefined;
+      }
     } finally {
       Deno.chdir(savedCwd);
       Deno.removeSync(dir, { recursive: true });

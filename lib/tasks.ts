@@ -52,13 +52,17 @@ export class Task {
       return true;
     }
     // Check all prerequisite paths exist.
-    for (const name of this.prereqs) {
-      if (!isFileTask(name)) {
+    for (const prereq of this.prereqs) {
+      if (!isFileTask(prereq)) {
         continue;
       }
-      if (!existsSync(name)) {
+      if (!existsSync(prereq)) {
+        if (env["--dry-run"]) {
+          // Assume the missing prerequisite would have been created thus rendering the target out of date.
+          return true;
+        }
         abort(
-          `task: ${this.name}: missing prerequisite path: ${name}`
+          `task: ${this.name}: missing prerequisite path: ${prereq}`
         );
       }
     }
