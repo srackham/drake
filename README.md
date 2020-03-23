@@ -244,9 +244,9 @@ command-line option is set.
 ### outOfDate
 `function outOfDate(target: string, prereqs: string[]): boolean;`
 
-Return `true` if either the target file does not exist or one or more
-prerequisite files has a more recent modification time. Otherwise
-return `false`.
+Return `true` if either the target file does not exist or its
+modification time is older then one or more prerequisite files.
+Otherwise return `false`.
 
 ### quote
 `function quote(values: string[], sep: string = " "): string;`

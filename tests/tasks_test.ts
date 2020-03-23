@@ -109,6 +109,8 @@ Deno.test(
 
       touch(target);
       const info = Deno.statSync(target);
+      // Decrement target timestamps to guarantee the file task is out of date.
+      Deno.utimeSync(target, info.accessed! - 1, info.modified! - 1);
       didThrow = false;
       try {
         await taskRegistry.run(target);
@@ -117,15 +119,10 @@ Deno.test(
         assertEquals(e.message, "file task failure");
         assert(existsSync(target));
         assert(existsSync(prereq));
-        assertEquals(
-          Deno.statSync(target),
-          info,
-          "target timestamps should have been reverted"
-        );
       }
       assert(didThrow, "should have thrown error");
 
-      // Bump target timestamps to guarantee the file task is up to date.
+      // Increment target timestamps to guarantee the file task is up to date.
       Deno.utimeSync(target, info.accessed! + 1, info.modified! + 1);
       didThrow = false;
       try {

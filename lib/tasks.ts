@@ -42,8 +42,8 @@ export class Task {
   }
 
   /**
-   * Return true if either the task name file does not exist or one or more prerequisite files has a
-   * more recent modification time. Otherwise return false.
+   * Return `true` if either the task name file does not exist or its modification time is older
+   * then one or more prerequisite files. Otherwise return `false`.
    *
    * - Return true if the task is not a file task.
    * - Throw error if any prerequisite path does not exist.

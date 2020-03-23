@@ -136,8 +136,8 @@ export function updateFile(
 }
 
 /**
- * Return `true` if either the target file does not exist or one or more prerequisite files has a
- * more recent modification time. Otherwise return `false`.
+ * Return `true` if either the target file does not exist or its modification time is older then one
+ * or more prerequisite files. Otherwise return `false`.
  */
 export function outOfDate(target: string, prereqs: string[]): boolean {
   if (!existsSync(target)) {
@@ -149,7 +149,7 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
     if (!targetStat.modified || !prereqStat.modified) {
       continue;
     }
-    if (targetStat.modified <= prereqStat.modified) {
+    if (targetStat.modified < prereqStat.modified) {
       return true;
     }
   }
