@@ -1,6 +1,7 @@
 import {
   bold,
   green,
+  underline,
   yellow
 } from "https://deno.land/std@v0.36.0/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
@@ -129,7 +130,12 @@ export class TaskRegistry extends Map<string, Task> {
     const result: string[] = [];
     for (const k of keys.sort()) {
       const task = this.get(k);
-      let msg = task.name.padEnd(maxLen);
+      const padding = " ".repeat(maxLen - k.length);
+      let msg = k;
+      if (k === env["--default-task"]) {
+        msg = underline(msg);
+      }
+      msg += padding;
       if (task.desc) {
         msg = `${green(bold(msg))} ${task.desc}`;
       } else {
