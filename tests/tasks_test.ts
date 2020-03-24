@@ -6,11 +6,7 @@ import {
   assertThrowsAsync
 } from "https://deno.land/std@v0.36.0/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env } from "../lib/utils.ts";
-
-export function touch(path: string): void {
-  Deno.openSync(path, "w");
-}
+import { DrakeError, env, touch } from "../lib/utils.ts";
 
 Deno.test(
   async function taskRegistryTests() {

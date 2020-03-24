@@ -1,3 +1,4 @@
+import { existsSync } from "https://deno.land/std@v0.36.0/fs/exists.ts";
 import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
 import {
   assert,
@@ -20,14 +21,10 @@ import {
   readFile,
   sh,
   shCapture,
+  touch,
   updateFile,
   writeFile
 } from "../lib/utils.ts";
-
-export function touch(path: string): void {
-  Deno.openSync(path, "w");
-}
-
 Deno.test(
   function abortTest() {
     assertThrows(
@@ -39,15 +36,19 @@ Deno.test(
 );
 
 Deno.test(
-  function fileTest() {
+  function fileReadWriteUpdateTest() {
     const dir = Deno.makeTempDirSync();
     try {
-      const filename = path.join(dir, "fileTest");
+      let file = path.join(dir, "fileTest");
       const text = "foobar";
-      writeFile(filename, text);
-      assertEquals(readFile(filename), text);
-      updateFile(filename, /o/g, "O!");
-      assertEquals(readFile(filename), "fO!O!bar");
+      writeFile(file, text);
+      assertEquals(readFile(file), text);
+      updateFile(file, /o/g, "O!");
+      assertEquals(readFile(file), "fO!O!bar");
+      file = path.join(dir, "a/b/foobar");
+      touch(file);
+      assert(existsSync(file), "touched file should exist");
+      const info = Deno.statSync(file);
     } finally {
       Deno.removeSync(dir, { recursive: true });
     }
@@ -58,13 +59,10 @@ Deno.test(
   function outOfDateTest() {
     const dir = Deno.makeTempDirSync();
     try {
-      Deno.mkdirSync(dir + "/a/b", { recursive: true });
       const prereqs = ["a/b/z.ts", "a/y.ts", "u", "target.ts"].map(f =>
         path.join(dir, f)
       );
-      for (const f of prereqs) {
-        touch(f);
-      }
+      touch(...prereqs);
       const target = prereqs.pop()!;
       const info = Deno.statSync(target);
       // Reduce target timestamps to guarantee out of date.

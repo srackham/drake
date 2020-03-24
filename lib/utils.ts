@@ -136,6 +136,21 @@ export function updateFile(
 }
 
 /**
+ * Update the modification time of each file to the current time.
+ * If a file does not exist then create a zero length file.
+ * Missing parent directory paths are also created.
+ */
+export function touch(...files: string[]): void {
+  for (const file of files) {
+    const dir = path.dirname(file);
+    if (!existsSync(dir)) {
+      Deno.mkdirSync(dir, { recursive: true });
+    }
+    Deno.openSync(file, "w");
+  }
+}
+
+/**
  * Return `true` if either the target file does not exist or its modification time is older then one
  * or more prerequisite files. Otherwise return `false`.
  */

@@ -64,9 +64,9 @@ valid file paths. In cases of ambiguity a _File task_ name should be
 prefixed with a period and a path separator e.g. `./hello-world`.
 
 A _Normal task_ executes unconditionally.  A _File task_ is only
-executed if it is out of date i.e. either the task name file does not
-exist or one or more prerequisite files has a more recent modification
-time.
+executed if it is out of date i.e. immediately prior to  execution
+either the task name file path does not exist or one or more
+prerequisite files has a more recent modification time.
 
 If a _File task_ execution error occurs the following precautions are
 taken to ensure the task remains out of date:
@@ -319,6 +319,13 @@ Create and register a task.
 - `action` is an optional function (`type Action = (this: Task) =>
   any;`) that is run if the task is selected for execution.
 
+### touch
+`function touch(...files: string[]): void;`
+
+Update the modification time of each file to the current time.
+If a file does not exist then create a zero length file.
+Missing parent directory paths are also created.
+
 ### writeFile
 `function writeFile(filename: string, text: string): void;`
 
@@ -386,8 +393,8 @@ The Drake version number.
 - You can use the `utils.ts` module in non-Drakefiles.  The utility
   functions manifest errors by throwing `DrakeError` exceptions.
   Useable functions include: `abort`, `glob`, `log`, `outOfDate`,
-  `quote`, `readFile`, `sh`, `shCapture`, `updateFile`, `writeFile`.
-  For example:
+  `quote`, `readFile`, `sh`, `shCapture`, `touch`, `updateFile`,
+  `writeFile`.  For example:
 
       import { glob, sh } from "https://raw.github.com/srackham/drake/master/lib/utils.ts";
 

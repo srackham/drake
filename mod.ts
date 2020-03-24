@@ -13,6 +13,7 @@ export {
   ShCaptureOpts,
   ShOpts,
   ShOutput,
+  touch,
   updateFile,
   writeFile
 } from "./lib/utils.ts";
