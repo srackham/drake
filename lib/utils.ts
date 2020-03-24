@@ -1,6 +1,6 @@
-import { bold, red } from "https://deno.land/std@v0.36.0/fmt/colors.ts";
-import { existsSync, walkSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
+import { bold, red } from "https://deno.land/std@v0.37.1/fmt/colors.ts";
+import { existsSync, walkSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -146,7 +146,7 @@ export function touch(...files: string[]): void {
     if (!existsSync(dir)) {
       Deno.mkdirSync(dir, { recursive: true });
     }
-    Deno.openSync(file, "w");
+    Deno.openSync(file, "w").close();
   }
 }
 
@@ -276,22 +276,22 @@ export function glob(...patterns: string[]): string[] {
 }
 
 function shArgs(command: string): [string[], string | undefined] {
-  let args: string[];
+  let cmdArgs: string[];
   let cmdFile: string | undefined;
   if (Deno.build.os === "win") {
     cmdFile = Deno.makeTempFileSync(
       { prefix: "drake_", suffix: ".cmd" }
     );
     writeFile(cmdFile, `@echo off\n${command}`);
-    args = [cmdFile];
+    cmdArgs = [cmdFile];
   } else {
     const shellExe = Deno.env("SHELL")!;
     if (!shellExe) {
       abort(`cannot locate shell: missing SHELL environment variable`);
     }
-    args = [shellExe, "-c", command];
+    cmdArgs = [shellExe, "-c", command];
   }
-  return [args, cmdFile];
+  return [cmdArgs, cmdFile];
 }
 
 export interface ShOpts {
@@ -322,22 +322,29 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
     commands = [commands];
   }
   const tempFiles: string[] = [];
-  const promises = [];
-  for (const cmd of commands) {
-    let args: string[];
-    let cmdFile: string | undefined;
-    [args, cmdFile] = shArgs(cmd);
-    if (cmdFile) tempFiles.push(cmdFile);
-    const p = Deno.run({
-      args: args,
-      cwd: opts.cwd,
-      env: opts.env,
-      stdout: opts.stdout ?? "inherit",
-      stderr: opts.stderr ?? "inherit"
-    });
-    promises.push(p.status());
+  const processes: Deno.Process[] = [];
+  const results: Deno.ProcessStatus[] = [];
+  try {
+    for (const cmd of commands) {
+      let cmdArgs: string[];
+      let cmdFile: string | undefined;
+      [cmdArgs, cmdFile] = shArgs(cmd);
+      if (cmdFile) tempFiles.push(cmdFile);
+      const p = Deno.run({
+        cmd: cmdArgs,
+        cwd: opts.cwd,
+        env: opts.env,
+        stdout: opts.stdout ?? "inherit",
+        stderr: opts.stderr ?? "inherit"
+      });
+      processes.push(p);
+    }
+    results.push(...await Promise.all(processes.map(p => p.status())));
+  } finally {
+    for (const p of processes) {
+      p.close();
+    }
   }
-  const results = await Promise.all(promises);
   for (const f of tempFiles) {
     Deno.removeSync(f);
   }
@@ -381,32 +388,38 @@ export async function shCapture(
   command: string,
   opts: ShCaptureOpts = {}
 ): Promise<ShOutput> {
-  let args: string[];
+  let cmdArgs: string[];
   let cmdFile: string | undefined;
-  [args, cmdFile] = shArgs(command);
+  [cmdArgs, cmdFile] = shArgs(command);
   const p = Deno.run({
-    args: args,
+    cmd: cmdArgs,
     cwd: opts.cwd,
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
     stderr: opts.stderr ?? "piped"
   });
-  if (p.stdin) {
-    await p.stdin.write(new TextEncoder().encode(opts.input));
-    p.stdin.close();
+  let status: Deno.ProcessStatus;
+  let outputBytes, errorBytes: Uint8Array;
+  try {
+    if (p.stdin) {
+      await p.stdin.write(new TextEncoder().encode(opts.input));
+      p.stdin.close();
+    }
+    [status, outputBytes, errorBytes] = await Promise.all(
+      [
+        p.status(),
+        p.stdout ? p.output() : Promise.resolve(new Uint8Array()),
+        p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array())
+      ]
+    );
+  } finally {
+    p.close();
   }
-  const [status, stdout, stderr] = await Promise.all(
-    [
-      p.status(),
-      p.stdout ? p.output() : Promise.resolve(new Uint8Array()),
-      p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array())
-    ]
-  );
   if (cmdFile) Deno.removeSync(cmdFile);
   return {
     code: status.code,
-    output: new TextDecoder().decode(stdout),
-    error: new TextDecoder().decode(stderr)
+    output: new TextDecoder().decode(outputBytes),
+    error: new TextDecoder().decode(errorBytes)
   };
 }

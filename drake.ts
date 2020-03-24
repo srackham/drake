@@ -1,6 +1,6 @@
 // A thin CLI wrapper for the Drake library module.
 
-import { existsSync } from "https://deno.land/std@v0.36.0/fs/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
 import { abort, env } from "./mod.ts";
 
 if (!env["--help"] && !env["--version"]) {

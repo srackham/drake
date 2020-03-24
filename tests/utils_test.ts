@@ -1,5 +1,5 @@
-import { existsSync } from "https://deno.land/std@v0.36.0/fs/exists.ts";
-import * as path from "https://deno.land/std@v0.36.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.37.1/fs/exists.ts";
+import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
 import {
   assert,
   assertEquals,
@@ -7,7 +7,7 @@ import {
   assertStrContains,
   assertThrows,
   assertThrowsAsync
-} from "https://deno.land/std@v0.36.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.37.1/testing/asserts.ts";
 import {
   abort,
   DrakeError,
