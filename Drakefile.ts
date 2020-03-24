@@ -2,8 +2,7 @@
  * Drake drakefile.
  */
 
-import { readFile } from "./lib/utils.ts";
-import { abort, desc, env, glob, quote, run, sh, task } from "./mod.ts";
+import { abort, desc, env, glob, quote, run, sh, task, vers } from "./mod.ts";
 
 env["--default-task"] = "test";
 const TS_FILES = glob("**/*.ts").filter(p => !p.endsWith(".d.ts"));
@@ -41,12 +40,8 @@ task("tag", ["test"], async function() {
   if (!/^\d+\.\d+\.\d+/.test(env.vers)) {
     abort(`illegal semantic version number: ${env.vers}`);
   }
-  let match = readFile("mod.ts").match(/^const vers: string = "(.+)"/m);
-  if (!match) {
-    abort(`missing 'vers' declaration in mod.ts`);
-  }
-  if (match[1] !== env.vers) {
-    abort(`${env.vers} does not match version ${match[1]} in mod.ts`);
+  if (vers() !== env.vers) {
+    abort(`${env.vers} does not match version ${vers()} in mod.ts`);
   }
   const tag = `v${env.vers}`;
   console.log(`tag: ${tag}`);
