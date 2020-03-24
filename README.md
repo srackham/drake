@@ -338,9 +338,9 @@ overwritten.
 Find and replace in text file synchronously.
 
 ### vers
-`const vers: string;`
+`function vers(): string;`
 
-The Drake version number.
+Returns the Drake version number string.
 
 
 ## Tips for using Drake

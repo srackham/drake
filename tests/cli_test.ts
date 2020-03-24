@@ -13,7 +13,7 @@ Deno.test(
       `${drake} --version`
     );
     assertEquals(code, 0);
-    assertEquals(output.trimRight(), vers);
+    assertEquals(output.trimRight(), vers());
 
     ({ code, output, error } = await shCapture(
       `${drake} --help`

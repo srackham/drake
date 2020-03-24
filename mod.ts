@@ -25,8 +25,7 @@ import { help } from "./lib/help.ts";
 import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
-/** The Drake version number. */
-const vers: string = "0.12.0";
+const DRAKE_VERS = "0.12.0";
 
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
@@ -39,7 +38,7 @@ parseEnv(Deno.args.slice(), env);
 if (env["--help"]) {
   help();
 } else if (env["--version"]) {
-  console.log(vers);
+  console.log(vers());
 } else {
   // Caclulate drakefile path relative to cwd prior to processing --directory option.
   let drakefile = env["--drakefile"] ?? "Drakefile.ts";
@@ -55,6 +54,11 @@ if (env["--help"]) {
     }
     Deno.chdir(dir);
   }
+}
+
+/** Returns the Drake version number string. */
+function vers(): string {
+  return DRAKE_VERS;
 }
 
 /** Set description of next registered task. */
