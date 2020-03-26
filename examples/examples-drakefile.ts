@@ -85,4 +85,9 @@ task("run", [], async function() {
   await run("noop", "shell");
 });
 
+desc("print cwd");
+task("cwd", [], function() {
+  console.log(Deno.cwd());
+});
+
 run();

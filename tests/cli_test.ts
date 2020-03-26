@@ -1,3 +1,4 @@
+import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
 import {
   assertEquals,
   assertStrContains
@@ -8,7 +9,7 @@ env["--abort-exits"] = false;
 
 Deno.test(
   async function cliTest() {
-    const drake = "deno run -A Drakefile.ts";
+    const drake = "deno -A Drakefile.ts";
     let { code, output, error } = await shCapture(
       `${drake} --version`
     );
@@ -65,5 +66,26 @@ Deno.test(
     assertEquals(code, 1);
     assertEquals(output, "");
     assertStrContains(error, "--directory missing or not a directory");
+
+    ({ code, output, error } = await shCapture(
+      `deno -A  examples/examples-drakefile.ts cwd --quiet`
+    ));
+    assertEquals(code, 0);
+    assertEquals(output.trimRight(), Deno.cwd());
+    assertStrContains(error, "");
+
+    ({ code, output, error } = await shCapture(
+      `deno -A  examples/examples-drakefile.ts cwd --quiet --directory .`
+    ));
+    assertEquals(code, 0);
+    assertEquals(output.trimRight(), Deno.cwd());
+    assertStrContains(error, "");
+
+    ({ code, output, error } = await shCapture(
+      `deno -A  examples/examples-drakefile.ts cwd --quiet --directory examples`
+    ));
+    assertEquals(code, 0);
+    assertEquals(output.trimRight(), path.join(Deno.cwd(), "examples"));
+    assertStrContains(error, "");
   }
 );
