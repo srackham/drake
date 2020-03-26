@@ -256,5 +256,14 @@ Deno.test(
       { input: "", stdout: "inherit", stderr: "inherit" }
     ));
     assertEquals([code, output, error], [0, "", ""]);
+
+    ({ code, output, error } = await shCapture(
+      `cd examples
+      deno eval "console.log(Deno.cwd())"`
+    ));
+    assertEquals(
+      [code, output.trimRight(), error],
+      [0, path.join(Deno.cwd(), "examples"), ""]
+    );
   }
 );
