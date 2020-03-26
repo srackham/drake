@@ -27,10 +27,10 @@ import { abort, env, parseEnv } from "./lib/utils.ts";
 
 const DRAKE_VERS = "0.14.0";
 
+env["--abort-exits"] = true;
+
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
-
-env["--abort-exits"] = true;
 
 // Parse command-line options into Drake environment.
 parseEnv(Deno.args.slice(), env);
