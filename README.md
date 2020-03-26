@@ -52,13 +52,13 @@ Here are some of real-world drakefiles:
 Drakefiles are executed with the Deno `run` command, for example:
 
     deno run -A Drakefile.ts
-    deno run minimal-drakefile.ts hello -q
+    deno run minimal-drakefile.ts hello --quiet
 
-- Use the Drake `--help` option to view the [Drake man
-  page](#drake-man-page).
+- Use the Drake `--help` option to view the [Drake execution
+  options](#drake-man-page).
 
-- Use the `--list` option to display a list of the list of available
-  tasks.
+- Use the Drake `--list` option to display a list of the list of
+  available tasks.
 
 - By convention, a project's drakefile is named `Drakefile.ts` and
   resides in the project's root directory.
@@ -139,8 +139,8 @@ returned by asynchronous functions in any way that makes sense.
 
 
 ## Drake man page
-To display the Drake man page run your drakefile with the `--help`
-option:
+To display the Drake options and command syntax run your drakefile
+with the `--help` option:
 
 ```
 $ deno run -A Drakefile.ts --help
@@ -188,7 +188,7 @@ and must start with an alpha character.
 
 
 ## Drake API
-The Drake library module exports the following objects and functions:
+The Drake library module exports the following functions:
 
 ### abort
 `function abort(message: string): void;`
@@ -356,9 +356,6 @@ Returns the Drake version number string.
 
 - Path names can refer to any file type (not just regular files).
 
-- Use the Drake `readFile`, `writeFile` and `updateFile` APIs to
-  synchronously read, write and update text files.
-
 - The Drake `sh` API can be used to run multiple shell commands
   asynchronously. The following example starts two shell commands then
   waits for both to finish before continuing:
@@ -393,14 +390,13 @@ Returns the Drake version number string.
   * `` \` `` translates to `` ` ``
   * `\${` translates to `${` 
 
-- You can use the `utils.ts` module in non-Drakefiles.  The utility
-  functions manifest errors by throwing `DrakeError` exceptions.
-  Useable functions include: `abort`, `glob`, `log`, `outOfDate`,
-  `quote`, `readFile`, `sh`, `shCapture`, `touch`, `updateFile`,
-  `writeFile`.  For example:
+- You can use Drake API functions in non-drakefiles.  Useful utility
+  functions include: `abort`, `glob`, `log`, `outOfDate`, `quote`,
+  `readFile`, `sh`, `shCapture`, `touch`, `updateFile`, `writeFile`.
+  By default Drake functions manifest errors by printing an error
+  message and exiting with a non-zero exit code.  You can change the
+  default behaviour so that errors throw a `DrakeError` exception
+  by setting `env["--abort-exits"] = false`.  For example:
 
-      import { glob, sh } from "https://raw.github.com/srackham/drake/master/lib/utils.ts";
-
-- A drakefile can be run directly with the `deno run` command and can
-  also be installed as an executable using the `deno install` command.
-
+      import { env, glob, sh } from "https://raw.github.com/srackham/drake/master/mod.ts";
+      env["--abort-exits"] = false;
