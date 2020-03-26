@@ -25,8 +25,7 @@ task("install", ["test"], async function() {
 desc("Run examples drakefile");
 task("run", ["test"], async function() {
   await sh(`
-    cd ./examples
-    deno run -A ./Drakefile.ts prereqs pause "qux=Foo Bar" noop
+    deno run -A ./examples/examples-drakefile.ts prereqs pause "qux=Foo Bar" noop
   `);
 });
 
