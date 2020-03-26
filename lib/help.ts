@@ -9,7 +9,6 @@ NAME
   drake - a make-like task runner for Deno.
 
 SYNOPSIS
-  drake [OPTION|VARIABLE|TASK]...
   deno run [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
@@ -17,7 +16,7 @@ DESCRIPTION
   build TASKs on the Deno runtime.
 
   A DRAKEFILE is a TypeScript module file containing Drake task definitions.
-  The 'drake' CLI is a thin wrapper for executing a DRAKEFILE.
+  Drakefiles are run with the Deno 'run' command.
 
   A Drake VARIABLE is a named string value e.g. 'vers=0.1.0'.  Variables are
   accessed via the Drake 'env' object e.g. 'env.vers' or 'env["vers"]'.
@@ -25,7 +24,6 @@ DESCRIPTION
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
   -d, --directory DIR   Change to directory DIR before running drakefile.
-  -f, --drakefile FILE  Use FILE as drakefile (default: './Drakefile.ts').
   -h, --help            Display this help message.
   -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.

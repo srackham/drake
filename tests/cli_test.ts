@@ -8,7 +8,7 @@ env["--abort-exits"] = false;
 
 Deno.test(
   async function cliTest() {
-    const drake = "deno run -A drake.ts";
+    const drake = "deno run -A Drakefile.ts";
     let { code, output, error } = await shCapture(
       `${drake} --version`
     );
@@ -58,13 +58,6 @@ Deno.test(
     assertEquals(code, 1);
     assertEquals(output, "");
     assertStrContains(error, "missing task: nonexistent-task");
-
-    ({ code, output, error } = await shCapture(
-      `${drake} -f missing-drakefile.ts`
-    ));
-    assertEquals(code, 1);
-    assertEquals(output, "");
-    assertStrContains(error, "--drakefile missing or not a regular file");
 
     ({ code, output, error } = await shCapture(
       `${drake} -d missing-directory`

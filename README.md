@@ -9,12 +9,11 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - Optional task prerequisites (dependencies).
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
-- `drake` CLI.
 
 **NOTE**: This is a development release. A production release will
 follow once Deno has reached 1.0.
 If you experience compilation errors try forcing a cache reload
-with the Deno `fetch` command e.g. `deno fetch drake.ts --reload`
+with the Deno `fetch` command e.g. `deno fetch mod.ts --reload`
 
 Tested with Deno 0.37.1 running on Ubuntu 18.04.
 
@@ -44,14 +43,25 @@ API executes the tasks that were specified on the command-line along
 with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
-You can either run the drakefile directly with Deno e.g. `deno run -A
-Drakefile.ts` or with the [drake CLI](#drake-cli) e.g. `drake`
-
-    
-Here are a couple of real-world drakefiles:
+Here are some of real-world drakefiles:
 
 - https://github.com/srackham/drake/blob/master/Drakefile.ts
 - https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
+
+### Drakefile execution
+Drakefiles are executed with the Deno `run` command, for example:
+
+    deno run -A Drakefile.ts
+    deno run minimal-drakefile.ts hello -q
+
+- Use the Drake `--help` option to view the [Drake man
+  page](#drake-man-page).
+
+- Use the `--list` option to display a list of the list of available
+  tasks.
+
+- By convention, a project's drakefile is named `Drakefile.ts` and
+  resides in the project's root directory.
 
 
 ## Tasks
@@ -128,27 +138,17 @@ Of course you are free to eschew `await` and use the promises
 returned by asynchronous functions in any way that makes sense.
 
 
-## drake CLI
-The `drake` CLI is a thin wrapper for executing a drakefile.
+## Drake man page
+To display the Drake man page run your drakefile with the `--help`
+option:
 
-To install the `drake` CLI executable:
-
-    deno install --force -A drake https://raw.github.com/srackham/drake/master/drake.ts
-
-Run it with e.g.
-
-    $HOME/.deno/bin/drake --help
-
-The `drake` CLI is handy, but you can also run drakefiles directly
-with the `deno run` command.
-
-### drake man page
 ```
+$ deno run -A Drakefile.ts --help
+
 NAME
   drake - a make-like task runner for Deno.
 
 SYNOPSIS
-  drake [OPTION|VARIABLE|TASK]...
   deno run [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
@@ -156,7 +156,7 @@ DESCRIPTION
   build TASKs on the Deno runtime.
 
   A DRAKEFILE is a TypeScript module file containing Drake task definitions.
-  The 'drake' CLI is a thin wrapper for executing a DRAKEFILE.
+  Drakefiles are run with the Deno 'run' command.
 
   A Drake VARIABLE is a named string value e.g. 'vers=0.1.0'.  Variables are
   accessed via the Drake 'env' object e.g. 'env.vers' or 'env["vers"]'.
@@ -164,7 +164,6 @@ DESCRIPTION
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
   -d, --directory DIR   Change to directory DIR before running drakefile.
-  -f, --drakefile FILE  Use FILE as drakefile (default: './Drakefile.ts').
   -h, --help            Display this help message.
   -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.
@@ -200,8 +199,8 @@ Print error message to to `stdout` and terminate execution.
 `function desc(description: string): void;`
 
 Set description of next registered task. If a task has no description
-then it won't be displayed in the CLI tasks list unless the `-L`
-option is used.
+then it won't be displayed in the tasks list unless the `-L` option is
+used.
 
 ### env
 The Drake `env` object stores command-line options, task names and
@@ -344,6 +343,10 @@ Returns the Drake version number string.
 
 
 ## Tips for using Drake
+- A shell alias shortcut can be set to run the default drakefile:
+
+      alias drake="deno -A Drakefile.ts"
+
 - Use shell quoting and escapes to pass command-line variable values
   containing spaces or special characters e.g. `"title=Foo & bar"`.
 

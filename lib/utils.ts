@@ -47,14 +47,6 @@ export function parseEnv(args: string[], env: Env): void {
         }
         env["--directory"] = arg;
         break;
-      case "-f":
-      case "--drakefile":
-        arg = args.shift();
-        if (arg === undefined) {
-          abort("missing --drakefile option value");
-        }
-        env["--drakefile"] = arg;
-        break;
       case "-h":
       case "--help":
         env["--help"] = true;
