@@ -51,8 +51,8 @@ Here are some of real-world drakefiles:
 ### Drakefile execution
 Drakefiles are executed with the Deno `run` command, for example:
 
-    deno run -A Drakefile.ts
-    deno run minimal-drakefile.ts hello --quiet
+    deno -A Drakefile.ts
+    deno minimal-drakefile.ts hello --quiet
 
 - Use the Drake `--help` option to view the [Drake execution
   options](#drake-man-page).
@@ -143,13 +143,13 @@ To display the Drake options and command syntax run your drakefile
 with the `--help` option:
 
 ```
-$ deno run -A Drakefile.ts --help
+$ deno -A Drakefile.ts --help
 
 NAME
   drake - a make-like task runner for Deno.
 
 SYNOPSIS
-  deno run [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
+  deno [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
   The Drake TypeScript library provides functions for defining and executing

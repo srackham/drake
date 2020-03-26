@@ -9,7 +9,7 @@ NAME
   drake - a make-like task runner for Deno.
 
 SYNOPSIS
-  deno run [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
+  deno [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
   The Drake TypeScript library provides functions for defining and executing
