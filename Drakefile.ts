@@ -25,7 +25,7 @@ task("run", ["test"], async function() {
 });
 
 desc(
-  "Create Git version tag e.g. 'drake tag vers=1.0.0' creates tag 'v1.0.0'"
+  "Create Git version number tag e.g. specifying 'vers=1.0.0' creates tag 'v1.0.0'"
 );
 task("tag", ["test"], async function() {
   if (!env.vers) {

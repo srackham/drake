@@ -152,7 +152,7 @@ SYNOPSIS
   deno [DENO_OPTION...] DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
-  The Drake TypeScript library provides functions for defining and executing
+  The Drake TypeScript module provides functions for defining and executing
   build TASKs on the Deno runtime.
 
   A DRAKEFILE is a TypeScript module file containing Drake task definitions.
