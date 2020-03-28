@@ -167,20 +167,27 @@ export function touch(...files: string[]): void {
  * or more prerequisite files. Otherwise return `false`.
  */
 export function outOfDate(target: string, prereqs: string[]): boolean {
+  let result = false;
   if (!existsSync(target)) {
-    return true;
-  }
-  const targetStat = Deno.statSync(target);
-  for (const prereq of prereqs) {
-    const prereqStat = Deno.statSync(prereq);
-    if (!targetStat.modified || !prereqStat.modified) {
-      continue;
+    result = true;
+  } else {
+    const targetStat = Deno.statSync(target);
+    for (const prereq of prereqs) {
+      const prereqStat = Deno.statSync(prereq);
+      if (!targetStat.modified || !prereqStat.modified) {
+        continue;
+      }
+      if (targetStat.modified < prereqStat.modified) {
+        result = true;
+        break;
+      }
     }
-    if (targetStat.modified < prereqStat.modified) {
-      return true;
-    }
   }
-  return false;
+  debug(
+    "outOfDate",
+    `${result}: ${quote([target])}: [${quote(prereqs, ", ")}]`
+  );
+  return result;
 }
 
 /**
