@@ -1,6 +1,7 @@
 // Drake API.
 export {
   abort,
+  debug,
   DrakeError,
   env,
   glob,

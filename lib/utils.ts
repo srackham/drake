@@ -1,4 +1,8 @@
-import { bold, red } from "https://deno.land/std@v0.37.1/fmt/colors.ts";
+import {
+  bold,
+  red,
+  yellow
+} from "https://deno.land/std@v0.37.1/fmt/colors.ts";
 import { existsSync, walkSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
 
@@ -25,6 +29,8 @@ type Env = { [name: string]: any; "--tasks": string[] };
   */
 export const env: Env = { "--tasks": [] };
 
+env["--debug"] = Deno.env("DRAKE_DEBUG") ? "true" : "";
+
 export function parseEnv(args: string[], env: Env): void {
   let arg: string | undefined;
   while (!!(arg = args.shift())) {
@@ -46,6 +52,10 @@ export function parseEnv(args: string[], env: Env): void {
           abort("missing --directory option value");
         }
         env["--directory"] = arg;
+        break;
+      case "-D":
+      case "--debug":
+        env["--debug"] = "true";
         break;
       case "-h":
       case "--help":
@@ -90,11 +100,21 @@ export function abort(message: string): never {
 }
 
 /**
- * Log a message to the console. Do not log the message if the `--quiet` command-line option is set.
+ * Write a message to the console unless the `--quiet` command-line option is set.
  */
 export function log(message: string): void {
   if (!env["--quiet"]) {
     console.log(message);
+  }
+}
+
+/**
+ * Write a message to stderr if the `--debug` command-line option is set.
+ * and stderr is a TTY.
+ */
+export function debug(title: string, message?: any): void {
+  if (env["--debug"] && Deno.isatty(Deno.stderr.rid)) {
+    console.error(`${yellow(bold(title + ":"))} ${message}`);
   }
 }
 
@@ -264,7 +284,9 @@ export function glob(...patterns: string[]): string[] {
     result = [...result, ...glob1(pattern)];
   }
   // Drop dups, normalise and sort paths.
-  return [...new Set(result)].map(p => normalizePath(p)).sort();
+  result = [...new Set(result)].map(p => normalizePath(p)).sort();
+  debug("glob", `${quote(patterns, ", ")}:\n${result.join("\n")}`);
+  return result;
 }
 
 function shArgs(command: string): [string[], string | undefined] {
@@ -313,6 +335,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
   if (typeof commands === "string") {
     commands = [commands];
   }
+  debug("sh", `[${quote(commands, "\n")}], ${JSON.stringify(opts)}`);
   const tempFiles: string[] = [];
   const processes: Deno.Process[] = [];
   const results: Deno.ProcessStatus[] = [];
@@ -389,7 +412,7 @@ export async function shCapture(
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
-    stderr: opts.stderr ?? "piped"
+    stderr: opts.stderr ?? "inherit"
   });
   let status: Deno.ProcessStatus;
   let outputBytes, errorBytes: Uint8Array;
@@ -409,9 +432,14 @@ export async function shCapture(
     p.close();
   }
   if (cmdFile) Deno.removeSync(cmdFile);
-  return {
+  const result = {
     code: status.code,
     output: new TextDecoder().decode(outputBytes),
     error: new TextDecoder().decode(errorBytes)
   };
+  debug(
+    "shCapture",
+    `${quote([command])}, ${JSON.stringify(opts)}\n${JSON.stringify(result)}`
+  );
+  return result;
 }

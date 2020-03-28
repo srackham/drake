@@ -8,6 +8,7 @@ import { existsSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
+  debug,
   DrakeError,
   env,
   isFileTask,
@@ -204,7 +205,7 @@ export class TaskRegistry extends Map<string, Task> {
   async run(...names: string[]) {
     this.checkForCycles();
     const tasks = this.resolveDependencies(names).filter(t => t.action);
-    log(`${green(bold("task queue:"))} ${tasks.map(t => t.name)}`);
+    debug("run", `${tasks.map(t => t.name)}`);
     for (const task of tasks) {
       if (isNormalTask(task.name)) {
         await this.execute(task.name);
