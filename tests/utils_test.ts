@@ -214,7 +214,10 @@ Deno.test(
     let { code, output, error } = await shCapture("echo Hello");
     assertEquals([code, output.trimRight(), error], [0, "Hello", ""]);
 
-    ({ code, output, error } = await shCapture("a-nonexistent-command"));
+    ({ code, output, error } = await shCapture(
+      "a-nonexistent-command",
+      { stderr: "piped" }
+    ));
     assertNotEquals(code, 0);
     assertEquals(output, "");
     assertStrContains(error, "a-nonexistent-command");
@@ -259,7 +262,7 @@ Deno.test(
 
     ({ code, output, error } = await shCapture(
       `cd examples
-      deno eval "console.log(Deno.cwd())"`
+       deno eval "console.log(Deno.cwd())"`
     ));
     assertEquals(
       [code, output.trimRight(), error],

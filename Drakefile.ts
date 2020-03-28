@@ -9,7 +9,10 @@ const TS_FILES = glob("**/*.ts").filter(p => !p.endsWith(".d.ts"));
 
 desc("Run tests");
 task("test", ["fmt"], async function() {
-  await sh("deno test -A tests");
+  await sh(
+    "deno test -A tests",
+    { env: { "DRAKE_DEBUG": env["--debug"] } }
+  );
 });
 
 desc("Format source files");
