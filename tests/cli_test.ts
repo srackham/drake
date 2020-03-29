@@ -5,7 +5,7 @@ import {
 } from "https://deno.land/std@v0.37.1/testing/asserts.ts";
 import { env, shCapture, vers } from "../mod.ts";
 
-env["--abort-exits"] = false;
+env("--abort-exits", false);
 
 Deno.test(
   async function cliTest() {

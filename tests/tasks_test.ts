@@ -10,7 +10,7 @@ import { DrakeError, env, touch } from "../lib/utils.ts";
 
 Deno.test(
   async function taskRegistryTests() {
-    env["--quiet"] = true;
+    env("--quiet", true);
     const taskRegistry = new TaskRegistry();
 
     assertThrows(
@@ -52,7 +52,7 @@ Deno.test(
       ["Task 1", "Task 3"],
       "hidden tasks are not listed"
     );
-    env["--list-all"] = true;
+    env("--list-all", true);
     try {
       assertEquals(
         taskRegistry.list().length,
@@ -60,7 +60,7 @@ Deno.test(
         "--list-all lists hidden tasks"
       );
     } finally {
-      env["--list-all"] = undefined;
+      env("--list-all", undefined);
     }
 
     taskRegistry.desc("Task 4");
@@ -77,7 +77,7 @@ Deno.test(
 
 Deno.test(
   async function fileTaskTest() {
-    env["--quiet"] = true;
+    env("--quiet", true);
     const taskRegistry = new TaskRegistry();
 
     const target = "./target";
@@ -136,12 +136,12 @@ Deno.test(
         "missing prerequisite file should throw error"
       );
 
-      env["--dry-run"] = true;
+      env("--dry-run", true);
       try {
         // Missing prerequisite should not throw error if --dry-run.
         await taskRegistry.run(target);
       } finally {
-        env["--dry-run"] = undefined;
+        env("--dry-run", undefined);
       }
     } finally {
       Deno.chdir(savedCwd);

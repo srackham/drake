@@ -160,7 +160,7 @@ DESCRIPTION
   Drakefiles are run with the Deno 'run' command.
 
   A Drake VARIABLE is a named string value e.g. 'vers=0.1.0'.  Variables are
-  accessed via the Drake 'env' object e.g. 'env.vers' or 'env["vers"]'.
+  accessed via the Drake 'env' object e.g. 'env("vers")' or 'env("vers")'.
 
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
@@ -182,7 +182,7 @@ SEE ALSO
 A Drake command-line variable is a named string value that is made
 available to the drakefile.  Variables are formatted like
 `<name>=<value>` e.g.  `vers=0.1.0`.  Variables are accessed within a
-drakefile via the `env` object e.g.  `env.vers` or `env["vers"]`.
+drakefile via the `env` object e.g.  `env("vers")` or `env("vers")`.
 
 Variable names can only contain alphanumeric or underscore characters
 and must start with an alpha character.
@@ -214,17 +214,17 @@ used.
 The Drake `env` object stores command-line options, task names and
 variables.
 
-Options are keyed by their long option name e.g.  `env["--dry-run"]`.
+Options are keyed by their long option name e.g.  `env("--dry-run")`.
 Unspecified flag options are undefined; unspecified value options
 are assigned their default value.
 
-Task names are stored in the `env["--tasks"]` string array. A default
-task can be specified by setting `env["--default-task"]` to the task
+Task names are stored in the `env("--tasks")` string array. A default
+task can be specified by setting `env("--default-task")` to the task
 name.
 
 Command-line variable values are keyed by name. For example
-`vers=1.0.1` on the command-line is available as `env["vers"]` and
-`env.vers`.
+`vers=1.0.1` on the command-line is available as `env("vers")` and
+`env("vers")`.
 
 ### execute
 `async function execute(names: string | string[]);`
@@ -273,7 +273,7 @@ Read the entire contents of a file synchronously to a UTF-8 string.
 Execute named tasks along with their prerequisite tasks (direct and
 indirect). If no `names` are specified then the command-line tasks
 are run. If no command-line tasks were specified the default task (set
-in `env["--default-task"]`) is run.
+in `env("--default-task")`) is run.
 
 Task execution is ordered such that prerequisite tasks are executed
 prior to their parent task. The same task is never run twice.
@@ -410,7 +410,7 @@ Returns the Drake version number string.
   By default Drake functions manifest errors by printing an error
   message and exiting with a non-zero exit code.  You can change the
   default behaviour so that errors throw a `DrakeError` exception
-  by setting `env["--abort-exits"] = false`.  For example:
+  by setting `env("--abort-exits") = false`.  For example:
 
       import { env, glob, sh } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      env["--abort-exits"] = false;
+      env("--abort-exits", false)

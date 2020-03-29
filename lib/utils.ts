@@ -13,37 +13,43 @@ export class DrakeError extends Error {
   }
 }
 
-type Env = { [name: string]: any; "--tasks": string[] };
-
 /**
   * The Drake `env` object contains the command-line options, tasks an variables:
   *
-  * Options are keyed by their long option name e.g.  `env["--dry-run"]`. Unspecified flag options
+  * Options are keyed by their long option name e.g.  `env("--dry-run")`. Unspecified flag options
   * are undefined; unspecified value options are assigned their default value.
   *
-  * Tasks names are stored in the `env["--tasks"]` string array. A default task can be specified by
-  * setting `env["--default-task"]` to the task name.
+  * Tasks names are stored in the `env("--tasks")` string array. A default task can be specified by
+  * setting `env("--default-task")` to the task name.
   *
   * Variable values are keyed by name. For example `vers=1.0.1` on the command-line is available as
-  * `env["vers"]` and `env.vers`.
+  * `env("vers")` and `env.vers`.
   */
-export const env: Env = { "--tasks": [] };
+const _env: { [name: string]: any } = {};
 
-env["--debug"] = !!Deno.env("DRAKE_DEBUG");
+export function env(name: string, value?: any): any {
+  if (value !== undefined) {
+    _env[name] = value;
+  }
+  return _env[name];
+}
 
-export function parseEnv(args: string[], env: Env): void {
+env("--tasks", []);
+env("--debug", !!Deno.env("DRAKE_DEBUG"));
+
+export function parseEnv(args: string[]): void {
   let arg: string | undefined;
   while (!!(arg = args.shift())) {
     const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
     if (match) {
-      env[match[1]] = match[2];
+      env(match[1], match[2]);
       continue;
     }
     switch (arg) {
       case "-a":
       case "--always-make":
-        env["-a"] = true;
-        env["--always-make"] = true;
+        env("-a", true);
+        env("--always-make", true);
         break;
       case "-d":
       case "--directory":
@@ -51,39 +57,39 @@ export function parseEnv(args: string[], env: Env): void {
         if (arg === undefined) {
           abort("missing --directory option value");
         }
-        env["--directory"] = arg;
+        env("--directory", arg);
         break;
       case "-D":
       case "--debug":
-        env["--debug"] = true;
+        env("--debug", true);
         break;
       case "-h":
       case "--help":
-        env["--help"] = true;
+        env("--help", true);
         break;
       case "-l":
       case "--list-tasks":
-        env["--list-tasks"] = true;
+        env("--list-tasks", true);
         break;
       case "-L":
-        env["--list-all"] = true;
+        env("--list-all", true);
         break;
       case "-n":
       case "--dry-run":
-        env["--dry-run"] = true;
+        env("--dry-run", true);
         break;
       case "-q":
       case "--quiet":
-        env["--quiet"] = true;
+        env("--quiet", true);
         break;
       case "--version":
-        env["--version"] = true;
+        env("--version", true);
         break;
       default:
         if (arg.startsWith("-")) {
           abort(`illegal option: ${arg}`);
         }
-        env["--tasks"].push(arg);
+        env("--tasks").push(arg);
         break;
     }
   }
@@ -91,7 +97,7 @@ export function parseEnv(args: string[], env: Env): void {
 
 /** Print error message to to `stderr` and terminate execution. */
 export function abort(message: string): never {
-  if (env["--abort-exits"]) {
+  if (env("--abort-exits")) {
     console.error(`${red(bold("drake error:"))} ${message}`);
     Deno.exit(1);
   } else {
@@ -103,7 +109,7 @@ export function abort(message: string): never {
  * Write a message to the console unless the `--quiet` command-line option is set.
  */
 export function log(message: string): void {
-  if (!env["--quiet"]) {
+  if (!env("--quiet")) {
     console.log(message);
   }
 }
@@ -114,7 +120,7 @@ export function log(message: string): void {
  * environment variable is set.
  */
 export function debug(title: string, message?: any): void {
-  if (env["--debug"] && Deno.isatty(Deno.stderr.rid)) {
+  if (env("--debug") && Deno.isatty(Deno.stderr.rid)) {
     console.error(`${yellow(bold(title + ":"))} ${message}`);
   }
 }

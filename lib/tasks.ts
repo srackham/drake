@@ -61,7 +61,7 @@ export class Task {
         continue;
       }
       if (!existsSync(prereq)) {
-        if (env["--dry-run"]) {
+        if (env("--dry-run")) {
           // Assume the missing prerequisite would have been created thus rendering the target out of date.
           return true;
         }
@@ -122,7 +122,7 @@ export class TaskRegistry extends Map<string, Task> {
   /** Create a prinable list of tasks. */
   list(): string[] {
     let keys = Array.from(this.keys());
-    if (!env["--list-all"]) {
+    if (!env("--list-all")) {
       keys = keys.filter(k => this.get(k).desc); // Drop "hidden" tasks.
     }
     const maxLen = keys.reduce(function(a, b) {
@@ -133,7 +133,7 @@ export class TaskRegistry extends Map<string, Task> {
       const task = this.get(k);
       const padding = " ".repeat(maxLen - k.length);
       let msg = k;
-      if (k === env["--default-task"]) {
+      if (k === env("--default-task")) {
         msg = underline(msg);
       }
       msg += padding;
@@ -142,7 +142,7 @@ export class TaskRegistry extends Map<string, Task> {
       } else {
         msg = green(msg);
       }
-      if (env["--list-all"]) {
+      if (env("--list-all")) {
         msg += ` ${yellow(`[${task.prereqs}]`)}`;
       }
       result.push(msg);
@@ -227,7 +227,7 @@ export class TaskRegistry extends Map<string, Task> {
       names = [names];
     }
     names = names.map(name => normalizeTaskName(name));
-    if (env["--dry-run"]) {
+    if (env("--dry-run")) {
       log(yellow(`${names} skipped`) + " (dry run)");
       return;
     }
@@ -262,17 +262,17 @@ export class TaskRegistry extends Map<string, Task> {
    *   date.
    */
   async executeFileTask(task: Task) {
-    if (!env["--always-make"] && !task.isOutOfDate()) {
+    if (!env("--always-make") && !task.isOutOfDate()) {
       log(yellow(`${task.name} skipped`) + " (up to date)");
       return;
     }
     const oldInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
-    const savedAbortExits = env["--abort-exits"];
-    env["--abort-exits"] = false;
+    const savedAbortExits = env("--abort-exits");
+    env("--abort-exits", false);
     try {
       await this.execute(task.name);
     } catch (e) {
-      env["--abort-exits"] = savedAbortExits;
+      env("--abort-exits", savedAbortExits);
       const newInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
       if (!oldInfo && newInfo) {
         Deno.removeSync(task.name); // Delete newly created target file.
@@ -289,7 +289,7 @@ export class TaskRegistry extends Map<string, Task> {
         throw e;
       }
     } finally {
-      env["--abort-exits"] = savedAbortExits;
+      env("--abort-exits", savedAbortExits);
     }
   }
 }

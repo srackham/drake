@@ -19,7 +19,7 @@ DESCRIPTION
   Drakefiles are run with the Deno 'run' command.
 
   A Drake VARIABLE is a named string value e.g. 'vers=0.1.0'.  Variables are
-  accessed via the Drake 'env' object e.g. 'env.vers' or 'env["vers"]'.
+  accessed via the Drake 'env' object e.g. 'env("vers")' or 'env("vers")'.
 
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.

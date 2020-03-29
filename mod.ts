@@ -28,28 +28,28 @@ import { abort, env, parseEnv } from "./lib/utils.ts";
 
 const DRAKE_VERS = "0.14.0";
 
-env["--abort-exits"] = true;
+env("--abort-exits", true);
 
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
 
 // Parse command-line options into Drake environment.
-parseEnv(Deno.args.slice(), env);
+parseEnv(Deno.args.slice());
 
-if (env["--help"]) {
+if (env("--help")) {
   help();
-} else if (env["--version"]) {
+} else if (env("--version")) {
   console.log(vers());
 } else {
   // Caclulate drakefile path relative to cwd prior to processing --directory option.
-  let drakefile = env["--drakefile"] ?? "Drakefile.ts";
+  let drakefile = env("--drakefile") ?? "Drakefile.ts";
   if (!path.isAbsolute(drakefile)) {
     drakefile = path.join(Deno.cwd(), drakefile);
   }
-  env["--drakefile"] = drakefile;
+  env("--drakefile", drakefile);
 
-  if (env["--directory"]) {
-    const dir = env["--directory"];
+  if (env("--directory")) {
+    const dir = env("--directory");
     if (!existsSync(dir) || !Deno.statSync(dir).isDirectory()) {
       abort(`--directory missing or not a directory: ${dir}`);
     }
@@ -84,22 +84,22 @@ function task(
 /**
  * Execute named tasks along with their prerequisite tasks (direct and indirect). If no `names` are
  * specified then the command-line tasks are run. If no command-line tasks were specified the
- * default task (set in `env["--default-task"]`) is run.
+ * default task (set in `env("--default-task")`) is run.
  *
  * Task execution is ordered such that prerequisite tasks are executed prior to their parent task.
  * The same task is never run twice.
  */
 async function run(...names: string[]) {
-  if (env["--help"] || env["--version"]) {
+  if (env("--help") || env("--version")) {
     return;
   }
-  if (env["--list-tasks"] || env["--list-all"]) {
+  if (env("--list-tasks") || env("--list-all")) {
     taskRegistry.list().forEach(t => console.log(t));
   } else {
     if (names.length === 0) {
-      names = env["--tasks"];
-      if (names.length === 0 && env["--default-task"]) {
-        names.push(env["--default-task"]);
+      names = env("--tasks");
+      if (names.length === 0 && env("--default-task")) {
+        names.push(env("--default-task"));
       }
     }
     if (names.length === 0) {
