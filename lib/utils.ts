@@ -17,8 +17,8 @@ export class DrakeError extends Error {
   * The Drake `env` API function gets and sets the command-line options, task names and variables.
   *
   * Options are keyed by their long option name e.g.  `env("--dry-run")`.
-  * Flag options are set to `true`; unspecified flag options default to `false`.
-  * Unspecified value options default to `undefined`.
+  * Command-line flag options are set to `true`.
+  * Unspecified option values default to `undefined`.
   *
   * Tasks names are stored in the `env("--tasks")` string array. A default task can be specified by
   * setting the `"--default-task"` value to the task name.
@@ -33,7 +33,7 @@ export const env = newEnvFunction(
 type EnvData = { [name: string]: any };
 type EnvFunction = (name: string, value?: any) => any;
 
-/** Return an environment getter/setter function with this set to `envData`. */
+/** Return an environment getter/setter function with `this` set to `envData`. */
 function newEnvFunction(envData: EnvData) {
   return function(
     this: EnvData,
@@ -41,6 +41,40 @@ function newEnvFunction(envData: EnvData) {
     value?: any
   ): any {
     if (value !== undefined) {
+      switch (name) {
+        case "--abort-exits":
+        case "--always-make":
+        case "--debug":
+        case "--dry-run":
+        case "--help":
+        case "--list-all":
+        case "--list-tasks":
+        case "--quiet":
+        case "--version":
+          if (typeof value !== "boolean") {
+            abort(`${name} must be a boolean`);
+          }
+          break;
+        case "--default-task":
+        case "--directory":
+        case "--drakefile":
+          if (typeof value !== "string") {
+            abort(`${name} must be a string`);
+          }
+          break;
+        case "--tasks":
+          if (!(value instanceof Array)) {
+            abort("--tasks must be a string array");
+          }
+          break;
+        default:
+          if (name.startsWith("-")) {
+            abort(`illegal option: ${name}`);
+          }
+          if (typeof value !== "string") {
+            abort(`${name} must be a string`);
+          }
+      }
       this[name] = value;
     }
     return this[name];

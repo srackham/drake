@@ -215,8 +215,8 @@ The Drake `env` API function gets and sets the command-line options,
 task names and variables.
 
 Options are keyed by their long option name e.g.  `env("--dry-run")`.
-Flag options are set to `true`; unspecified flag options default to
-`false`.  Unspecified value options default to `undefined`.
+Command-line flag options are set to `true`.
+Unspecified option values default to `undefined`.
 
 Tasks names are stored in the `env("--tasks")` string array. A default
 task can be specified by setting the `"--default-task"` value to the
