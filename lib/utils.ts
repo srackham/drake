@@ -109,8 +109,9 @@ export function log(message: string): void {
 }
 
 /**
- * Write a message to stderr if the `--debug` command-line option is set.
- * and stderr is a TTY.
+ * Write the `title` and `message` to stderr if it is a TTY and the
+ * `--debug` command-line option was specified or the `DRAKE_DEBUG` shell
+ * environment variable is set.
  */
 export function debug(title: string, message?: any): void {
   if (env["--debug"] && Deno.isatty(Deno.stderr.rid)) {
@@ -393,18 +394,23 @@ export interface ShCaptureOpts extends ShOpts {
 }
 
 /**
- * Execute `command` in the command shell and return a promise for the exit `code`, `output` (the
- * stdout output) and `error` (the stderr output).
+ * Execute `command` in the command shell and return a promise for
+ * `{code, output, error}` (the exit code, the stdout output and the
+ * stderr output).
  *
- * - If the `opts.input` string has been assigned then it is piped to the shell `stdin`.
- * - `opts.cwd` sets the shell current working directory (defaults to the parent process working
- *   directory).
- * - The `opts.env` mapping passes additional environment variables to the shell.
- * - `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics and default to `"piped"`.
+ * - If the `opts.input` string has been assigned then it is piped to the
+ *   shell `stdin`.
+ * - `opts.cwd` sets the shell current working directory (defaults to the
+ *   parent process working directory).
+ * - The `opts.env` mapping passes additional environment variables to
+ *   the shell.
+ * - `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics.
+ *   `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
+ *   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
  *
  * Examples:
  *
- *     const { code, stdout, stderr } = await shCapture("echo Hello"); 
+ *     const { code, stdout } = await shCapture("echo Hello"); 
  */
 export async function shCapture(
   command: string,

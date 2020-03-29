@@ -10,9 +10,10 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**NOTE**: This is a development release. A production release will
-follow once Deno has reached 1.0.
-If you experience compilation errors try forcing a cache reload
+**NOTE**: This is a development release and will be subject to
+breaking changes until 1.0 (see the Git commit log for `BREAKING
+CHANGE`). A 1.0 production release will follow once Deno has reached
+1.0.  If you experience compilation errors try forcing a cache reload
 with the Deno `fetch` command e.g. `deno fetch Drakefile.ts --reload`
 
 Tested with Deno 0.37.1 running on Ubuntu 18.04.
@@ -195,6 +196,13 @@ The Drake library module exports the following functions:
 
 Print error message to to `stdout` and terminate execution.
 
+### debug
+`function debug(title: string, message?: any): void;`
+
+Write the `title` and `message` to stderr if it is a TTY and the
+`--debug` command-line option was specified or the `DRAKE_DEBUG` shell
+environment variable is set.
+
 ### desc
 `function desc(description: string): void;`
 
@@ -293,18 +301,24 @@ await sh("echo Hello World", { stdout: "null" });
 ### shCapture
 `async function shCapture(command: string, opts: ShCaptureOpts = {}): Promise<ShOutput>;`
 
-Execute `command` in the command shell and return a promise for the exit `code`,
-`output` (the stdout output) and `error` (the stderr output).
+Execute `command` in the command shell and return a promise for
+`{code, output, error}` (the exit code, the stdout output and the
+stderr output).
 
-- If the `opts.input` string has been assigned then it is piped to the shell `stdin`.
-- `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
-- The `opts.env` mapping passes additional environment variables to the shell.
-- `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics and default to `"piped"`.
+- If the `opts.input` string has been assigned then it is piped to the
+  shell `stdin`.
+- `opts.cwd` sets the shell current working directory (defaults to the
+  parent process working directory).
+- The `opts.env` mapping passes additional environment variables to
+  the shell.
+- `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics.
+  `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
+  `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
 
 Examples:
 
 ``` typescript
-const { code, output, error } = await shCapture("echo Hello"); 
+const { code, output } = await shCapture("echo Hello"); 
 ```
 
 ### task
