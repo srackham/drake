@@ -14,16 +14,17 @@ export class DrakeError extends Error {
 }
 
 /**
-  * The Drake `env` object contains the command-line options, tasks an variables:
+  * The Drake `env` API function gets and sets the command-line options, task names and variables.
   *
-  * Options are keyed by their long option name e.g.  `env("--dry-run")`. Unspecified flag options
-  * are undefined; unspecified value options are assigned their default value.
+  * Options are keyed by their long option name e.g.  `env("--dry-run")`.
+  * Flag options are set to `true`; unspecified flag options default to `false`.
+  * Unspecified value options default to `undefined`.
   *
   * Tasks names are stored in the `env("--tasks")` string array. A default task can be specified by
-  * setting `env("--default-task")` to the task name.
+  * setting the `"--default-task"` value to the task name.
   *
-  * Variable values are keyed by name. For example `vers=1.0.1` on the command-line is available as
-  * `env("vers")` and `env.vers`.
+  * Command-line variables are keyed by name. For example `vers=1.0.1` on the command-line sets
+  * the `"vers"` value to `"1.0.1"`.
   */
 export const env = newEnvFunction(
   { "--tasks": [], "--debug": !!Deno.env("DRAKE_DEBUG") }
