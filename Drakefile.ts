@@ -11,7 +11,7 @@ desc("Run tests");
 task("test", ["fmt"], async function() {
   await sh(
     "deno test -A tests",
-    { env: { "DRAKE_DEBUG": env["--debug"] } }
+    env["--debug"] ? { env: { DRAKE_DEBUG: "true" } } : {}
   );
 });
 

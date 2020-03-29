@@ -29,7 +29,7 @@ type Env = { [name: string]: any; "--tasks": string[] };
   */
 export const env: Env = { "--tasks": [] };
 
-env["--debug"] = Deno.env("DRAKE_DEBUG") ? "true" : "";
+env["--debug"] = !!Deno.env("DRAKE_DEBUG");
 
 export function parseEnv(args: string[], env: Env): void {
   let arg: string | undefined;
@@ -55,7 +55,7 @@ export function parseEnv(args: string[], env: Env): void {
         break;
       case "-D":
       case "--debug":
-        env["--debug"] = "true";
+        env["--debug"] = true;
         break;
       case "-h":
       case "--help":
