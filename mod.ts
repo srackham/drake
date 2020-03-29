@@ -34,7 +34,7 @@ env("--abort-exits", true);
 const taskRegistry = new TaskRegistry();
 
 // Parse command-line options into Drake environment.
-parseEnv(Deno.args.slice());
+parseEnv(Deno.args.slice(), env);
 
 if (env("--help")) {
   help();

@@ -25,19 +25,28 @@ export class DrakeError extends Error {
   * Variable values are keyed by name. For example `vers=1.0.1` on the command-line is available as
   * `env("vers")` and `env.vers`.
   */
-const _env: { [name: string]: any } = {};
+export const env = newEnvFunction(
+  { "--tasks": [], "--debug": !!Deno.env("DRAKE_DEBUG") }
+);
 
-export function env(name: string, value?: any): any {
-  if (value !== undefined) {
-    _env[name] = value;
-  }
-  return _env[name];
+type EnvData = { [name: string]: any };
+type EnvFunction = (name: string, value?: any) => any;
+
+/** Return an environment getter/setter function with this set to `envData`. */
+function newEnvFunction(envData: EnvData) {
+  return function(
+    this: EnvData,
+    name: string,
+    value?: any
+  ): any {
+    if (value !== undefined) {
+      this[name] = value;
+    }
+    return this[name];
+  }.bind(envData);
 }
 
-env("--tasks", []);
-env("--debug", !!Deno.env("DRAKE_DEBUG"));
-
-export function parseEnv(args: string[]): void {
+export function parseEnv(args: string[], env: EnvFunction): void {
   let arg: string | undefined;
   while (!!(arg = args.shift())) {
     const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
