@@ -1,8 +1,4 @@
-import {
-  bold,
-  red,
-  yellow
-} from "https://deno.land/std@v0.38.0/fmt/colors.ts";
+import { bold, red, yellow } from "https://deno.land/std@v0.38.0/fmt/colors.ts";
 import { existsSync, walkSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.38.0/path/mod.ts";
 
@@ -14,7 +10,8 @@ export class DrakeError extends Error {
 }
 
 /**
-  * The Drake `env` API function gets and sets the command-line options, task names and variables.
+  * The Drake `env` API function gets and optionally sets the command-line options,
+  * task names and variables.
   *
   * Options are keyed by their long option name e.g.  `env("--dry-run")`.
   * Command-line flag options are set to `true`.
@@ -34,7 +31,7 @@ type EnvData = { [name: string]: any };
 type EnvFunction = (name: string, value?: any) => any;
 
 /** Return an environment getter/setter function with `this` set to `envData`. */
-function newEnvFunction(envData: EnvData) {
+export function newEnvFunction(envData: EnvData) {
   return function (
     this: EnvData,
     name: string,
@@ -92,7 +89,6 @@ export function parseEnv(args: string[], env: EnvFunction): void {
     switch (arg) {
       case "-a":
       case "--always-make":
-        env("-a", true);
         env("--always-make", true);
         break;
       case "-d":

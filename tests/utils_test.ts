@@ -11,9 +11,11 @@ import {
 import {
   abort,
   DrakeError,
+  env,
   glob,
   isFileTask,
   isNormalTask,
+  newEnvFunction,
   normalizePath,
   normalizeTaskName,
   outOfDate,
@@ -25,12 +27,63 @@ import {
   updateFile,
   writeFile
 } from "../lib/utils.ts";
+
+env("--abort-exits", false);
+
 Deno.test(
   function abortTest() {
     assertThrows(
       () => abort("Abort test"),
       DrakeError,
       "Abort test",
+    );
+  },
+);
+
+Deno.test(
+  function envTest() {
+    const boolOpts = [
+      "--abort-exits",
+      "--always-make",
+      "--debug",
+      "--dry-run",
+      "--help",
+      "--list-all",
+      "--list-tasks",
+      "--quiet",
+      "--version",
+    ];
+    const strOpts = [
+      "--default-task",
+      "--directory",
+      "--drakefile",
+    ];
+    const env = newEnvFunction({});
+    for (const opt of boolOpts) {
+      assertEquals(env(opt), undefined);
+      env(opt, true);
+      assertEquals(env(opt), true);
+    }
+    for (const opt of strOpts) {
+      env(opt, "some-value");
+      assertEquals(env(opt), "some-value");
+      assertThrows(
+        () => env(opt, 42),
+        DrakeError,
+        `${opt} must be a string`,
+      );
+    }
+    assertThrows(
+      () => env("-foobar", "quux"),
+      DrakeError,
+      "illegal option: -foobar",
+    );
+    env("--tasks", []);
+    assertEquals(env("--tasks"), []);
+    assertThrows(
+      () => env("--tasks", "quux"),
+      DrakeError,
+      "--tasks must be a string array",
     );
   },
 );
