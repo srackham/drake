@@ -211,8 +211,10 @@ then it won't be displayed in the tasks list unless the `-L` option is
 used.
 
 ### env
-The Drake `env` API function gets and sets the command-line options,
-task names and variables.
+`function env(name: string, value?: any): any;`
+
+The Drake `env` API function gets and optionally sets the command-line
+options, task names and variables.
 
 Options are keyed by their long option name e.g.  `env("--dry-run")`.
 Command-line flag options are set to `true`.
