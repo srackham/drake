@@ -200,7 +200,7 @@ The Drake library module exports the following functions:
 `function abort(message: string): void;`
 
 Write an error message to `stderr` and terminate execution.  If the
-`"--abort-exits"` environment option is true throw a `DrakeError`
+`"--abort-exits"` environment option is `true` throw a `DrakeError`
 instead.
 
 ### debug
@@ -327,6 +327,7 @@ Examples:
 
 ``` typescript
 const { code, output } = await shCapture("echo Hello"); 
+const { code, output, error } = await shCapture("mkdir tmpdir", { stderr: "piped" });
 ```
 
 ### task

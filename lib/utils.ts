@@ -461,7 +461,9 @@ export interface ShCaptureOpts extends ShOpts {
  *
  * Examples:
  *
- *     const { code, stdout } = await shCapture("echo Hello"); 
+ *    const { code, stdout } = await shCapture("echo Hello"); 
+ *    const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" }); 
+ * 
  */
 export async function shCapture(
   command: string,
