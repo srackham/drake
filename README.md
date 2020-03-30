@@ -165,6 +165,7 @@ DESCRIPTION
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
   -d, --directory DIR   Change to directory DIR before running drakefile.
+  -D, --debug           Write debug information to stderr.
   -h, --help            Display this help message.
   -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.
