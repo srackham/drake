@@ -39,30 +39,34 @@ task("hello", [], function() {
 run()
 ```
 
+To run the above example, copy and paste it into a file and run it
+with Deno. For example:
+
+```
+$ deno -A minimal-drakefile.ts hello
+hello started
+Hello World!
+hello finished in 0.00 seconds
+```
+
 The `desc()` and `task()` APIs define and register tasks. The `run()`
 API executes the tasks that were specified on the command-line along
 with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
-Here are some of real-world drakefiles:
+- Use the Drake `--list` option to display a list of drakefile tasks.
+  For example:  `deno -A minimal-drakefile.ts --list` available tasks.
 
-- https://github.com/srackham/drake/blob/master/Drakefile.ts
-- https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
-
-### Drakefile execution
-Drakefiles are executed with the Deno `run` command, for example:
-
-    deno -A Drakefile.ts
-    deno minimal-drakefile.ts hello --quiet
+- By convention, a project's drakefile is named `Drakefile.ts` and
+  resides in the project's root directory.
 
 - Use the Drake `--help` option to view the [Drake execution
   options](#drake-man-page).
 
-- Use the Drake `--list` option to display a list of the list of
-  available tasks.
+Here are some of real-world drakefiles:
 
-- By convention, a project's drakefile is named `Drakefile.ts` and
-  resides in the project's root directory.
+- https://github.com/srackham/drake/blob/master/Drakefile.ts
+- https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
 
 
 ## Tasks
@@ -195,7 +199,9 @@ The Drake library module exports the following functions:
 ### abort
 `function abort(message: string): void;`
 
-Print error message to to `stdout` and terminate execution.
+Write an error message to `stderr` and terminate execution.  If the
+`"--abort-exits"` environment option is true throw a `DrakeError`
+instead.
 
 ### debug
 `function debug(title: string, message?: any): void;`
@@ -247,7 +253,7 @@ e.g. `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 ### log
 `function log(message: string): void;`
 
-Log a message to the console. Do not log the message if the `--quiet`
+Log a message to stdout. Do not log the message if the `--quiet`
 command-line option is set.
 
 ### outOfDate

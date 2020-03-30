@@ -135,7 +135,11 @@ export function parseEnv(args: string[], env: EnvFunction): void {
   }
 }
 
-/** Print error message to to `stderr` and terminate execution. */
+/**
+ * Write an error message to to `stderr` and terminate execution.
+ * If the `"--abort-exits"` environment option is true throw a
+ * `DrakeError` instead.
+ */
 export function abort(message: string): never {
   if (env("--abort-exits")) {
     console.error(`${red(bold("drake error:"))} ${message}`);
@@ -146,7 +150,8 @@ export function abort(message: string): never {
 }
 
 /**
- * Write a message to the console unless the `--quiet` command-line option is set.
+ * Log a message to stdout. Do not log the message if the `--quiet`
+ * command-line option is set.
  */
 export function log(message: string): void {
   if (!env("--quiet")) {
