@@ -20,8 +20,8 @@ export {
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import { existsSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.38.0/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
@@ -76,7 +76,7 @@ function desc(description: string): void {
 function task(
   name: string,
   prereqs: string[] = [],
-  action?: Action
+  action?: Action,
 ): void {
   taskRegistry.register(name, prereqs, action);
 }
@@ -94,7 +94,7 @@ async function run(...names: string[]) {
     return;
   }
   if (env("--list-tasks") || env("--list-all")) {
-    taskRegistry.list().forEach(t => console.log(t));
+    taskRegistry.list().forEach((t) => console.log(t));
   } else {
     if (names.length === 0) {
       names = env("--tasks");

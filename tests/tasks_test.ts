@@ -1,10 +1,10 @@
-import { existsSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
 import {
   assert,
   assertEquals,
   assertThrows,
   assertThrowsAsync
-} from "https://deno.land/std@v0.37.1/testing/asserts.ts";
+} from "https://deno.land/std@v0.38.0/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
 import { DrakeError, env, touch } from "../lib/utils.ts";
 
@@ -16,11 +16,11 @@ Deno.test(
     assertThrows(
       () => taskRegistry.get("quux"),
       DrakeError,
-      "missing task: quux"
+      "missing task: quux",
     );
 
     let log: string[] = [];
-    const action = function(this: Task) {
+    const action = function (this: Task) {
       log.push(this.name);
     };
 
@@ -35,29 +35,31 @@ Deno.test(
 
     assertEquals(taskRegistry.get("1").desc, "Task 1");
     assertEquals(
-      taskRegistry.resolveDependencies(["1", "3", "2"]).map(task => task.name),
-      ["3", "2", "1"]
+      taskRegistry.resolveDependencies(["1", "3", "2"]).map((task) =>
+        task.name
+      ),
+      ["3", "2", "1"],
     );
     await taskRegistry.run("1", "2", "3");
     assertEquals(log, ["3", "2", "1"], "execution log mismatch");
 
     assertEquals(
-      taskRegistry.list().map(s => s.slice(-6)),
+      taskRegistry.list().map((s) => s.slice(-6)),
       ["Task 1", "Task 2", "Task 3"],
-      "task list should have descriptions"
+      "task list should have descriptions",
     );
     taskRegistry.get("2").desc = "";
     assertEquals(
-      taskRegistry.list().map(s => s.slice(-6)),
+      taskRegistry.list().map((s) => s.slice(-6)),
       ["Task 1", "Task 3"],
-      "hidden tasks are not listed"
+      "hidden tasks are not listed",
     );
     env("--list-all", true);
     try {
       assertEquals(
         taskRegistry.list().length,
         3,
-        "--list-all lists hidden tasks"
+        "--list-all lists hidden tasks",
       );
     } finally {
       env("--list-all", undefined);
@@ -70,9 +72,9 @@ Deno.test(
       async () => await taskRegistry.run("4"),
       DrakeError,
       "cyclic dependency between '4' and '1', cyclic dependency between '4' and '4'",
-      "cyclic dependency should throw error"
+      "cyclic dependency should throw error",
     );
-  }
+  },
 );
 
 Deno.test(
@@ -82,7 +84,7 @@ Deno.test(
 
     const target = "./target";
     const prereq = "./prereq";
-    taskRegistry.register(target, [prereq], function() {
+    taskRegistry.register(target, [prereq], function () {
       touch(target);
       throw new DrakeError("file task failure");
     });
@@ -133,7 +135,7 @@ Deno.test(
         async () => await taskRegistry.run(target),
         DrakeError,
         "missing prerequisite path:",
-        "missing prerequisite file should throw error"
+        "missing prerequisite file should throw error",
       );
 
       env("--dry-run", true);
@@ -147,5 +149,5 @@ Deno.test(
       Deno.chdir(savedCwd);
       Deno.removeSync(dir, { recursive: true });
     }
-  }
+  },
 );

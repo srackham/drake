@@ -2,9 +2,9 @@ import {
   bold,
   red,
   yellow
-} from "https://deno.land/std@v0.37.1/fmt/colors.ts";
-import { existsSync, walkSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
+} from "https://deno.land/std@v0.38.0/fmt/colors.ts";
+import { existsSync, walkSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.38.0/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -27,7 +27,7 @@ export class DrakeError extends Error {
   * the `"vers"` value to `"1.0.1"`.
   */
 export const env = newEnvFunction(
-  { "--tasks": [], "--debug": !!Deno.env("DRAKE_DEBUG") }
+  { "--tasks": [], "--debug": !!Deno.env("DRAKE_DEBUG") },
 );
 
 type EnvData = { [name: string]: any };
@@ -35,10 +35,10 @@ type EnvFunction = (name: string, value?: any) => any;
 
 /** Return an environment getter/setter function with `this` set to `envData`. */
 function newEnvFunction(envData: EnvData) {
-  return function(
+  return function (
     this: EnvData,
     name: string,
-    value?: any
+    value?: any,
   ): any {
     if (value !== undefined) {
       switch (name) {
@@ -175,7 +175,7 @@ export function debug(title: string, message?: any): void {
  * The separator defaults to a space character.
  */
 export function quote(values: string[], sep: string = " "): string {
-  values = values.map(value => `"${value.replace(/"/g, '\\"')}"`);
+  values = values.map((value) => `"${value.replace(/"/g, '\\"')}"`);
   return values.join(sep);
 }
 
@@ -193,7 +193,7 @@ export function writeFile(filename: string, text: string): void {
 export function updateFile(
   filename: string,
   find: RegExp,
-  replace: string
+  replace: string,
 ): void {
   writeFile(filename, readFile(filename).replace(find, replace));
 }
@@ -236,7 +236,7 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
   }
   debug(
     "outOfDate",
-    `${result}: ${quote([target])}: [${quote(prereqs, ", ")}]`
+    `${result}: ${quote([target])}: [${quote(prereqs, ", ")}]`,
   );
   return result;
 }
@@ -335,14 +335,14 @@ export function glob(...patterns: string[]): string[] {
     }
     const regexp = path.globToRegExp(pattern, globOptions);
     const iter = walkSync(root, { match: [regexp], includeDirs: false });
-    return Array.from(iter, info => info.filename);
+    return Array.from(iter, (info) => info.filename);
   }
   let result: string[] = [];
   for (const pattern of patterns) {
     result = [...result, ...glob1(pattern)];
   }
   // Drop dups, normalise and sort paths.
-  result = [...new Set(result)].map(p => normalizePath(p)).sort();
+  result = [...new Set(result)].map((p) => normalizePath(p)).sort();
   debug("glob", `${quote(patterns, ", ")}:\n${result.join("\n")}`);
   return result;
 }
@@ -352,7 +352,7 @@ function shArgs(command: string): [string[], string | undefined] {
   let cmdFile: string | undefined;
   if (Deno.build.os === "win") {
     cmdFile = Deno.makeTempFileSync(
-      { prefix: "drake_", suffix: ".cmd" }
+      { prefix: "drake_", suffix: ".cmd" },
     );
     writeFile(cmdFile, `@echo off\n${command}`);
     cmdArgs = [cmdFile];
@@ -408,11 +408,11 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
         cwd: opts.cwd,
         env: opts.env,
         stdout: opts.stdout ?? "inherit",
-        stderr: opts.stderr ?? "inherit"
+        stderr: opts.stderr ?? "inherit",
       });
       processes.push(p);
     }
-    results.push(...await Promise.all(processes.map(p => p.status())));
+    results.push(...await Promise.all(processes.map((p) => p.status())));
   } finally {
     for (const p of processes) {
       p.close();
@@ -464,7 +464,7 @@ export interface ShCaptureOpts extends ShOpts {
  */
 export async function shCapture(
   command: string,
-  opts: ShCaptureOpts = {}
+  opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
   let cmdArgs: string[];
   let cmdFile: string | undefined;
@@ -475,7 +475,7 @@ export async function shCapture(
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
-    stderr: opts.stderr ?? "inherit"
+    stderr: opts.stderr ?? "inherit",
   });
   let status: Deno.ProcessStatus;
   let outputBytes, errorBytes: Uint8Array;
@@ -488,8 +488,8 @@ export async function shCapture(
       [
         p.status(),
         p.stdout ? p.output() : Promise.resolve(new Uint8Array()),
-        p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array())
-      ]
+        p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array()),
+      ],
     );
   } finally {
     p.close();
@@ -498,11 +498,11 @@ export async function shCapture(
   const result = {
     code: status.code,
     output: new TextDecoder().decode(outputBytes),
-    error: new TextDecoder().decode(errorBytes)
+    error: new TextDecoder().decode(errorBytes),
   };
   debug(
     "shCapture",
-    `${quote([command])}, ${JSON.stringify(opts)}\n${JSON.stringify(result)}`
+    `${quote([command])}, ${JSON.stringify(opts)}\n${JSON.stringify(result)}`,
   );
   return result;
 }

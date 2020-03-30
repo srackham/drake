@@ -5,7 +5,7 @@ import {
 } from "https://raw.github.com/srackham/drake/master/mod.ts";
 
 desc("Minimal Drake task");
-task("hello", [], function() {
+task("hello", [], function () {
   console.log("Hello World!");
 });
 

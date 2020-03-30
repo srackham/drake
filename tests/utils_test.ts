@@ -1,5 +1,5 @@
-import { existsSync } from "https://deno.land/std@v0.37.1/fs/exists.ts";
-import * as path from "https://deno.land/std@v0.37.1/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.38.0/fs/exists.ts";
+import * as path from "https://deno.land/std@v0.38.0/path/mod.ts";
 import {
   assert,
   assertEquals,
@@ -7,7 +7,7 @@ import {
   assertStrContains,
   assertThrows,
   assertThrowsAsync
-} from "https://deno.land/std@v0.37.1/testing/asserts.ts";
+} from "https://deno.land/std@v0.38.0/testing/asserts.ts";
 import {
   abort,
   DrakeError,
@@ -30,9 +30,9 @@ Deno.test(
     assertThrows(
       () => abort("Abort test"),
       DrakeError,
-      "Abort test"
+      "Abort test",
     );
-  }
+  },
 );
 
 Deno.test(
@@ -52,14 +52,14 @@ Deno.test(
     } finally {
       Deno.removeSync(dir, { recursive: true });
     }
-  }
+  },
 );
 
 Deno.test(
   function outOfDateTest() {
     const dir = Deno.makeTempDirSync();
     try {
-      const prereqs = ["a/b/z.ts", "a/y.ts", "u", "target.ts"].map(f =>
+      const prereqs = ["a/b/z.ts", "a/y.ts", "u", "target.ts"].map((f) =>
         path.join(dir, f)
       );
       touch(...prereqs);
@@ -77,7 +77,7 @@ Deno.test(
     } finally {
       Deno.removeSync(dir, { recursive: true });
     }
-  }
+  },
 );
 
 Deno.test(
@@ -86,17 +86,17 @@ Deno.test(
     assertEquals(
       files,
       ["lib/graph.ts", "lib/help.ts", "lib/tasks.ts", "lib/utils.ts", "mod.ts"]
-        .map(p => normalizePath(p))
+        .map((p) => normalizePath(p)),
     );
     files = glob("./mod.ts", "./lib/!(graph|utils).ts");
     assertEquals(
       files,
-      ["lib/help.ts", "lib/tasks.ts", "mod.ts"].map(p => normalizePath(p))
+      ["lib/help.ts", "lib/tasks.ts", "mod.ts"].map((p) => normalizePath(p)),
     );
     const dir = Deno.makeTempDirSync();
     try {
       Deno.mkdirSync(dir + "/a/b", { recursive: true });
-      const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map(f =>
+      const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
         path.join(dir, f)
       );
       for (const f of fixtures) {
@@ -110,15 +110,15 @@ Deno.test(
         files = glob("./**/*.ts", "u");
         assertEquals(
           files,
-          ["./u", "a/b/z.ts", "a/y.ts", "x.ts"].map(p => normalizePath(p))
+          ["./u", "a/b/z.ts", "a/y.ts", "x.ts"].map((p) => normalizePath(p)),
         );
         files = glob("./**/@(x|y).ts");
-        assertEquals(files, ["a/y.ts", "x.ts"].map(p => normalizePath(p)));
+        assertEquals(files, ["a/y.ts", "x.ts"].map((p) => normalizePath(p)));
         Deno.chdir("a");
         files = glob("../**/*.ts");
         assertEquals(
           files,
-          ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map(p => normalizePath(p))
+          ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map((p) => normalizePath(p)),
         );
       } finally {
         Deno.chdir(saved);
@@ -126,7 +126,7 @@ Deno.test(
     } finally {
       Deno.removeSync(dir, { recursive: true });
     }
-  }
+  },
 );
 
 Deno.test(
@@ -141,13 +141,13 @@ Deno.test(
       ["/tmp/foobar", false],
       ["../foobar/", false],
       ["./foobar/quux", false],
-      [".foobar", false]
+      [".foobar", false],
     ];
     for (let [name, expected] of tests) {
       assertEquals(isNormalTask(name), expected);
       assertEquals(isFileTask(name), !expected);
     }
-  }
+  },
 );
 
 Deno.test(
@@ -157,19 +157,19 @@ Deno.test(
       ["lib/io.ts", "lib/io.ts"],
       ["/tmp//foobar", "/tmp/foobar"],
       ["/tmp/./foobar", "/tmp/foobar"],
-      ["/tmp/../foobar", "/foobar"]
+      ["/tmp/../foobar", "/foobar"],
     ];
     for (let [name, expected] of tests) {
       assertEquals(normalizePath(name), normalizePath(expected));
     }
-  }
+  },
 );
 
 Deno.test(
   function normalizeTaskNameTest() {
     const tests = [
       [" foobar", "foobar"],
-      ["lib/io.ts", "lib/io.ts"].map(p => normalizePath(p))
+      ["lib/io.ts", "lib/io.ts"].map((p) => normalizePath(p)),
     ];
     for (let [name, expected] of tests) {
       assertEquals(normalizeTaskName(name), expected);
@@ -177,21 +177,21 @@ Deno.test(
     assertThrows(
       () => normalizeTaskName(" "),
       DrakeError,
-      "blank task name"
+      "blank task name",
     );
     const name = "**/*.ts";
     assertThrows(
       () => normalizeTaskName(name),
       DrakeError,
-      `wildcard task name not allowed: ${name}`
+      `wildcard task name not allowed: ${name}`,
     );
-  }
+  },
 );
 
 Deno.test(
   function quoteTest() {
     assertEquals(quote(["foo", '"bar"']), '"foo" "\\"bar\\""');
-  }
+  },
 );
 
 Deno.test(
@@ -200,13 +200,13 @@ Deno.test(
     await assertThrowsAsync(
       async () => await sh("non-existent-command", { stderr: "null" }),
       DrakeError,
-      "sh: non-existent-command: error code:"
+      "sh: non-existent-command: error code:",
     );
     await sh(
       ["echo Hello 1", "echo Hello 2", "echo Hello 3"],
-      { stdout: "null" }
+      { stdout: "null" },
     );
-  }
+  },
 );
 
 Deno.test(
@@ -216,7 +216,7 @@ Deno.test(
 
     ({ code, output, error } = await shCapture(
       "a-nonexistent-command",
-      { stderr: "piped" }
+      { stderr: "piped" },
     ));
     assertNotEquals(code, 0);
     assertEquals(output, "");
@@ -235,38 +235,38 @@ Deno.test(
 
     ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.cwd())"`,
-      { cwd: "lib" }
+      { cwd: "lib" },
     ));
     assertEquals(
       [code, output.trimRight(), error],
-      [0, path.join(Deno.cwd(), "lib"), ""]
+      [0, path.join(Deno.cwd(), "lib"), ""],
     );
 
     ({ code, output, error } = await shCapture(
       `deno eval "console.log(Deno.env('FOO')+Deno.env('BAR'))"`,
-      { env: { FOO: "foo", BAR: "bar" } }
+      { env: { FOO: "foo", BAR: "bar" } },
     ));
     assertEquals([code, output.trimRight(), error], [0, "foobar", ""]);
 
     ({ code, output, error } = await shCapture(
       "echo Hello",
-      { stdout: "null", stderr: "null" }
+      { stdout: "null", stderr: "null" },
     ));
     assertEquals([code, output, error], [0, "", ""]);
 
     ({ code, output, error } = await shCapture(
       cat,
-      { input: "", stdout: "inherit", stderr: "inherit" }
+      { input: "", stdout: "inherit", stderr: "inherit" },
     ));
     assertEquals([code, output, error], [0, "", ""]);
 
     ({ code, output, error } = await shCapture(
       `cd examples
-       deno eval "console.log(Deno.cwd())"`
+       deno eval "console.log(Deno.cwd())"`,
     ));
     assertEquals(
       [code, output.trimRight(), error],
-      [0, path.join(Deno.cwd(), "examples"), ""]
+      [0, path.join(Deno.cwd(), "examples"), ""],
     );
-  }
+  },
 );

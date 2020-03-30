@@ -29,14 +29,14 @@ export class Graph {
   private dfsVisit(
     node: string,
     discovered: Set<string>,
-    finished: Set<string>
+    finished: Set<string>,
   ) {
     discovered.add(node);
     for (let adjacent of this.nodes.get(node)!) {
       // Detect cycles.
       if (discovered.has(adjacent)) {
         this.errors.push(
-          `cyclic dependency between '${node}' and '${adjacent}'`
+          `cyclic dependency between '${node}' and '${adjacent}'`,
         );
       }
       // Recurse into DFS tree.

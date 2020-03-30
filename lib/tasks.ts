@@ -3,8 +3,8 @@ import {
   green,
   underline,
   yellow
-} from "https://deno.land/std@v0.37.1/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.37.1/fs/mod.ts";
+} from "https://deno.land/std@v0.38.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -66,7 +66,7 @@ export class Task {
           return true;
         }
         abort(
-          `task: ${this.name}: missing prerequisite path: ${prereq}`
+          `task: ${this.name}: missing prerequisite path: ${prereq}`,
         );
       }
       prereqs.push(prereq);
@@ -123,9 +123,9 @@ export class TaskRegistry extends Map<string, Task> {
   list(): string[] {
     let keys = Array.from(this.keys());
     if (!env("--list-all")) {
-      keys = keys.filter(k => this.get(k).desc); // Drop "hidden" tasks.
+      keys = keys.filter((k) => this.get(k).desc); // Drop "hidden" tasks.
     }
-    const maxLen = keys.reduce(function(a, b) {
+    const maxLen = keys.reduce(function (a, b) {
       return a.length > b.length ? a : b;
     }).length;
     const result: string[] = [];
@@ -174,11 +174,11 @@ export class TaskRegistry extends Map<string, Task> {
    * Ordered in first to last execution order,
    */
   resolveDependencies(names: string[]): Task[] {
-    names = names.map(name => normalizeTaskName(name));
+    names = names.map((name) => normalizeTaskName(name));
     const result: Task[] = [];
     for (const task of this.expand(names)) {
       // Drop downstream dups.
-      if (result.find(t => t.name === task.name)) {
+      if (result.find((t) => t.name === task.name)) {
         continue;
       }
       result.push(task);
@@ -190,7 +190,7 @@ export class TaskRegistry extends Map<string, Task> {
   checkForCycles(): void {
     const graph = new Graph();
     for (const task of this.keys()) {
-      graph.addNode(task, this.get(task).prereqs.filter(p => this.has(p)));
+      graph.addNode(task, this.get(task).prereqs.filter((p) => this.has(p)));
     }
     graph.searchForCycles();
     if (graph.errors.length > 0) {
@@ -204,8 +204,8 @@ export class TaskRegistry extends Map<string, Task> {
    */
   async run(...names: string[]) {
     this.checkForCycles();
-    const tasks = this.resolveDependencies(names).filter(t => t.action);
-    debug("run", `${tasks.map(t => t.name)}`);
+    const tasks = this.resolveDependencies(names).filter((t) => t.action);
+    debug("run", `${tasks.map((t) => t.name)}`);
     for (const task of tasks) {
       if (isNormalTask(task.name)) {
         await this.execute(task.name);
@@ -226,7 +226,7 @@ export class TaskRegistry extends Map<string, Task> {
     if (typeof names === "string") {
       names = [names];
     }
-    names = names.map(name => normalizeTaskName(name));
+    names = names.map((name) => normalizeTaskName(name));
     if (env("--dry-run")) {
       log(yellow(`${names} skipped`) + " (dry run)");
       return;
@@ -249,7 +249,7 @@ export class TaskRegistry extends Map<string, Task> {
     const endTime = new Date().getTime();
     log(
       green(bold(`${names} finished`)) +
-        ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`
+        ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`,
     );
   }
 

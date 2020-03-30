@@ -1,6 +1,6 @@
 import {
   assertEquals
-} from "https://deno.land/std@v0.37.1/testing/asserts.ts";
+} from "https://deno.land/std@v0.38.0/testing/asserts.ts";
 import { Graph } from "../lib/graph.ts";
 
 Deno.test(
@@ -17,8 +17,8 @@ Deno.test(
       g.errors,
       [
         "cyclic dependency between 'x' and 'v'",
-        "cyclic dependency between 'z' and 'z'"
-      ]
+        "cyclic dependency between 'z' and 'z'",
+      ],
     );
-  }
+  },
 );
