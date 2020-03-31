@@ -55,7 +55,7 @@ with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
 - Use the Drake `--list` option to display a list of drakefile tasks.
-  For example:  `deno -A minimal-drakefile.ts --list` available tasks.
+  For example:  `deno -A minimal-drakefile.ts --list`
 
 - By convention, a project's drakefile is named `Drakefile.ts` and
   resides in the project's root directory.
@@ -197,28 +197,36 @@ and must start with an alpha character.
 The Drake library module exports the following functions:
 
 ### abort
-`function abort(message: string): void;`
+``` typescript
+function abort(message: string): void;
+```
 
 Write an error message to `stderr` and terminate execution.  If the
 `"--abort-exits"` environment option is `true` throw a `DrakeError`
 instead.
 
 ### debug
-`function debug(title: string, message?: any): void;`
+``` typescript
+function debug(title: string, message?: any): void;
+```
 
 Write the `title` and `message` to stderr if it is a TTY and the
 `--debug` command-line option was specified or the `DRAKE_DEBUG` shell
 environment variable is set.
 
 ### desc
-`function desc(description: string): void;`
+``` typescript
+function desc(description: string): void;
+```
 
 Set description of next registered task. If a task has no description
 then it won't be displayed in the tasks list unless the `-L` option is
 used.
 
 ### env
-`function env(name: string, value?: any): any;`
+``` typescript
+function env(name: string, value?: any): any;
+```
 
 The Drake `env` API function gets and optionally sets the command-line
 options, task names and variables.
@@ -235,7 +243,9 @@ Command-line variables are keyed by name. For example `vers=1.0.1` on
 the command-line sets the `"vers"` value to `"1.0.1"`.
 
 ### execute
-`async function execute(names: string | string[]);`
+``` typescript
+async function execute(names: string | string[]);
+```
 
 Unconditionally execute task action functions ignoring task prerequisites.
 
@@ -244,39 +254,51 @@ Unconditionally execute task action functions ignoring task prerequisites.
 - Silently skip tasks that have no action function.
 
 ### glob
-`function glob(...patterns: string[]): string[];`
+``` typescript
+function glob(...patterns: string[]): string[];
+```
 
 Return a sorted array of normalized file names matching the wildcard patterns.
 Wildcard patterns can include the `**` (globstar) pattern.
 e.g. `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 
 ### log
-`function log(message: string): void;`
+``` typescript
+function log(message: string): void;
+```
 
 Log a message to stdout. Do not log the message if the `--quiet`
 command-line option is set.
 
 ### outOfDate
-`function outOfDate(target: string, prereqs: string[]): boolean;`
+``` typescript
+function outOfDate(target: string, prereqs: string[]): boolean;
+```
 
 Return `true` if either the target file does not exist or its
 modification time is older then one or more prerequisite files.
 Otherwise return `false`.
 
 ### quote
-`function quote(values: string[], sep: string = " "): string;`
+``` typescript
+function quote(values: string[], sep: string = " "): string;
+```
 
 Quote string array values with double-quotes then join them with a separator.
 Double-quote characters are escaped with a backspace.
 The separator defaults to a space character.
 
 ### readFile
-`function readFile(filename: string): string;`
+``` typescript
+function readFile(filename: string): string;
+```
 
 Read the entire contents of a file synchronously to a UTF-8 string.
 
 ### run
-`async function run(...names: string[]);`
+``` typescript
+async function run(...names: string[]);
+```
 
 Execute named tasks along with their prerequisite tasks (direct and
 indirect). If no `names` are specified then the command-line tasks
@@ -287,7 +309,9 @@ Task execution is ordered such that prerequisite tasks are executed
 prior to their parent task. The same task is never run twice.
 
 ### sh
-`async function sh(commands: string | string[], opts: ShOpts = {});`
+``` typescript
+async function sh(commands: string | string[], opts: ShOpts = {});
+```
 
 Execute commands in the command shell.
 
@@ -307,7 +331,9 @@ await sh("echo Hello World", { stdout: "null" });
 ```
 
 ### shCapture
-`async function shCapture(command: string, opts: ShCaptureOpts = {}): Promise<ShOutput>;`
+``` typescript
+async function shCapture(command: string, opts: ShCaptureOpts = {}): Promise<ShOutput>;
+```
 
 Execute `command` in the command shell and return a promise for
 `{code, output, error}` (the exit code, the stdout output and the
@@ -331,7 +357,9 @@ const { code, output, error } = await shCapture("mkdir tmpdir", { stderr: "piped
 ```
 
 ### task
-`function task(name: string, prereqs: string[] = [], action?: Action): void;`
+``` typescript
+function task(name: string, prereqs: string[] = [], action?: Action): void;
+```
 
 Create and register a task.
 
@@ -342,25 +370,33 @@ Create and register a task.
   any;`) that is run if the task is selected for execution.
 
 ### touch
-`function touch(...files: string[]): void;`
+``` typescript
+function touch(...files: string[]): void;
+```
 
 Update the modification time of each file to the current time.
 If a file does not exist then create a zero length file.
 Missing parent directory paths are also created.
 
 ### writeFile
-`function writeFile(filename: string, text: string): void;`
+``` typescript
+function writeFile(filename: string, text: string): void;
+```
 
 Write text to a file synchronously. If the file exists it will be
 overwritten.
 
 ### updateFile
-`function updateFile(filename: string, find: RegExp, replace: string): void;`
+``` typescript
+function updateFile(filename: string, find: RegExp, replace: string): void;
+```
 
 Find and replace in text file synchronously.
 
 ### vers
-`function vers(): string;`
+``` typescript
+function vers(): string;
+```
 
 Returns the Drake version number string.
 
