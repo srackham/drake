@@ -202,7 +202,7 @@ function abort(message: string): void;
 ```
 
 Write an error message to `stderr` and terminate execution.  If the
-`"--abort-exits"` environment option is `true` throw a `DrakeError`
+`"--abort-exits"` environment option is `false` throw a `DrakeError`
 instead.
 
 ### debug
