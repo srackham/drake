@@ -388,7 +388,7 @@ overwritten.
 
 ### updateFile
 ``` typescript
-function updateFile(filename: string, find: RegExp, replace: string): void;
+function updateFile(filename: string, find: RegExp, replace: string): boolean;
 ```
 
 Find and replace in text file synchronously.  If the file contents is
