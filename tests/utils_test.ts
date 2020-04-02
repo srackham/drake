@@ -96,8 +96,10 @@ Deno.test(
       const text = "foobar";
       writeFile(file, text);
       assertEquals(readFile(file), text);
-      updateFile(file, /o/g, "O!");
+      assertEquals(updateFile(file, /o/g, "O!"), true);
       assertEquals(readFile(file), "fO!O!bar");
+      assertEquals(updateFile(file, /o/g, "O!"), false);
+      assertEquals(updateFile(file, /zzz/g, "O!"), false);
       file = path.join(dir, "a/b/foobar");
       touch(file);
       assert(existsSync(file), "touched file should exist");

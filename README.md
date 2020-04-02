@@ -391,7 +391,9 @@ overwritten.
 function updateFile(filename: string, find: RegExp, replace: string): void;
 ```
 
-Find and replace in text file synchronously.
+Find and replace in text file synchronously.  If the file contents is
+unchanged return `false`.  If the contents has changed write it to the
+file and return `true`.
 
 ### vers
 ``` typescript

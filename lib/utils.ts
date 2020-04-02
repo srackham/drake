@@ -182,21 +182,45 @@ export function quote(values: string[], sep: string = " "): string {
 
 /** Read the entire contents of a file synchronously to a UTF-8 string. */
 export function readFile(filename: string): string {
-  return new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
+  const result = new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
+  debug(
+    "readFile",
+    `filename: "${filename}": "${result}"`,
+  );
+  return result;
 }
 
 /* Write text to a file synchronously. If the file exists it will be overwritten. */
 export function writeFile(filename: string, text: string): void {
+  debug(
+    "writeFile",
+    `filename: "${filename}": text: "${text}"`,
+  );
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }
 
-/** Find and replace in text file synchronously. */
+/**
+ * Find and replace in text file synchronously.
+ * If the file contents is unchanged return `false`.
+ * If the contents has changed write it to the file and return `true`.
+ */
 export function updateFile(
   filename: string,
   find: RegExp,
   replace: string,
-): void {
-  writeFile(filename, readFile(filename).replace(find, replace));
+): boolean {
+  let result = false;
+  const text = readFile(filename);
+  const updatedText = text.replace(find, replace);
+  if (text !== updatedText) {
+    writeFile(filename, updatedText);
+    result = true;
+  }
+  debug(
+    "updateFile",
+    `filename: "${filename}": find: ${find}: replace: "${replace}": ${result}`,
+  );
+  return result;
 }
 
 /**
@@ -205,6 +229,7 @@ export function updateFile(
  * Missing parent directory paths are also created.
  */
 export function touch(...files: string[]): void {
+  debug("touch", `[${quote(files, ", ")}]`);
   for (const file of files) {
     const dir = path.dirname(file);
     if (!existsSync(dir)) {
@@ -348,6 +373,7 @@ export function glob(...patterns: string[]): string[] {
   return result;
 }
 
+/** Sythesize platform dependent shell command arguments and Windows command file. */
 function shArgs(command: string): [string[], string | undefined] {
   let cmdArgs: string[];
   let cmdFile: string | undefined;
