@@ -78,6 +78,11 @@ Deno.test(
       DrakeError,
       "illegal option: -foobar",
     );
+    assertThrows(
+      () => env("foo-bar", "quux"),
+      DrakeError,
+      "illegal variable name: foo-bar",
+    );
     env("--tasks", []);
     assertEquals(env("--tasks"), []);
     assertThrows(

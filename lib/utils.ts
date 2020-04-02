@@ -71,6 +71,9 @@ export function newEnvFunction(envData: EnvData) {
           if (typeof value !== "string") {
             abort(`${name} must be a string`);
           }
+          if (!/^[a-zA-Z]\w*$/.test(name)) {
+            abort(`illegal variable name: ${name}`);
+          }
       }
       this[name] = value;
     }
