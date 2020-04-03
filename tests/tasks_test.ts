@@ -1,10 +1,10 @@
-import { existsSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.39.0/fs/mod.ts";
 import {
   assert,
   assertEquals,
   assertThrows,
   assertThrowsAsync
-} from "https://deno.land/std@v0.38.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.39.0/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
 import { DrakeError, env, touch } from "../lib/utils.ts";
 

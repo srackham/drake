@@ -1,8 +1,8 @@
-import * as path from "https://deno.land/std@v0.38.0/path/mod.ts";
+import * as path from "https://deno.land/std@v0.39.0/path/mod.ts";
 import {
   assertEquals,
   assertStrContains
-} from "https://deno.land/std@v0.38.0/testing/asserts.ts";
+} from "https://deno.land/std@v0.39.0/testing/asserts.ts";
 import { env, shCapture, vers } from "../mod.ts";
 
 env("--abort-exits", false);

@@ -3,8 +3,8 @@ import {
   green,
   underline,
   yellow
-} from "https://deno.land/std@v0.38.0/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.38.0/fs/mod.ts";
+} from "https://deno.land/std@v0.39.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.39.0/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
