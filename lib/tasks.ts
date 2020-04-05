@@ -248,8 +248,7 @@ export class TaskRegistry extends Map<string, Task> {
     await Promise.all(promises);
     const endTime = new Date().getTime();
     log(
-      green(bold(`${names} finished`)) +
-        ` in ${((endTime - startTime) / 1000).toFixed(2)} seconds`,
+      `${green(bold(`${names} finished`))} (${endTime - startTime}ms)`,
     );
   }
 

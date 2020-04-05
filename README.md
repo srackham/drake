@@ -46,7 +46,7 @@ with Deno. For example:
 $ deno -A minimal-drakefile.ts hello
 hello started
 Hello World!
-hello finished in 0.00 seconds
+hello finished (0ms)
 ```
 
 The `desc()` and `task()` APIs define and register tasks. The `run()`
