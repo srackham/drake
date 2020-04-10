@@ -408,6 +408,8 @@ Returns the Drake version number string.
 
       alias drake="deno -A Drakefile.ts"
 
+- Use [drake](./drake) shell script to find and execute drakefile.
+
 - Use shell quoting and escapes to pass command-line variable values
   containing spaces or special characters e.g. `"title=Foo & bar"`.
 
