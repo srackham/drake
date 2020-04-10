@@ -1,0 +1,11 @@
+#!/bin/sh
+extensions=(ts js '')
+for ext in ${extensions[@]}; do
+  drakefile=Drakefile.$ext
+  if [ -f $drakefile ]; then
+    echo Executing $drakefile
+    exec deno run --allow-all $drakefile "$@"
+  fi
+done
+echo 'Drakefile not found'
+exit -1
