@@ -1,7 +1,7 @@
 #!/bin/bash
-extensions=(ts js '')
+extensions=(.ts .js '')
 for ext in "${extensions[@]}"; do
-  drakefile=Drakefile."$ext"
+  drakefile=Drakefile"$ext"
   if [ -f "$drakefile" ]; then
     echo Executing "$drakefile"
     exec deno run --allow-all "$drakefile" "$@"
