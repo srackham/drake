@@ -14,9 +14,9 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 breaking changes until 1.0 (see the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0.  If you experience compilation errors try forcing a cache reload
-with the Deno `fetch` command e.g. `deno fetch Drakefile.ts --reload`
+with the Deno `cache` command e.g. `deno cache Drakefile.ts --reload`
 
-Tested with Deno 0.39.0 running on Ubuntu 18.04.
+Tested with Deno 0.40.0 running on Ubuntu 18.04.
 
 
 ## Drakefiles

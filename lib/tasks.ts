@@ -2,9 +2,9 @@ import {
   bold,
   green,
   underline,
-  yellow
-} from "https://deno.land/std@v0.39.0/fmt/colors.ts";
-import { existsSync } from "https://deno.land/std@v0.39.0/fs/mod.ts";
+  yellow,
+} from "https://deno.land/std@v0.40.0/fmt/colors.ts";
+import { existsSync } from "https://deno.land/std@v0.40.0/fs/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -16,7 +16,7 @@ import {
   log,
   normalizePrereqs,
   normalizeTaskName,
-  outOfDate
+  outOfDate,
 } from "./utils.ts";
 
 export type Action = (this: Task) => any;

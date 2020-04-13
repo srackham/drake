@@ -1,13 +1,13 @@
-import { existsSync } from "https://deno.land/std@v0.39.0/fs/exists.ts";
-import * as path from "https://deno.land/std@v0.39.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.40.0/fs/exists.ts";
+import * as path from "https://deno.land/std@v0.40.0/path/mod.ts";
 import {
   assert,
   assertEquals,
   assertNotEquals,
   assertStrContains,
   assertThrows,
-  assertThrowsAsync
-} from "https://deno.land/std@v0.39.0/testing/asserts.ts";
+  assertThrowsAsync,
+} from "https://deno.land/std@v0.40.0/testing/asserts.ts";
 import {
   abort,
   DrakeError,
@@ -25,7 +25,7 @@ import {
   shCapture,
   touch,
   updateFile,
-  writeFile
+  writeFile,
 } from "../lib/utils.ts";
 
 env("--abort-exits", false);

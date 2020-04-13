@@ -16,12 +16,12 @@ export {
   ShOutput,
   touch,
   updateFile,
-  writeFile
+  writeFile,
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import { existsSync } from "https://deno.land/std@v0.39.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.39.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.40.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.40.0/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";

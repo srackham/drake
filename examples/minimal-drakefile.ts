@@ -1,7 +1,7 @@
 import {
   desc,
   run,
-  task
+  task,
 } from "https://raw.github.com/srackham/drake/master/mod.ts";
 
 desc("Minimal Drake task");
