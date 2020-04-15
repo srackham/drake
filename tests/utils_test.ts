@@ -94,7 +94,7 @@ Deno.test(
 );
 
 Deno.test(
-  function fileReadWriteUpdateTest() {
+  function fileFunctionsTest() {
     const dir = Deno.makeTempDirSync();
     try {
       let file = path.join(dir, "fileTest");
@@ -119,11 +119,14 @@ Deno.test(
   function outOfDateTest() {
     const dir = Deno.makeTempDirSync();
     try {
-      const prereqs = ["a/b/z.ts", "a/y.ts", "u", "target.ts"].map((f) =>
-        path.join(dir, f)
+      const prereqs = ["a/b/z.ts", "a/y.ts", "u"].map((f) => path.join(dir, f));
+      const target = path.join(dir, "target.ts");
+      touch(target, ...prereqs);
+      assertThrows(
+        () => outOfDate(target, [path.join(dir, "non-existent-file")]),
+        DrakeError,
+        "outOfDate: missing prerequisite file:",
       );
-      touch(...prereqs);
-      const target = prereqs.pop()!;
       const info = Deno.statSync(target);
       // Reduce target timestamps to guarantee out of date.
       Deno.utimeSync(target, info.accessed! - 10, info.modified! - 10);
@@ -155,15 +158,13 @@ Deno.test(
     );
     const dir = Deno.makeTempDirSync();
     try {
-      Deno.mkdirSync(dir + "/a/b", { recursive: true });
       const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
         path.join(dir, f)
-      );
-      for (const f of fixtures) {
-        touch(f);
-      }
-      files = glob(dir + "/**/*.ts", dir + "/u");
+      ).sort();
+      touch(...fixtures);
+      files = glob(...["**/*.ts", "u"].map((f) => path.join(dir, f)));
       assertEquals(files, fixtures);
+      assertEquals(glob(path.join(dir, "non-existent-file")), []);
       const saved = Deno.cwd();
       try {
         Deno.chdir(dir);

@@ -70,7 +70,7 @@ function desc(description: string): void {
 /**
  * Create and register a task.
  * @param name - A unique task name.
- * @param prereqs - An array of prerequisite task names i.e. the names of tasks to be run prior to executing the task action function.
+ * @param prereqs - An array of prerequisite task names. Prerequisites can be _Normal task_ names, _File task_ names, file paths or globs (wildcards).
  * @param action - An optional function that is run if the task is selected for execution.
  */
 function task(

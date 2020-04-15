@@ -100,7 +100,7 @@ A unique task name.
 **prereqs**:
 An array of prerequisite task names i.e. the names of tasks to be run
 prior to executing the task action function. Prerequisites can be
-Normal task names, File task names, file paths and globs (wildcards):
+Normal task names, File task names, file paths or globs (wildcards):
 
 - Normal task names must have a matching task.
 - File path prerequisites do not require a matching task.
@@ -259,8 +259,8 @@ function glob(...patterns: string[]): string[];
 ```
 
 Return a sorted array of normalized file names matching the wildcard patterns.
-Wildcard patterns can include the `**` (globstar) pattern.
-e.g. `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
+Valid glob patterns are those supported by Deno's `path` library
+Example: `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 
 ### log
 ``` typescript
@@ -277,7 +277,8 @@ function outOfDate(target: string, prereqs: string[]): boolean;
 
 Return `true` if either the target file does not exist or its
 modification time is older then one or more prerequisite files.
-Otherwise return `false`.
+Otherwise return `false`. Throws and error if one or more prerequisite
+files do not exist.
 
 ### quote
 ``` typescript
@@ -364,8 +365,8 @@ function task(name: string, prereqs: string[] = [], action?: Action): void;
 Create and register a task.
 
 - `name` is a unique task name.
-- `prereqs` is an array of prerequisite task names i.e. the names of
-  tasks to be run prior to executing the task action function.
+- `prereqs` is an array of prerequisite task names.  Prerequisites can
+  be Normal task names, File task names, file paths or globs (wildcards).
 - `action` is an optional function (`type Action = (this: Task) =>
   any;`) that is run if the task is selected for execution.
 
@@ -454,10 +455,13 @@ Returns the Drake version number string.
 - You can use Drake API functions in non-drakefiles.  Useful utility
   functions include: `abort`, `glob`, `log`, `outOfDate`, `quote`,
   `readFile`, `sh`, `shCapture`, `touch`, `updateFile`, `writeFile`.
-  By default Drake functions manifest errors by printing an error
-  message and exiting with a non-zero exit code.  You can change the
-  default behaviour so that errors throw a `DrakeError` exception
-  by setting `env("--abort-exits", false)`.  For example:
 
-      import { env, glob, sh } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      env("--abort-exits", false)
+- Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
+  environment variable is set. This can be useful when executing
+  non-Drakefiles.
+
+- By default Drake functions manifest errors by printing an error
+  message and exiting with a non-zero exit code.  You can change the
+  default behaviour so that errors throw a `DrakeError` exception by
+  setting `env("--abort-exits", false)`.
+

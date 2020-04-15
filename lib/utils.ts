@@ -244,9 +244,15 @@ export function touch(...files: string[]): void {
 
 /**
  * Return `true` if either the target file does not exist or its modification time is older then one
- * or more prerequisite files. Otherwise return `false`.
+ * or more prerequisite files. Otherwise return `false`. Throws and error if one or more prerequisite
+ * files do not exist.
  */
 export function outOfDate(target: string, prereqs: string[]): boolean {
+  for (const prereq of prereqs) {
+    if (!existsSync(prereq)) {
+      abort(`outOfDate: missing prerequisite file: ${prereq}`);
+    }
+  }
   let result = false;
   if (!existsSync(target)) {
     result = true;
@@ -350,9 +356,9 @@ export function normalizePrereqs(prereqs: string[]): string[] {
 }
 
 /**
- * Return a  sorted array of normalized file names matching the wildcard patterns.
- * Wildcard patterns can include the `**` (globstar) pattern.
- * e.g. `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
+ * Return a sorted array of normalized file names matching the wildcard glob patterns.
+ * Valid glob patterns are those supported by Deno's `path` library.
+ * Example: `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
  */
 export function glob(...patterns: string[]): string[] {
   function glob1(pattern: string): string[] {
