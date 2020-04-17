@@ -11,7 +11,7 @@ task("prereqs", ["noop", "pause"]);
 
 desc("Synchronous task that does nothing");
 task("noop", ["pause"], function () {
-  console.log(env);
+  console.log(env("--drakefile"));
   console.log(`${this.desc} executing in ${Deno.cwd()}`);
   console.log(`$HOME=${Deno.env("HOME")}`);
 });
@@ -77,7 +77,7 @@ task("execute", [], async function () {
 
 desc("execute actions asynchronously");
 task("async-execute", [], async function () {
-  await execute(["noop", "shell2", "pause", "hello"]);
+  await execute("noop", "shell2", "pause", "hello");
 });
 
 desc("run noop and shell tasks");

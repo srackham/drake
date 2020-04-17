@@ -110,12 +110,9 @@ async function run(...names: string[]) {
 }
 
 /**
- * Unconditionally execute task action functions ignoring task prerequisites.
- *
- * - If `names` is a task name string execute the task action.
- * - If `names` is an array of task names execute their actions asynchronously.
- * - Silently skip tasks that have no action function.
+ * Unconditionally execute task action functions asynchronously.
+ * Silently skip tasks that have no action function.
  */
-async function execute(names: string | string[]) {
-  await taskRegistry.execute(names);
+async function execute(...names: string[]) {
+  await taskRegistry.execute(...names);
 }

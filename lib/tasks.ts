@@ -216,16 +216,10 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Unconditionally execute task action functions ignoring task prerequisites.
-   *
-   * - If `names` is a task name string execute the task action.
-   * - If `names` is an array of task names execute their actions asynchronously.
-   * - Silently skip tasks that have no action function.
+   * Unconditionally execute task action functions asynchronously.
+   * Silently skip tasks that have no action function.
    */
-  async execute(names: string | string[]) {
-    if (typeof names === "string") {
-      names = [names];
-    }
+  async execute(...names: string[]) {
     names = names.map((name) => normalizeTaskName(name));
     if (env("--dry-run")) {
       log(yellow(`${names} skipped`) + " (dry run)");
