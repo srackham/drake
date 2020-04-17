@@ -20,8 +20,8 @@ export {
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import { existsSync } from "https://deno.land/std@v0.40.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.40.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v0.41.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.41.0/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
@@ -50,7 +50,7 @@ if (env("--help")) {
 
   if (env("--directory")) {
     const dir = env("--directory");
-    if (!existsSync(dir) || !Deno.statSync(dir).isDirectory()) {
+    if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
       abort(`--directory missing or not a directory: ${dir}`);
     }
     Deno.chdir(dir);

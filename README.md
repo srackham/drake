@@ -11,12 +11,12 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - Drake API functions for defining, registering and running tasks.
 
 **NOTE**: This is a development release and will be subject to
-breaking changes until 1.0 (see the Git commit log for `BREAKING
+breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0.  If you experience compilation errors try forcing a cache reload
 with the Deno `cache` command e.g. `deno cache Drakefile.ts --reload`
 
-Tested with Deno 0.40.0 running on Ubuntu 18.04.
+Tested with Deno 0.41.0 running on Ubuntu 18.04.
 
 
 ## Drakefiles
