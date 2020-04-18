@@ -383,23 +383,21 @@ export function glob(...patterns: string[]): string[] {
 }
 
 /** Sythesize platform dependent shell command arguments and Windows command file. */
-function shArgs(command: string): [string[], string | undefined] {
+function shArgs(command: string): [string[], string] {
   let cmdArgs: string[];
-  let cmdFile: string | undefined;
   if (Deno.build.os === "win") {
-    cmdFile = Deno.makeTempFileSync(
+    const cmdFile = Deno.makeTempFileSync(
       { prefix: "drake_", suffix: ".cmd" },
     );
     writeFile(cmdFile, `@echo off\n${command}`);
-    cmdArgs = [cmdFile];
+    return [[cmdFile], cmdFile];
   } else {
     const shellExe = Deno.env("SHELL")!;
     if (!shellExe) {
       abort(`cannot locate shell: missing SHELL environment variable`);
     }
-    cmdArgs = [shellExe, "-c", command];
+    return [[shellExe, "-c", command], ""];
   }
-  return [cmdArgs, cmdFile];
 }
 
 export interface ShOpts {
@@ -436,7 +434,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
   try {
     for (const cmd of commands) {
       let cmdArgs: string[];
-      let cmdFile: string | undefined;
+      let cmdFile = "";
       [cmdArgs, cmdFile] = shArgs(cmd);
       if (cmdFile) tempFiles.push(cmdFile);
       const p = Deno.run({
@@ -505,7 +503,7 @@ export async function shCapture(
   opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
   let cmdArgs: string[];
-  let cmdFile: string | undefined;
+  let cmdFile = "";
   [cmdArgs, cmdFile] = shArgs(command);
   const p = Deno.run({
     cmd: cmdArgs,
