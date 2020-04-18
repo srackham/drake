@@ -244,7 +244,7 @@ export function touch(...files: string[]): void {
 
 /**
  * Return `true` if either the target file does not exist or its modification time is older then one
- * or more prerequisite files. Otherwise return `false`. Throws and error if one or more prerequisite
+ * or more prerequisite files. Otherwise return `false`. Throws an error if one or more prerequisite
  * files do not exist.
  */
 export function outOfDate(target: string, prereqs: string[]): boolean {

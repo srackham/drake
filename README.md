@@ -90,8 +90,7 @@ taken to ensure the task remains out of date:
 - If an existing target file modification date has changed then it is
   reverted to the prior date.
 
-File path task names and file task prerequisite names are normalized
-at task registration.
+Task name and prerequisite file paths are normalized at task registration.
 
 ### Task properties
 **name**:
@@ -145,7 +144,7 @@ returned by asynchronous functions in any way that makes sense.
 
 ## Drake man page
 To display the Drake options and command syntax run your drakefile
-with the `--help` option:
+with the `--help` option. For example:
 
 ```
 $ deno -A Drakefile.ts --help
@@ -228,7 +227,7 @@ used.
 function env(name: string, value?: any): any;
 ```
 
-The Drake `env` API function gets and optionally sets the command-line
+The Drake `env` API function gets and optionally sets the Drake command-line
 options, task names and variables.
 
 Options are keyed by their long option name e.g.  `env("--dry-run")`.
@@ -274,7 +273,7 @@ function outOfDate(target: string, prereqs: string[]): boolean;
 
 Return `true` if either the target file does not exist or its
 modification time is older then one or more prerequisite files.
-Otherwise return `false`. Throws and error if one or more prerequisite
+Otherwise return `false`. Throws an error if one or more prerequisite
 files do not exist.
 
 ### quote
@@ -406,14 +405,15 @@ Returns the Drake version number string.
 
       alias drake="deno -A Drakefile.ts"
 
-- Use shell quoting and escapes to pass command-line variable values
-  containing spaces or special characters e.g. `"title=Foo & bar"`.
+- Use shell quoting and escapes to pass Drake command-line variable values
+  that contain spaces or special characters e.g. `"title=Foo & bar"`.
 
 - Don't forget to use `await` when calling `async` functions.
 
 - Task path name prerequisites can be glob wildcards.
 
-- Path names can refer to any file type (not just regular files).
+- Task name and prerequisite file paths can refer to any file type
+  (not just regular files).
 
 - The Drake `sh` API can be used to run multiple shell commands
   asynchronously. The following example starts two shell commands then
@@ -455,10 +455,17 @@ Returns the Drake version number string.
 
 - Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
   environment variable is set. This can be useful when executing
-  non-Drakefiles.
+  non-Drakefiles (in leiu of the Drake `--debug` command-line option).
 
 - By default Drake functions manifest errors by printing an error
   message and exiting with a non-zero exit code.  You can change the
   default behaviour so that errors throw a `DrakeError` exception by
   setting `env("--abort-exits", false)`.
+
+- Specify the Drake version to import in the `import` statment URL.
+  The first example imports the HEAD of the `master` branch; the
+  second imports the commit tagged `v0.41.0`:
+
+      import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
+      import { desc, run, task } from "https://raw.github.com/srackham/drake/v0.41.0/mod.ts";
 

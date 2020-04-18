@@ -15,6 +15,10 @@ export class Graph {
     this.nodes.set(node, adjacents);
   }
 
+  /**
+   * Search the graph for cycles. Each cycle contributes an error message to the list of `errors`.
+   * If no cycles are found the `errors` list will be empty.
+   * */
   searchForCycles() {
     this.errors = [];
     let discovered: Set<string> = new Set();
