@@ -54,14 +54,13 @@ API executes the tasks that were specified on the command-line along
 with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
-- Use the Drake `--list` option to display a list of drakefile tasks.
-  For example:  `deno -A minimal-drakefile.ts --list`
+- Use the Drake `--help` option to list [Drake command-line
+  options](#drake-man-page).  For example:
+
+      deno -A minimal-drakefile.ts --help
 
 - By convention, a project's drakefile is named `Drakefile.ts` and
   resides in the project's root directory.
-
-- Use the Drake `--help` option to view the [Drake execution
-  options](#drake-man-page).
 
 Here are some of real-world drakefiles:
 
@@ -315,7 +314,7 @@ Execute commands in the command shell.
 - If `commands` is a string execute it.
 - If `commands` is an array of commands execute them asynchronously.
 - If any command fails throw an error.
-- If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are ignored.
+- If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are suppressed.
 - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
 - The `opts.env` mapping passes additional environment variables to the shell.
 
@@ -468,4 +467,9 @@ Returns the Drake version number string.
 
       import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
       import { desc, run, task } from "https://raw.github.com/srackham/drake/v0.41.0/mod.ts";
+
+- The Deno `run` command automatically compiles updated source and
+  writes compilation messages to `stderr`. This can interfere with tests
+  that capture Deno run command outputs. Use the Deno `--quiet` option
+  to eliminate this problem.
 
