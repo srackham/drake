@@ -164,7 +164,7 @@ export class TaskRegistry extends Map<string, Task> {
       }
       const task = this.get(name);
       result.unshift(task);
-      result = this.resolveDependencies(task.prereqs).concat(result);
+      result = [...this.resolveDependencies(task.prereqs), ...result];
     }
     return result;
   }
