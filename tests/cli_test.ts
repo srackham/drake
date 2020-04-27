@@ -9,7 +9,8 @@ env("--abort-exits", false);
 
 Deno.test(
   async function cliTest() {
-    const drake = "deno -A Drakefile.ts";
+    const denoRun = "deno -A --quiet";
+    const drake = `${denoRun} Drakefile.ts`;
 
     let { code, output, error } = await shCapture(
       `${drake} --version`,
@@ -66,19 +67,19 @@ Deno.test(
     assertStrContains(error, "--directory missing or not a directory");
 
     ({ code, output } = await shCapture(
-      `deno -A  examples/examples-drakefile.ts cwd --quiet`,
+      `${denoRun} examples/examples-drakefile.ts cwd --quiet`,
     ));
     assertEquals(code, 0);
     assertEquals(output.trimRight(), Deno.cwd());
 
     ({ code, output } = await shCapture(
-      `deno -A  examples/examples-drakefile.ts cwd --quiet --directory .`,
+      `${denoRun} examples/examples-drakefile.ts cwd --quiet --directory .`,
     ));
     assertEquals(code, 0);
     assertEquals(output.trimRight(), Deno.cwd());
 
     ({ code, output } = await shCapture(
-      `deno -A  examples/examples-drakefile.ts cwd --quiet --directory examples`,
+      `${denoRun} examples/examples-drakefile.ts cwd --quiet --directory examples`,
     ));
     assertEquals(code, 0);
     assertEquals(output.trimRight(), path.join(Deno.cwd(), "examples"));
