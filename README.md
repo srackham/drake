@@ -100,13 +100,17 @@ An array of prerequisite task names i.e. the names of tasks to be run
 prior to executing the task action function. Prerequisites can be
 Normal task names, File task names, file paths or globs (wildcards):
 
-- Normal task names must have a matching task.
+- Globs are expanded when the task is registered.
+- Prerequisites are resolved at the time the task is run.
 - File path prerequisites do not require a matching task.
-- Globs are expanded when the task is registered with the `task()`
-  API.
+- An error is thrown if any prerequisite file path is missing at the
+  time the task action is executed.
 
 **desc**:
-An optional task description that is set by the `desc()` API.
+An optional task description that is set by the `desc()` API. Tasks
+without a description are not displayed by the `---list-tasks`
+command-line option (use the `-L` option to include hidden tasks and
+task prerequisites in the tasks list).
 
 **action**:
 An optional function that is run if the task is selected for
@@ -354,16 +358,19 @@ const { code, output, error } = await shCapture("mkdir tmpdir", { stderr: "piped
 
 ### task
 ``` typescript
-function task(name: string, prereqs: string[] = [], action?: Action): void;
+function task(name: string, prereqs?: string[], action?: Action): Task;
 ```
 
-Create and register a task.
+Create and register a task. Returns the task object.
 
 - `name` is a unique task name.
 - `prereqs` is an array of prerequisite task names.  Prerequisites can
-  be Normal task names, File task names, file paths or globs (wildcards).
-- `action` is an optional function (`type Action = (this: Task) =>
-  any;`) that is run if the task is selected for execution.
+  be normal task names, file task names, file paths or globs
+  (wildcards).
+- `action` is an optional function that is run if the task is selected
+  for execution (`type Action = (this: Task) => any;`).
+- To fetch an existing task omit both the `prereqs` and `action`
+  parameters.
 
 ### touch
 ``` typescript
@@ -470,6 +477,6 @@ Returns the Drake version number string.
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
-  that capture Deno run command outputs. Use the Deno `--quiet` option
+  that capture Deno `run` command outputs. Use the Deno `--quiet` option
   to eliminate this problem.
 
