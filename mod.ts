@@ -23,7 +23,7 @@ export { desc, execute, run, task, vers };
 import { existsSync } from "https://deno.land/std@v0.41.0/fs/mod.ts";
 import * as path from "https://deno.land/std@v0.41.0/path/mod.ts";
 import { help } from "./lib/help.ts";
-import { Action, TaskRegistry } from "./lib/tasks.ts";
+import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
 const DRAKE_VERS = "0.41.0";
@@ -68,17 +68,23 @@ function desc(description: string): void {
 }
 
 /**
- * Create and register a task.
- * @param name - A unique task name.
- * @param prereqs - An array of prerequisite task names. Prerequisites can be _Normal task_ names, _File task_ names, file paths or globs (wildcards).
- * @param action - An optional function that is run if the task is selected for execution.
+ * Create and register a task. Returns the task object.
+ *
+ * - `name` is a unique task name.
+ * - `prereqs` is an array of prerequisite task names.  Prerequisites can
+ *   be Normal task names, File task names, file paths or globs
+ *   (wildcards).
+ * - `action` is an optional function that is run if the task is selected
+ *   for execution (`type Action = (this: Task) => any;`).
+ * - To fetch an existing task omit both the `prereqs` and `action`
+ *   parameters.
+ *
  */
-function task(
-  name: string,
-  prereqs: string[] = [],
-  action?: Action,
-): void {
-  taskRegistry.register(name, prereqs, action);
+function task(name: string, prereqs?: string[], action?: Action): Task {
+  if (prereqs !== undefined) {
+    taskRegistry.register(name, prereqs, action);
+  }
+  return taskRegistry.get(name);
 }
 
 /**
