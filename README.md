@@ -69,7 +69,14 @@ Here are some of real-world drakefiles:
 
 
 ## Tasks
+
+### Task types
 There are two types of task: _Normal tasks_ and _File tasks_.
+
+A _Normal task_ executes unconditionally.  A _File task_ is only
+executed if it is out of date i.e. immediately prior to  execution
+either the task name file path does not exist or one or more
+prerequisite files has a more recent modification time.
 
 Task types are distinguished by their names.  _Normal task_ names can
 only contain alphanumeric, underscore and hyphen characters and cannot
@@ -77,40 +84,20 @@ start with a hyphen e.g. `test`, `hello-world`. _File task_ names are
 valid file paths. In cases of ambiguity a _File task_ name should be
 prefixed with a period and a path separator e.g. `./hello-world`.
 
-A _Normal task_ executes unconditionally.  A _File task_ is only
-executed if it is out of date i.e. immediately prior to  execution
-either the task name file path does not exist or one or more
-prerequisite files has a more recent modification time.
-
-If a _File task_ execution error occurs the following precautions are
-taken to ensure the task remains out of date:
-
-- If a new target file has been created then it is deleted.
-- If an existing target file modification date has changed then it is
-  reverted to the prior date.
-
-Task name and prerequisite file paths are normalized at task registration.
-
 ### Task properties
 **name**:
 A unique task name.
-
-**prereqs**:
-An array of prerequisite task names i.e. the names of tasks to be run
-prior to executing the task action function. Prerequisites can be
-Normal task names, File task names, file paths or globs (wildcards):
-
-- Globs are expanded when the task is registered.
-- Prerequisites are resolved at the time the task is run.
-- File path prerequisites do not require a matching task.
-- An error is thrown if any prerequisite file path is missing at the
-  time the task action is executed.
 
 **desc**:
 An optional task description that is set by the `desc()` API. Tasks
 without a description are not displayed by the `---list-tasks`
 command-line option (use the `-L` option to include hidden tasks and
 task prerequisites in the tasks list).
+
+**prereqs**:
+An array of prerequisite task names i.e. the names of tasks to be run
+prior to executing the task action function. Prerequisites can be
+Normal task names, File task names, file paths or globs (wildcards).
 
 **action**:
 An optional function that is run if the task is selected for
@@ -119,6 +106,27 @@ i.e. the parent task properties are accessible inside the action
 function through the `this` object e.g. `this.prereqs` returns the
 task's prerequisite names array.
 
+### Task execution
+Task execution is ordered such that prerequisite tasks (direct and
+indirect) are executed prior to their parent task. The same task is
+never run twice.
+
+- Task name and prerequisite file paths are normalized at task
+  registration.
+- Prerequisite globs are expanded when the task is registered.
+- Prerequisites are resolved at the time the task is run.
+- All prerequisite files must exist by the time the task executes. An
+  error is thrown if any are missing.
+- Prerequisite file paths in normal tasks must have matching tasks
+  (because a prerequisite file without a matching task does nothing in
+  a normal task)
+
+If a _File task_ execution error occurs the following precautions are
+taken to ensure the task remains out of date:
+
+- If a new target file has been created then it is deleted.
+- If an existing target file modification date has changed then it is
+  reverted to the prior date.
 
 ### Asynchronous task actions
 Normally you will want tasks to execute sequentially i.e. the next
@@ -144,10 +152,9 @@ has even started.
 Of course you are free to eschew `await` and use the promises
 returned by asynchronous functions in any way that makes sense.
 
-
-## Drake man page
-To display the Drake options and command syntax run your drakefile
-with the `--help` option. For example:
+### Drakefile execution
+A drakefile is executed from the command-line. Use the `--help` option
+to view Drake command-line options and syntax.  For example:
 
 ```
 $ deno -A Drakefile.ts --help
@@ -185,14 +192,15 @@ SEE ALSO
   The Drake user guide: https://github.com/srackham/drake
 ```
 
-### Command-line variables
+If no command-line tasks are given the default task is run (specified
+by setting the `env` API `"--default-task"` value).
+
 A Drake command-line variable is a named string value that is made
 available to the drakefile.  Variables are formatted like
 `<name>=<value>` e.g.  `vers=0.1.0`.  Variables are accessed within a
-drakefile using the `env` API e.g.  `env("vers")`.
-
-Variable names can only contain alphanumeric or underscore characters
-and must start with an alpha character.
+drakefile using the `env` API e.g.  `env("vers")`.  Variable names can
+only contain alphanumeric or underscore characters and must start with
+an alpha character.
 
 
 ## Drake API
@@ -440,6 +448,16 @@ Returns the Drake version number string.
           ls
           wc Drakefile.ts`);
 
+- Task can be created dynamically, for example:
+
+      for (const prereq of glob("*.md")) {
+        const target = `${path.basename(prereq, ".md")}.html`;
+        desc(`compile "${target}"`);
+        task(target, [prereq], function () {
+          sh(`markdown "${prereq}" > "${target}"`);
+        });
+      }
+
 - The built-in [Deno API](https://deno.land/typedoc/) has many useful
   functions e.g.
 
@@ -461,7 +479,7 @@ Returns the Drake version number string.
 
 - Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
   environment variable is set. This can be useful when executing
-  non-Drakefiles (in leiu of the Drake `--debug` command-line option).
+  non-Drakefiles (in lieu of the Drake `--debug` command-line option).
 
 - By default Drake functions manifest errors by printing an error
   message and exiting with a non-zero exit code.  You can change the
