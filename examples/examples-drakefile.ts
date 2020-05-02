@@ -1,4 +1,5 @@
 // import { desc, env, execute, run, sh, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
+import { readFile, updateFile, writeFile } from "../lib/utils.ts";
 import { desc, env, execute, run, sh, task } from "../mod.ts";
 
 desc("Minimal Drake task");
@@ -88,6 +89,13 @@ task("run", [], async function () {
 desc("print cwd");
 task("cwd", [], function () {
   console.log(Deno.cwd());
+});
+
+desc("readFile, writeFile, updateFile");
+task("rwu", [], function () {
+  writeFile("/tmp/drake-test.txt", "Hello World!");
+  updateFile("/tmp/drake-test.txt", /Hello/, "Hello cruel");
+  console.log(readFile("/tmp/drake-test.txt"));
 });
 
 run();
