@@ -134,7 +134,7 @@ Deno.test(
       await assertThrowsAsync(
         async () => await taskRegistry.run(target),
         DrakeError,
-        "missing prerequisite path:",
+        "missing prerequisite file:",
         "missing prerequisite file should throw error",
       );
 
