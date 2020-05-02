@@ -244,7 +244,7 @@ Deno.test(
     assertThrows(
       () => normalizeTaskName(name),
       DrakeError,
-      `wildcard task name not allowed: ${name}`,
+      `wildcard task name not allowed: "${name}"`,
     );
   },
 );

@@ -250,7 +250,7 @@ export function touch(...files: string[]): void {
 export function outOfDate(target: string, prereqs: string[]): boolean {
   for (const prereq of prereqs) {
     if (!existsSync(prereq)) {
-      abort(`outOfDate: missing prerequisite file: ${prereq}`);
+      abort(`outOfDate: missing prerequisite file: "${prereq}"`);
     }
   }
   let result = false;
@@ -325,7 +325,7 @@ export function normalizeTaskName(name: string): string {
     abort("blank task name");
   }
   if (path.isGlob(name)) {
-    abort(`wildcard task name not allowed: ${name}`);
+    abort(`wildcard task name not allowed: "${name}"`);
   }
   if (isFileTask(name)) {
     name = normalizePath(name);

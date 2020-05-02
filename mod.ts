@@ -51,7 +51,7 @@ if (env("--help")) {
   if (env("--directory")) {
     const dir = env("--directory");
     if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
-      abort(`--directory missing or not a directory: ${dir}`);
+      abort(`--directory missing or not a directory: "${dir}"`);
     }
     Deno.chdir(dir);
   }
