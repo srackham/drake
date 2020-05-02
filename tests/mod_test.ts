@@ -6,6 +6,7 @@ import { touch } from "../lib/utils.ts";
 import { desc, DrakeError, env, run, task } from "../mod.ts";
 
 env("--abort-exits", false);
+env("--quiet", true);
 
 Deno.test(
   async function drakeApiTest() {
@@ -13,6 +14,20 @@ Deno.test(
     const savedCwd = Deno.cwd();
     try {
       Deno.chdir(dir);
+
+      await assertThrowsAsync(
+        async () => await run("missing-normal-task"),
+        DrakeError,
+        "missing task:",
+        "normal task passed to `run` API must exist",
+      );
+
+      await assertThrowsAsync(
+        async () => await run("./missing-file-task"),
+        DrakeError,
+        "missing task:",
+        "file task passed to `run` API must exist",
+      );
 
       desc("Test task one");
       task("task1", []);
@@ -46,7 +61,7 @@ Deno.test(
 
       touch(prereqFile);
 
-      run(prereqFile);
+      run(targetFile);
 
       await assertThrowsAsync(
         async () => await run("normalTask"),

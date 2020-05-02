@@ -202,6 +202,9 @@ export class TaskRegistry extends Map<string, Task> {
    * Tasks without an action function are skipped.
    */
   async run(...names: string[]) {
+    for (const name of names) {
+      this.get(name); // Throws error if task is missing.
+    }
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
     debug("run", `[${tasks.map((t) => `"${t.name}"`)}]`);
