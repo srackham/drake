@@ -188,7 +188,7 @@ export function readFile(filename: string): string {
   const result = new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
   debug(
     "readFile",
-    `filename: "${filename}": "${result}"`,
+    `filename: "${filename}": ${result.length} characters read`,
   );
   return result;
 }
@@ -197,7 +197,7 @@ export function readFile(filename: string): string {
 export function writeFile(filename: string, text: string): void {
   debug(
     "writeFile",
-    `filename: "${filename}": text: "${text}"`,
+    `filename: "${filename}": ${text.length} characters written`,
   );
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }
@@ -212,6 +212,10 @@ export function updateFile(
   find: RegExp,
   replace: string,
 ): boolean {
+  debug(
+    "updateFile",
+    `filename: "${filename}": find: ${find}, replace: "${replace}"`,
+  );
   let result = false;
   const text = readFile(filename);
   const updatedText = text.replace(find, replace);
@@ -219,10 +223,6 @@ export function updateFile(
     writeFile(filename, updatedText);
     result = true;
   }
-  debug(
-    "updateFile",
-    `filename: "${filename}": find: ${find}: replace: "${replace}": ${result}`,
-  );
   return result;
 }
 
