@@ -1,6 +1,6 @@
-import { bold, red, yellow } from "https://deno.land/std@v0.41.0/fmt/colors.ts";
-import { existsSync, walkSync } from "https://deno.land/std@v0.41.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.41.0/path/mod.ts";
+import { bold, red, yellow } from "https://deno.land/std@v0.42.0/fmt/colors.ts";
+import { existsSync, walkSync } from "https://deno.land/std@v0.42.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.42.0/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -24,7 +24,7 @@ export class DrakeError extends Error {
   * the `"vers"` value to `"1.0.1"`.
   */
 export const env = newEnvFunction(
-  { "--tasks": [], "--debug": !!Deno.env("DRAKE_DEBUG") },
+  { "--tasks": [], "--debug": !!Deno.env.get("DRAKE_DEBUG") },
 );
 
 type EnvData = { [name: string]: any };
@@ -230,6 +230,7 @@ export function updateFile(
  * Update the modification time of each file to the current time.
  * If a file does not exist then create a zero length file.
  * Missing parent directory paths are also created.
+ * Files are processed in `files` order.
  */
 export function touch(...files: string[]): void {
   debug("touch", `[${quote(files, ", ")}]`);
@@ -238,7 +239,18 @@ export function touch(...files: string[]): void {
     if (!existsSync(dir)) {
       Deno.mkdirSync(dir, { recursive: true });
     }
-    Deno.openSync(file, "w").close();
+    if (existsSync(file)) {
+      // KLUDGE: utimeSync truncates times down to nearest second so round up if the current time
+      // has fractions of a second to ensure the touched file is never older that previously created
+      // timestamps.
+      // See https://github.com/denoland/deno/issues/5065
+      // Deno.utimeSync(file, new Date(), new Date());
+      const ms = Date.now();
+      const secs = Math.floor(ms / 1000) + (ms % 1000 ? 1 : 0);
+      Deno.utimeSync(file, secs, secs);
+    } else {
+      Deno.openSync(file, { create: true, write: true }).close();
+    }
   }
 }
 
@@ -260,10 +272,10 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
     const targetStat = Deno.statSync(target);
     for (const prereq of prereqs) {
       const prereqStat = Deno.statSync(prereq);
-      if (!targetStat.modified || !prereqStat.modified) {
+      if (targetStat.mtime === null || prereqStat.mtime === null) {
         continue;
       }
-      if (targetStat.modified < prereqStat.modified) {
+      if (targetStat.mtime.getTime() < prereqStat.mtime.getTime()) {
         result = true;
         break;
       }
@@ -370,7 +382,7 @@ export function glob(...patterns: string[]): string[] {
     }
     const regexp = path.globToRegExp(pattern, globOptions);
     const iter = walkSync(root, { match: [regexp], includeDirs: false });
-    return Array.from(iter, (info) => info.filename);
+    return Array.from(iter, (info) => info.path);
   }
   let result: string[] = [];
   for (const pattern of patterns) {
@@ -385,14 +397,14 @@ export function glob(...patterns: string[]): string[] {
 /** Sythesize platform dependent shell command arguments and Windows command file. */
 function shArgs(command: string): [string[], string] {
   let cmdArgs: string[];
-  if (Deno.build.os === "win") {
+  if (Deno.build.os === "windows") {
     const cmdFile = Deno.makeTempFileSync(
       { prefix: "drake_", suffix: ".cmd" },
     );
     writeFile(cmdFile, `@echo off\n${command}`);
     return [[cmdFile], cmdFile];
   } else {
-    const shellExe = Deno.env("SHELL")!;
+    const shellExe = Deno.env.get("SHELL")!;
     if (!shellExe) {
       abort(`cannot locate shell: missing SHELL environment variable`);
     }

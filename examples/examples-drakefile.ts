@@ -14,7 +14,7 @@ desc("Synchronous task that does nothing");
 task("noop", ["pause"], function () {
   console.log(env("--drakefile"));
   console.log(`${this.desc} executing in ${Deno.cwd()}`);
-  console.log(`$HOME=${Deno.env("HOME")}`);
+  console.log(`$HOME=${Deno.env.get("HOME")}`);
 });
 
 desc("Execute shell command");

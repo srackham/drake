@@ -16,7 +16,7 @@ CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0.  If you experience compilation errors try forcing a cache reload
 with the Deno `cache` command e.g. `deno cache Drakefile.ts --reload`
 
-Tested with Deno 0.41.0 running on Ubuntu 18.04.
+Tested with Deno 0.42.0 running on Ubuntu 18.04.
 
 
 ## Drakefiles
@@ -388,6 +388,7 @@ function touch(...files: string[]): void;
 Update the modification time of each file to the current time.
 If a file does not exist then create a zero length file.
 Missing parent directory paths are also created.
+Files are processed in `files` order.
 
 ### writeFile
 ``` typescript
@@ -488,10 +489,10 @@ Returns the Drake version number string.
 
 - Specify the Drake version to import in the `import` statment URL.
   The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v0.41.0`:
+  second imports the commit tagged `v0.42.0`:
 
       import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      import { desc, run, task } from "https://raw.github.com/srackham/drake/v0.41.0/mod.ts";
+      import { desc, run, task } from "https://raw.github.com/srackham/drake/v0.42.0/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
