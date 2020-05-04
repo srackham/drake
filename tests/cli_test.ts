@@ -1,14 +1,14 @@
-import * as path from "https://deno.land/std@v0.42.0/path/mod.ts";
+import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 import {
   assertEquals,
   assertStrContains,
-} from "https://deno.land/std@v0.42.0/testing/asserts.ts";
+} from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
 import { env, shCapture, vers } from "../mod.ts";
 
 env("--abort-exits", false);
 
 Deno.test("cliTest", async function () {
-  const denoRun = "deno -A --quiet";
+  const denoRun = "deno run -A --quiet --unstable";
   const drake = `${denoRun} Drakefile.ts`;
 
   let { code, output, error } = await shCapture(

@@ -20,13 +20,13 @@ export {
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import { existsSync } from "https://deno.land/std@v0.42.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.42.0/path/mod.ts";
+import { existsSync } from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
+import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
-const DRAKE_VERS = "0.42.0";
+const DRAKE_VERS = "1.0.0-rc1";
 
 env("--abort-exits", true);
 
