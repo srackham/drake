@@ -247,17 +247,32 @@ export function touch(...files: string[]): void {
       Deno.mkdirSync(dir, { recursive: true });
     }
     if (existsSync(file)) {
-      // KLUDGE: utimeSync truncates times down to nearest second so round up if the current time
-      // has fractions of a second to ensure the touched file is never older that previously created
-      // timestamps.
+      // KLUDGE: Until Deno.utimeSync() is stable and sets millisecond resolution use utime().
       // See https://github.com/denoland/deno/issues/5065
       // Deno.utimeSync(file, new Date(), new Date());
-      const ms = Date.now();
-      const secs = Math.floor(ms / 1000) + (ms % 1000 ? 1 : 0);
-      Deno.utimeSync(file, secs, secs);
+      utime(file);
     } else {
-      Deno.openSync(file, { create: true, write: true }).close();
+      Deno.createSync(file).close();
     }
+  }
+}
+
+function utime(file: string): void {
+  // KLUDGE: The utime() function is neccessary because Deno.utimeSync() currently truncates
+  // timestamps down to nearest second and is classed as unstable.
+  // See https://github.com/denoland/deno/issues/5065
+  if (Deno.statSync(file).size === 0) {
+    // Deno.createSync(file).close();
+    Deno.truncateSync(file);
+  } else {
+    // Read then write the first byte of the file to update the file timestamp.
+    const buf = new Uint8Array(1);
+    let fd = Deno.openSync(file, { read: true });
+    fd.readSync(buf);
+    fd.close();
+    fd = Deno.openSync(file, { write: true });
+    fd.writeSync(buf);
+    fd.close();
   }
 }
 
@@ -267,6 +282,7 @@ export function touch(...files: string[]): void {
  * files do not exist.
  */
 export function outOfDate(target: string, prereqs: string[]): boolean {
+  const resolution = 10; // The number of milliseconds file timestamp uncertainty.
   for (const prereq of prereqs) {
     if (!existsSync(prereq)) {
       abort(`outOfDate: missing prerequisite file: "${prereq}"`);
@@ -282,7 +298,9 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
       if (targetStat.mtime === null || prereqStat.mtime === null) {
         continue;
       }
-      if (targetStat.mtime.getTime() < prereqStat.mtime.getTime()) {
+      if (
+        targetStat.mtime.getTime() + resolution < prereqStat.mtime.getTime()
+      ) {
         result = true;
         break;
       }

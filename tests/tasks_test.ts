@@ -99,21 +99,14 @@ Deno.test("fileTaskTest", async function () {
     assert(!taskRan, "task should not have executed: target file up to date");
 
     taskRan = false;
-    // Set target timestamps to less than the prerequisite file guarantee the file task is out of date.
-    const prereqInfo = Deno.statSync(prereq);
-    const atime = new Date(prereqInfo.atime!.getTime() - 1);
-    const mtime = new Date(prereqInfo.mtime!.getTime() - 1);
-    Deno.utimeSync(target, atime, mtime);
+    await sleep(25);
+    touch(prereq);
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: target file out of date");
 
+    await sleep(25);
     touch(target);
     taskRan = false;
-    // TODO: Drop debug messsages.
-    // console.log("prereq atime:", Deno.statSync(prereq).atime!.getTime());
-    // console.log("prereq mtime:", Deno.statSync(prereq).mtime!.getTime());
-    // console.log("target atime:", Deno.statSync(target).atime!.getTime());
-    // console.log("target mtime:", Deno.statSync(target).mtime!.getTime());
     await taskRegistry.run(target);
     assert(!taskRan, "task should not have executed: target file up to date");
 
@@ -137,3 +130,7 @@ Deno.test("fileTaskTest", async function () {
     Deno.removeSync(dir, { recursive: true });
   }
 });
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

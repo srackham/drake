@@ -101,42 +101,48 @@ Deno.test("fileFunctionsTest", function () {
     assertEquals(readFile(file), "fO!O!bar");
     assertEquals(updateFile(file, /o/g, "O!"), false);
     assertEquals(updateFile(file, /zzz/g, "O!"), false);
-    // Touch tests.
-    touch(file);
-    assertEquals(
-      Deno.statSync(file).size,
-      8,
-      "existing touched file size should not be changed",
-    );
-    file = path.join(dir, "a/b/foobar");
-    touch(file);
-    assert(existsSync(file), "touched file and directories should exist");
-    assertEquals(
-      Deno.statSync(file).size,
-      0,
-      "created touched file should zero length",
-    );
-    const start = Date.now();
-    touch(file);
-    const ts = Deno.statSync(file).mtime!.getTime();
-    assert(ts >= start, "timestamp should not be older than current time");
-    assertEquals(
-      ts % 1000,
-      0,
-      "touched existing file timestamp rounds up to nearest second",
-    );
-    touch(file);
-    assertEquals(
-      Deno.statSync(file).mtime!.getTime(),
-      ts,
-      "touching a second time should not change timestamp",
-    );
   } finally {
     Deno.removeSync(dir, { recursive: true });
   }
 });
 
-Deno.test("outOfDateTest", function () {
+Deno.test("touchTest", async function () {
+  const dir = Deno.makeTempDirSync();
+  try {
+    const file = path.join(dir, "a/b/foobar");
+    touch(file);
+    assert(existsSync(file), "touched file and directories should exist");
+    assertEquals(
+      Deno.statSync(file).size,
+      0,
+      "new touched file should have zero length",
+    );
+    await touchAndCheck(file);
+    writeFile(file, "foobar");
+    await touchAndCheck(file);
+  } finally {
+    Deno.removeSync(dir, { recursive: true });
+  }
+});
+
+async function touchAndCheck(file: string) {
+  const oldTime = Deno.statSync(file).mtime!.getTime();
+  const oldSize = Deno.statSync(file).size;
+  await sleep(10);
+  touch(file);
+  assert(existsSync(file), "touched file should exist");
+  assertEquals(
+    Deno.statSync(file).size,
+    oldSize,
+    "touched file size should not change",
+  );
+  assert(
+    Deno.statSync(file).mtime!.getTime() > oldTime,
+    "touched file timestamp should be newer",
+  );
+}
+
+Deno.test("outOfDateTest", async function () {
   const dir = Deno.makeTempDirSync();
   try {
     const prereqs = ["a/b/z.ts", "a/y.ts", "u"].map((f) => path.join(dir, f));
@@ -147,25 +153,28 @@ Deno.test("outOfDateTest", function () {
       DrakeError,
       "outOfDate: missing prerequisite file:",
     );
-    // Reduce target timestamps to guarantee out of date.
-    const targetInfo = Deno.statSync(target);
-    const atime = new Date();
-    const mtime = new Date();
-    // KLUDGE: -1000 instead of -1 because of touch API 1 second resolution.
-    atime.setTime(targetInfo.atime!.getTime() - 1000);
-    mtime.setTime(targetInfo.mtime!.getTime() - 1000);
-    Deno.utimeSync(target, atime, mtime);
-    assert(outOfDate(target, prereqs));
-    // Touch target to guarantee up to date.
-    touch(target);
-    assert(!outOfDate(target, prereqs));
+    // Touch target to set up to date.
+    await touchAndCheck(target);
+    assert(!outOfDate(target, prereqs), "touched target: should be up to date");
+
+    // Touch prerequisite to set out of date.
+    await sleep(10);
+    await touchAndCheck(prereqs[0]);
+    assert(
+      outOfDate(target, prereqs),
+      "touched prerequisite: should be out of date",
+    );
     // Delete target to guarantee out of date.
     Deno.removeSync(target);
-    assert(outOfDate(target, prereqs));
+    assert(outOfDate(target, prereqs), "missing target: should be out of date");
   } finally {
     Deno.removeSync(dir, { recursive: true });
   }
 });
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 Deno.test("globTest", function () {
   let files = glob("./mod.ts", "./lib/*.ts");
