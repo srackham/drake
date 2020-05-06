@@ -364,6 +364,13 @@ const { code, output } = await shCapture("echo Hello");
 const { code, output, error } = await shCapture("mkdir tmpdir", { stderr: "piped" });
 ```
 
+### sleep
+``` typescript
+async function sleep(ms: number): Promise<unknown>;
+```
+
+Wait `ms` milliseconds. Must be called with `await`.
+
 ### task
 ``` typescript
 function task(name: string, prereqs?: string[], action?: Action): Task;

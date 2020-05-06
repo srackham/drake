@@ -14,6 +14,7 @@ export {
   ShCaptureOpts,
   ShOpts,
   ShOutput,
+  sleep,
   touch,
   updateFile,
   writeFile,

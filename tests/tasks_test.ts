@@ -5,7 +5,7 @@ import {
   assertThrowsAsync,
 } from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env, touch } from "../lib/utils.ts";
+import { DrakeError, env, sleep, touch } from "../lib/utils.ts";
 
 Deno.test("taskRegistryTests", async function () {
   env("--quiet", true);
@@ -130,7 +130,3 @@ Deno.test("fileTaskTest", async function () {
     Deno.removeSync(dir, { recursive: true });
   }
 });
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

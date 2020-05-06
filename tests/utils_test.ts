@@ -23,6 +23,7 @@ import {
   readFile,
   sh,
   shCapture,
+  sleep,
   touch,
   updateFile,
   writeFile,
@@ -171,10 +172,6 @@ Deno.test("outOfDateTest", async function () {
     Deno.removeSync(dir, { recursive: true });
   }
 });
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 Deno.test("globTest", function () {
   let files = glob("./mod.ts", "./lib/*.ts");

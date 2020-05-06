@@ -1,12 +1,5 @@
-import {
-  bold,
-  red,
-  yellow,
-} from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
-import {
-  existsSync,
-  walkSync,
-} from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
+import { bold, red, yellow } from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
+import { existsSync, walkSync } from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
 import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 
 export class DrakeError extends Error {
@@ -188,6 +181,11 @@ export function debug(title: string, message?: any): void {
 export function quote(values: string[], sep: string = " "): string {
   values = values.map((value) => `"${value.replace(/"/g, '\\"')}"`);
   return values.join(sep);
+}
+
+/** Wait `ms` milliseconds. Must be called with `await`. */
+export async function sleep(ms: number): Promise<unknown> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /** Read the entire contents of a file synchronously to a UTF-8 string. */
