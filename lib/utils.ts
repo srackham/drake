@@ -1,5 +1,12 @@
-import { bold, red, yellow } from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
-import { existsSync, walkSync } from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
+import {
+  bold,
+  red,
+  yellow,
+} from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
+import {
+  existsSync,
+  walkSync,
+} from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
 import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 
 export class DrakeError extends Error {
@@ -193,7 +200,7 @@ export function readFile(filename: string): string {
   const result = new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
   debug(
     "readFile",
-    `filename: "${filename}": ${result.length} characters read`,
+    `filename: ${filename}: ${result.length} characters read`,
   );
   return result;
 }
@@ -202,7 +209,7 @@ export function readFile(filename: string): string {
 export function writeFile(filename: string, text: string): void {
   debug(
     "writeFile",
-    `filename: "${filename}": ${text.length} characters written`,
+    `filename: ${filename}: ${text.length} characters written`,
   );
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }
@@ -219,7 +226,7 @@ export function updateFile(
 ): boolean {
   debug(
     "updateFile",
-    `filename: "${filename}": find: ${find}, replace: "${replace}"`,
+    `filename: ${filename}: find: ${find}, replace: "${replace}"`,
   );
   let result = false;
   const text = readFile(filename);
@@ -238,7 +245,7 @@ export function updateFile(
  * Files are processed in `files` order.
  */
 export function touch(...files: string[]): void {
-  debug("touch", `[${quote(files, ", ")}]`);
+  debug("touch", `${files.join("\n")}`);
   for (const file of files) {
     const dir = path.dirname(file);
     if (!existsSync(dir)) {
@@ -306,7 +313,7 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
   }
   debug(
     "outOfDate",
-    `${result}: ${quote([target])}: [${quote(prereqs, ", ")}]`,
+    `${result}: ${target}:\n${prereqs.join("\n")}`,
   );
   return result;
 }
@@ -462,7 +469,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
   if (typeof commands === "string") {
     commands = [commands];
   }
-  debug("sh", `[${quote(commands, "\n")}], ${JSON.stringify(opts)}`);
+  debug("sh", `${commands.join("\n")}\nopts: ${JSON.stringify(opts)}`);
   const tempFiles: string[] = [];
   const processes: Deno.Process[] = [];
   const results: Deno.ProcessStatus[] = [];
@@ -573,7 +580,9 @@ export async function shCapture(
   };
   debug(
     "shCapture",
-    `${quote([command])}, ${JSON.stringify(opts)}\n${JSON.stringify(result)}`,
+    `${command}\nopts:      ${JSON.stringify(opts)}\noutputs:   ${
+      JSON.stringify(result)
+    }`,
   );
   return result;
 }

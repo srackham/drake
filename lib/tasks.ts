@@ -207,7 +207,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    debug("run", `[${tasks.map((t) => `"${t.name}"`)}]`);
+    debug("run", `${names.join(" ")}\n${tasks.map((t) => t.name).join("\n")}`);
     for (const task of tasks) {
       if (isNormalTask(task.name)) {
         await this.executeNormalTask(task);
