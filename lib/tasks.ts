@@ -266,8 +266,7 @@ export class TaskRegistry extends Map<string, Task> {
         newInfo.mtime! > oldInfo.mtime!
       ) {
         // Reset target timestamps to ensure task executes when next run.
-        // TODO: Reinstate once Deno.utimeSync() becomes stable.
-        // Deno.utimeSync(task.name, oldInfo.atime!, oldInfo.mtime!);
+        Deno.utimeSync(task.name, oldInfo.atime!, oldInfo.mtime!);
       }
       if (e instanceof DrakeError) {
         abort(e.message);

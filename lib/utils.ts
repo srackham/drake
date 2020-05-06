@@ -257,12 +257,12 @@ export function touch(...files: string[]): void {
   }
 }
 
+/** Update `file` mtime and atime timestamps to the current time. */
 function utime(file: string): void {
   // KLUDGE: The utime() function is neccessary because Deno.utimeSync() currently truncates
   // timestamps down to nearest second and is classed as unstable.
   // See https://github.com/denoland/deno/issues/5065
   if (Deno.statSync(file).size === 0) {
-    // Deno.createSync(file).close();
     Deno.truncateSync(file);
   } else {
     // Read then write the first byte of the file to update the file timestamp.

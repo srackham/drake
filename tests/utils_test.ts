@@ -128,7 +128,7 @@ Deno.test("touchTest", async function () {
 async function touchAndCheck(file: string) {
   const oldTime = Deno.statSync(file).mtime!.getTime();
   const oldSize = Deno.statSync(file).size;
-  await sleep(10);
+  await sleep(10); // File system timestamp uncertainty.
   touch(file);
   assert(existsSync(file), "touched file should exist");
   assertEquals(
@@ -153,18 +153,18 @@ Deno.test("outOfDateTest", async function () {
       DrakeError,
       "outOfDate: missing prerequisite file:",
     );
-    // Touch target to set up to date.
+    // Touch target to ensure up to date.
     await touchAndCheck(target);
     assert(!outOfDate(target, prereqs), "touched target: should be up to date");
 
-    // Touch prerequisite to set out of date.
+    // Touch prerequisite to ensure out of date.
     await sleep(10);
     await touchAndCheck(prereqs[0]);
     assert(
       outOfDate(target, prereqs),
       "touched prerequisite: should be out of date",
     );
-    // Delete target to guarantee out of date.
+    // Delete target to ensure out of date.
     Deno.removeSync(target);
     assert(outOfDate(target, prereqs), "missing target: should be out of date");
   } finally {
