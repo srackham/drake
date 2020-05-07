@@ -10,13 +10,17 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
+**IMPORTANT**: Currently (as of 1.0.0-rc1) it is necessary to include
+the Deno `--unstable` when you compile drakefiles. This will not be
+necessary in future Drake releases.
+
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0.  If you experience compilation errors try forcing a cache reload
 with the Deno `cache` command e.g. `deno cache Drakefile.ts --reload`
 
-Tested with Deno 0.42.0 running on Ubuntu 18.04.
+Tested with Deno 1.0.0-rc1 running on Ubuntu 18.04.
 
 
 ## Drakefiles
@@ -43,7 +47,7 @@ To run the above example, copy and paste it into a file and run it
 with Deno. For example:
 
 ```
-$ deno -A minimal-drakefile.ts hello
+$ deno run -A --unstable minimal-drakefile.ts hello
 hello started
 Hello World!
 hello finished (0ms)
@@ -57,7 +61,7 @@ in the drakefile.  Tasks are executed in the correct dependency order.
 - Use the Drake `--help` option to list [Drake command-line
   options](#drake-man-page).  For example:
 
-      deno -A minimal-drakefile.ts --help
+      deno run -A minimal-drakefile.ts --help
 
 - By convention, a project's drakefile is named `Drakefile.ts` and
   resides in the project's root directory.
@@ -157,13 +161,13 @@ A drakefile is executed from the command-line. Use the `--help` option
 to view Drake command-line options and syntax.  For example:
 
 ```
-$ deno -A Drakefile.ts --help
+$ deno run -A Drakefile.ts --help
 
 NAME
   drake - a make-like task runner for Deno.
 
 SYNOPSIS
-  deno -A DRAKEFILE [OPTION|VARIABLE|TASK]...
+  deno run -A DRAKEFILE [OPTION|VARIABLE|TASK]...
 
 DESCRIPTION
   The Drake TypeScript module provides functions for defining and executing
@@ -359,13 +363,6 @@ const { code, output } = await shCapture("echo Hello");
 const { code, output, error } = await shCapture("mkdir tmpdir", { stderr: "piped" });
 ```
 
-### sleep
-``` typescript
-async function sleep(ms: number): Promise<unknown>;
-```
-
-Wait `ms` milliseconds. Must be called with `await`.
-
 ### task
 ``` typescript
 function task(name: string, prereqs?: string[], action?: Action): Task;
@@ -410,7 +407,7 @@ Returns the Drake version number string.
 ## Tips for using Drake
 - A shell alias shortcut can be set to run the default drakefile:
 
-      alias drake="deno -A Drakefile.ts"
+      alias drake="deno run -A Drakefile.ts"
 
 - Use shell quoting and escapes to pass Drake command-line variable values
   that contain spaces or special characters e.g. `"title=Foo & bar"`.
@@ -481,10 +478,10 @@ Returns the Drake version number string.
 
 - Specify the Drake version to import in the `import` statment URL.
   The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v0.42.0`:
+  second imports the commit tagged `v1.0.0-rc1`:
 
       import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      import { desc, run, task } from "https://raw.github.com/srackham/drake/v0.42.0/mod.ts";
+      import { desc, run, task } from "https://raw.github.com/srackham/drake/v1.0.0-rc1/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
