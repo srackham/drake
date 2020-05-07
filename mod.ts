@@ -6,7 +6,6 @@ export {
   env,
   glob,
   log,
-  outOfDate,
   quote,
   readFile,
   sh,
@@ -14,8 +13,6 @@ export {
   ShCaptureOpts,
   ShOpts,
   ShOutput,
-  sleep,
-  touch,
   updateFile,
   writeFile,
 } from "./lib/utils.ts";
@@ -42,7 +39,7 @@ if (env("--help")) {
 } else if (env("--version")) {
   console.log(vers());
 } else {
-  // Caclulate drakefile path relative to cwd prior to processing --directory option.
+  // Calculate drakefile path relative to cwd prior to processing --directory option.
   let drakefile = env("--drakefile") ?? "Drakefile.ts";
   if (!path.isAbsolute(drakefile)) {
     drakefile = path.join(Deno.cwd(), drakefile);

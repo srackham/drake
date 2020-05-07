@@ -192,6 +192,11 @@ SEE ALSO
   The Drake user guide: https://github.com/srackham/drake
 ```
 
+The `--directory` option sets the drakefile execution directory and
+defaults to the current working directory. The `--directory` option
+allows a single drakefile to be used to build multiple project
+directories.
+
 If no command-line tasks are given the default task is run (specified
 by setting the `env` API `"--default-task"` value).
 
@@ -276,16 +281,6 @@ function log(message: string): void;
 
 Log a message to stdout. Do not log the message if the `--quiet`
 command-line option is set.
-
-### outOfDate
-``` typescript
-function outOfDate(target: string, prereqs: string[]): boolean;
-```
-
-Return `true` if either the target file does not exist or its
-modification time is older then one or more prerequisite files.
-Otherwise return `false`. Throws an error if one or more prerequisite
-files do not exist.
 
 ### quote
 ``` typescript
@@ -387,16 +382,6 @@ Create and register a task. Returns the task object.
 - To fetch an existing task omit both the `prereqs` and `action`
   parameters.
 
-### touch
-``` typescript
-function touch(...files: string[]): void;
-```
-
-Update the modification time of each file to the current time.
-If a file does not exist then create a zero length file.
-Missing parent directory paths are also created.
-Files are processed in `files` order.
-
 ### writeFile
 ``` typescript
 function writeFile(filename: string, text: string): void;
@@ -482,8 +467,8 @@ Returns the Drake version number string.
   * `\${` translates to `${` 
 
 - You can use Drake API functions in non-drakefiles.  Useful utility
-  functions include: `abort`, `glob`, `log`, `outOfDate`, `quote`,
-  `readFile`, `sh`, `shCapture`, `touch`, `updateFile`, `writeFile`.
+  functions include: `abort`, `glob`, `log`, `quote`, `readFile`,
+  `sh`, `shCapture`, `updateFile`, `writeFile`.
 
 - Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
   environment variable is set. This can be useful when executing
