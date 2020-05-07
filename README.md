@@ -11,8 +11,12 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - Drake API functions for defining, registering and running tasks.
 
 **IMPORTANT**: Currently (as of 1.0.0-rc1) it is necessary to include
-the Deno `--unstable` when you compile drakefiles. This will not be
-necessary in future Drake releases.
+the Deno `--unstable` when you compile drakefiles. If you still get
+compile errors try reloading the Deno cache with:
+
+    deno cache -r --unstable Drakefile.ts
+
+This should not be necessary in future Drake releases.
 
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
@@ -47,7 +51,7 @@ To run the above example, copy and paste it into a file and run it
 with Deno. For example:
 
 ```
-$ deno run -A --unstable minimal-drakefile.ts hello
+$ deno run -A minimal-drakefile.ts hello
 hello started
 Hello World!
 hello finished (0ms)
