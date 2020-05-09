@@ -12,7 +12,7 @@ Deno.test("apiTest", async function () {
   const dir = Deno.makeTempDirSync();
   const savedCwd = Deno.cwd();
   try {
-    Deno.chdir(dir);
+    env("--directory", dir);
 
     await assertThrowsAsync(
       async () => await run("missing-normal-task"),
@@ -31,21 +31,21 @@ Deno.test("apiTest", async function () {
     desc("Test task one");
     task("task1", []);
 
-    const prereqFile = "./prerequisite-file";
-    const targetFile = "./target-file";
+    const prereq = "./prerequisite-file";
+    const target = "./target-file";
 
     let t = task("task1");
     assertEquals(t.name, "task1");
     assertEquals(t.desc, "Test task one");
 
     desc("File task");
-    task(targetFile, [prereqFile]);
+    task(target, [prereq]);
 
     desc("Normal task");
-    task("normalTask", [prereqFile]);
+    task("normalTask", [prereq]);
 
     await assertThrowsAsync(
-      async () => await run(targetFile),
+      async () => await run(target),
       DrakeError,
       "missing prerequisite file:",
       "prerequisite files should exist when file task executes",
@@ -58,9 +58,9 @@ Deno.test("apiTest", async function () {
       "prerequisite files should exist when normal task executes",
     );
 
-    touch(prereqFile);
+    touch(prereq);
 
-    run(targetFile);
+    run(target);
 
     await assertThrowsAsync(
       async () => await run("normalTask"),
@@ -69,7 +69,7 @@ Deno.test("apiTest", async function () {
       "missing prerequisite file task should throw error in a normal task",
     );
   } finally {
-    Deno.chdir(savedCwd);
+    env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });
   }
 });

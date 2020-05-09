@@ -30,15 +30,13 @@ export class DrakeError extends Error {
   * Command-line variables are keyed by name. For example `vers=1.0.1` on the command-line sets
   * the `"vers"` value to `"1.0.1"`.
   */
-export const env = newEnvFunction(
-  { "--tasks": [], "--debug": !!Deno.env.get("DRAKE_DEBUG") },
-);
+export const env = newEnvFunction();
 
 type EnvData = { [name: string]: any };
 type EnvFunction = (name: string, value?: any) => any;
 
 /** Return an environment getter/setter function with `this` set to `envData`. */
-export function newEnvFunction(envData: EnvData) {
+export function newEnvFunction() {
   return function (
     this: EnvData,
     name: string,
@@ -59,8 +57,16 @@ export function newEnvFunction(envData: EnvData) {
             abort(`${name} must be a boolean`);
           }
           break;
-        case "--default-task":
         case "--directory":
+          if (typeof value !== "string") {
+            abort(`${name} must be a string`);
+          }
+          if (!existsSync(value) || !Deno.statSync(value).isDirectory) {
+            abort(`--directory missing or not a directory: ${value}`);
+          }
+          Deno.chdir(value);
+          break;
+        case "--default-task":
         case "--drakefile":
           if (typeof value !== "string") {
             abort(`${name} must be a string`);
@@ -85,7 +91,12 @@ export function newEnvFunction(envData: EnvData) {
       this[name] = value;
     }
     return this[name];
-  }.bind(envData);
+    // TODO is a new bound object created every time envFunction is called?
+  }.bind({
+    "--tasks": [],
+    "--debug": !!Deno.env.get("DRAKE_DEBUG"),
+    "--directory": Deno.cwd(),
+  });
 }
 
 export function parseEnv(args: string[], env: EnvFunction): void {
@@ -174,7 +185,10 @@ export function log(message: string): void {
  * `--debug` command-line option was specified or the `DRAKE_DEBUG` shell
  * environment variable is set.
  */
-export function debug(title: string, message?: any): void {
+export function debug(title: string, message: any = ""): void {
+  if (typeof message === "object") {
+    message = JSON.stringify(message, null, 1);
+  }
   if (env("--debug") && Deno.isatty(Deno.stderr.rid)) {
     console.error(`${yellow(bold(title + ":"))} ${message}`);
   }
@@ -290,7 +304,7 @@ export function outOfDate(target: string, prereqs: string[]): boolean {
   const resolution = 10; // The number of milliseconds file timestamp uncertainty.
   for (const prereq of prereqs) {
     if (!existsSync(prereq)) {
-      abort(`outOfDate: missing prerequisite file: "${prereq}"`);
+      abort(`outOfDate: missing prerequisite file: ${prereq}`);
     }
   }
   let result = false;
@@ -367,7 +381,7 @@ export function normalizeTaskName(name: string): string {
     abort("blank task name");
   }
   if (path.isGlob(name)) {
-    abort(`wildcard task name not allowed: "${name}"`);
+    abort(`wildcard task name not allowed: ${name}`);
   }
   if (isFileTask(name)) {
     name = normalizePath(name);

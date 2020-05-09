@@ -5,6 +5,7 @@ import {
   yellow,
 } from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
 import { existsSync } from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
+import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -16,9 +17,18 @@ import {
   log,
   normalizePrereqs,
   normalizeTaskName,
-  outOfDate,
+  readFile,
+  writeFile,
 } from "./utils.ts";
+
 export type Action = (this: Task) => any;
+
+// Snapshot file info.
+type SnapshotFileInfo = { size: number; mtime: string };
+// Prerequisite file properties.
+type Snapshot = { [prereq: string]: SnapshotFileInfo };
+// File task snapshots.
+type Snapshots = { [task: string]: Snapshot };
 
 /** Drake task. */
 export class Task {
@@ -27,6 +37,7 @@ export class Task {
   desc: string;
   prereqs: string[];
   action?: Action;
+  snapshot?: Snapshot;
 
   /**
    * Create a new task.
@@ -43,34 +54,113 @@ export class Task {
   }
 
   /**
-   * Return `true` if either the task name file does not exist or its modification time is older
-   * then one or more prerequisite files. Otherwise return `false`.
+   * TODO
+   * Throw an error if any prerequisite file is missing or any prerequisite file does.
+   * 
+   * Unconditionally execute normal task. Throw an error if any prerequisite file is missing or any
+   * prerequisite file does not have a matching task (a prerequisite file without a matching task
+   * does nothing in a normal task).
+   */
+  checkPrerequisites(): void {
+    if (!env("--dry-run")) {
+      for (const prereq of this.prereqs) {
+        if (isFileTask(prereq)) {
+          if (!existsSync(prereq)) {
+            abort(`missing prerequisite file: ${prereq}`);
+          }
+          // if (!this.has(prereq)) {
+          //   abort(`no matching task for prerequisite file: ${prereq}`);
+          // }
+        }
+      }
+    }
+  }
+
+  static fileInfo(path: string): SnapshotFileInfo {
+    const info = Deno.statSync(path);
+    return {
+      size: info.size,
+      mtime: info.mtime ? info.mtime.toISOString() : "null",
+    };
+  }
+
+  updateSnapshot(): void {
+    // assert(isFileTask(this.name));
+    const snapshot: Snapshot = {};
+    if (existsSync(this.name)) {
+      snapshot[this.name] = Task.fileInfo(this.name);
+    }
+    for (const prereq of this.prereqs) {
+      if (isFileTask(prereq)) {
+        if (existsSync(prereq)) {
+          const info = Deno.statSync(prereq);
+          snapshot[prereq] = Task.fileInfo(prereq);
+        }
+      } else {
+        delete snapshot[prereq];
+      }
+    }
+    // debug("updateSnapshot", snapshot);
+    debug("updateSnapshot", `${this.name}`);
+    this.snapshot = snapshot;
+  }
+
+  /**
+   * TODO
    *
-   * - Return true if the task is not a file task.
    * - Throw error if any prerequisite path does not exist.
    */
   isOutOfDate(): boolean {
-    if (!isFileTask(this.name)) {
-      return true;
-    }
-    const prereqs: string[] = [];
-    // Check all prerequisite paths exist.
-    for (const prereq of this.prereqs) {
-      if (!isFileTask(prereq)) {
-        continue;
-      }
-      if (!existsSync(prereq)) {
-        if (env("--dry-run")) {
-          // Assume the missing prerequisite would have been created thus rendering the target out of date.
-          return true;
+    // this.checkPrerequisites();
+    let result = false;
+    let debugMsg = "false";
+    if (isNormalTask(this.name)) { // TODO: necessary?
+      debugMsg = "true: normal task";
+      result = true;
+    } else if (!this.snapshot) {
+      debugMsg = "true: no previous snapshot";
+      result = true;
+    } else if (!existsSync(this.name)) {
+      debugMsg = "true: no target file";
+      result = true;
+    } else {
+      for (const filename of [this.name, ...this.prereqs]) {
+        if (filename != this.name && !existsSync(filename)) {
+          if (env("--dry-run")) {
+            // Assume the missing prerequisite would have been created thus rendering the target out of date.
+            debugMsg = `true: dry run`;
+            result = true;
+            break;
+          }
+          abort(
+            `missing prerequisite file: "${filename}"`,
+          );
         }
-        abort(
-          `task: ${this.name}: missing prerequisite file: "${prereq}"`,
-        );
+        const prev = this.snapshot[filename];
+        if (!prev) {
+          debugMsg = `true: no previous snapshot: ${filename}`;
+          result = true;
+          break;
+        }
+        const curr = Task.fileInfo(filename);
+        // console.log(
+        //   `${filename}\nnow: ${(new Date()).toISOString()}\nfrom: ${JSON.stringify(prev)}\nto:   ${
+        //     JSON.stringify(curr)
+        //   }`,
+        // );
+        if (
+          curr.size !== prev.size || curr.mtime !== prev.mtime
+        ) {
+          debugMsg = `true: ${filename}\nfrom: ${JSON.stringify(prev)}\nto:   ${
+            JSON.stringify(curr)
+          }`;
+          result = true;
+          break;
+        }
       }
-      prereqs.push(prereq);
     }
-    return outOfDate(this.name, prereqs);
+    debug("isOutOfDate", `${this.name}: ${debugMsg}`);
+    return result;
   }
 }
 
@@ -118,7 +208,43 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = ""; // Consume decription.
   }
 
-  /** Create a prinable list of tasks. */
+  private snapshotsFile(): string {
+    return path.join(env("--directory"), ".drake.cache.json");
+  }
+
+  loadSnapshots(): void {
+    const filename = this.snapshotsFile();
+    if (!existsSync(filename)) {
+      debug("loadSnapshots:", `no snapshots file: ${filename}`);
+      return;
+    }
+    debug("loadSnapshots");
+    const json = readFile(filename);
+    const snapshots: Snapshots = JSON.parse(json);
+    // debug("loadSnapshots", snapshots);
+    for (const taskname of Object.keys(snapshots)) {
+      this.get(taskname).snapshot = snapshots[taskname];
+    }
+  }
+
+  saveSnapshots(): void {
+    const filename = this.snapshotsFile();
+    const snapshots: Snapshots = {};
+    for (const task of this.values()) {
+      if (isFileTask(task.name) && task.snapshot) {
+        snapshots[task.name] = task.snapshot;
+      }
+    }
+    if (Object.keys(snapshots).length !== 0) {
+      // debug("saveSnapshots", snapshots);
+      debug("saveSnapshots");
+      writeFile(filename, JSON.stringify(snapshots, null, 1));
+    } else {
+      debug("saveSnapshots", "skipped: no snapshots");
+    }
+  }
+
+  /** Create a printable list of tasks. */
   list(): string[] {
     let keys = Array.from(this.keys());
     if (!env("--list-all")) {
@@ -202,6 +328,7 @@ export class TaskRegistry extends Map<string, Task> {
    * Tasks without an action function are skipped.
    */
   async run(...names: string[]) {
+    this.loadSnapshots();
     for (const name of names) {
       this.get(name); // Throws error if task is missing.
     }
@@ -209,12 +336,27 @@ export class TaskRegistry extends Map<string, Task> {
     const tasks = this.resolveDependencies(names);
     debug("run", `${names.join(" ")}\n${tasks.map((t) => t.name).join("\n")}`);
     for (const task of tasks) {
-      if (isNormalTask(task.name)) {
-        await this.executeNormalTask(task);
-      } else {
-        await this.executeFileTask(task);
+      const savedAbortExits = env("--abort-exits");
+      env("--abort-exits", false);
+      try {
+        if (isNormalTask(task.name)) {
+          await this.executeNormalTask(task);
+        } else {
+          await this.executeFileTask(task);
+        }
+      } catch (e) {
+        env("--abort-exits", savedAbortExits);
+        this.saveSnapshots();
+        if (e instanceof DrakeError) {
+          abort(e.message);
+        } else {
+          throw e;
+        }
+      } finally {
+        env("--abort-exits", savedAbortExits);
       }
     }
+    this.saveSnapshots();
   }
 
   /**
@@ -227,10 +369,10 @@ export class TaskRegistry extends Map<string, Task> {
       for (const prereq of task.prereqs) {
         if (isFileTask(prereq)) {
           if (!existsSync(prereq)) {
-            abort(`missing prerequisite file: "${prereq}"`);
+            abort(`missing prerequisite file: ${prereq}`);
           }
           if (!this.has(prereq)) {
-            abort(`no matching task for prerequisite file: "${prereq}"`);
+            abort(`no matching task for prerequisite file: ${prereq}`);
           }
         }
       }
@@ -239,6 +381,7 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
+   * TODO
    * Execute file task if it is out of date. Throw an error if any prerequisite files ares missing.
    * If an error occurs the following precautions are taken to ensure the task remains out of date:
    *
@@ -247,35 +390,13 @@ export class TaskRegistry extends Map<string, Task> {
    *   date.
    */
   private async executeFileTask(task: Task) {
+    task.checkPrerequisites();
     if (!env("--always-make") && !task.isOutOfDate()) {
       log(yellow(`${task.name} skipped`) + " (up to date)");
       return;
     }
-    const oldInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
-    const savedAbortExits = env("--abort-exits");
-    env("--abort-exits", false);
-    try {
-      await this.execute(task.name);
-    } catch (e) {
-      env("--abort-exits", savedAbortExits);
-      const newInfo = existsSync(task.name) ? Deno.statSync(task.name) : null;
-      if (!oldInfo && newInfo) {
-        Deno.removeSync(task.name); // Delete newly created target file.
-      } else if (
-        newInfo && oldInfo &&
-        newInfo.mtime! > oldInfo.mtime!
-      ) {
-        // Reset target timestamps to ensure task executes when next run.
-        Deno.utimeSync(task.name, oldInfo.atime!, oldInfo.mtime!);
-      }
-      if (e instanceof DrakeError) {
-        abort(e.message);
-      } else {
-        throw e;
-      }
-    } finally {
-      env("--abort-exits", savedAbortExits);
-    }
+    await this.execute(task.name);
+    task.updateSnapshot();
   }
 
   /**

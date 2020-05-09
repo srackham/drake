@@ -18,7 +18,6 @@ export {
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import { existsSync } from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
 import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
@@ -45,14 +44,6 @@ if (env("--help")) {
     drakefile = path.join(Deno.cwd(), drakefile);
   }
   env("--drakefile", drakefile);
-
-  if (env("--directory")) {
-    const dir = env("--directory");
-    if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
-      abort(`--directory missing or not a directory: "${dir}"`);
-    }
-    Deno.chdir(dir);
-  }
 }
 
 /** Returns the Drake version number string. */
