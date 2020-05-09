@@ -11,8 +11,8 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - Drake API functions for defining, registering and running tasks.
 
 **IMPORTANT**: Currently (as of 1.0.0-rc1) it is necessary to include
-the Deno `--unstable` when you compile drakefiles. If you still get
-compile errors try reloading the Deno cache with:
+the Deno `--unstable` command-line option when you compile drakefiles.
+If you still get compile errors try reloading the Deno cache with:
 
     deno cache -r --unstable Drakefile.ts
 
@@ -21,8 +21,7 @@ This should not be necessary in future Drake releases.
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
-1.0.  If you experience compilation errors try forcing a cache reload
-with the Deno `cache` command e.g. `deno cache Drakefile.ts --reload`
+1.0.
 
 Tested with Deno 1.0.0-rc1 running on Ubuntu 18.04.
 
