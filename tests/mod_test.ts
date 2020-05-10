@@ -2,7 +2,7 @@ import {
   assertEquals,
   assertThrowsAsync,
 } from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
-import { touch } from "../lib/utils.ts";
+import { writeFile } from "../lib/utils.ts";
 import { desc, DrakeError, env, run, task } from "../mod.ts";
 
 env("--abort-exits", false);
@@ -58,8 +58,7 @@ Deno.test("apiTest", async function () {
       "prerequisite files should exist when normal task executes",
     );
 
-    touch(prereq);
-
+    writeFile(prereq, "");
     run(target);
 
     await assertThrowsAsync(

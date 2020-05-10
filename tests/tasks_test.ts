@@ -5,14 +5,11 @@ import {
   assertThrowsAsync,
 } from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env, sleep, touch } from "../lib/utils.ts";
+import { DrakeError, env, writeFile } from "../lib/utils.ts";
 
 env("--abort-exits", false);
 
 Deno.test("taskRegistryTests", async function () {
-  // TODO: uncomment
-  return;
-
   env("--quiet", true);
   const taskRegistry = new TaskRegistry();
 
@@ -85,8 +82,6 @@ Deno.test("fileTaskTest", async function () {
   const prereq = "./prereq";
   let taskRan = false;
   taskRegistry.register(target, [prereq], async function () {
-    await sleep(1); // To ensure mtime is incremented.
-    touch(target);
     taskRan = true;
   });
 
@@ -95,7 +90,7 @@ Deno.test("fileTaskTest", async function () {
   env("--directory", dir);
   try {
     const task = taskRegistry.get(target);
-    touch(prereq);
+    writeFile(prereq, "");
     assert(
       task.isOutOfDate(),
       "isOutOfDate should return true: no previous snapshot",
@@ -104,7 +99,7 @@ Deno.test("fileTaskTest", async function () {
       task.isOutOfDate(),
       "isOutOfDate should return true: missing target file",
     );
-    touch(target);
+    writeFile(target, "quux");
     task.updateSnapshot();
     taskRegistry.saveSnapshots();
     taskRegistry.loadSnapshots();
@@ -113,17 +108,17 @@ Deno.test("fileTaskTest", async function () {
       0,
       "loaded snapshot prereq size should match",
     );
+    assertEquals(
+      task.snapshot![target].size,
+      4,
+      "loaded snapshot target size should match",
+    );
 
-    // TODO This test mysteriously fails intermittently. The prereq mtime is not changed by touch!
-    // env("--debug", true);
-    // writeFile(prereq, "");
-    // // touch(prereq);
-    // // await sleep(100); // To ensure mtime is incremented.
-    // assert(
-    //   task.isOutOfDate(),
-    //   "isOutOfDate should return true: modified prerequisite file",
-    // );
-    // env("--debug", false);
+    writeFile(prereq, "baz");
+    assert(
+      task.isOutOfDate(),
+      "isOutOfDate should return true: modified prerequisite file",
+    );
 
     taskRegistry.saveSnapshots();
     Deno.removeSync(prereq);
@@ -133,24 +128,27 @@ Deno.test("fileTaskTest", async function () {
       "missing prerequisite file:",
       "isOutOfDate should throw error: missing prerequisite file",
     );
-    touch(prereq);
+    writeFile(prereq, "");
     Deno.removeSync(target);
     taskRan = false;
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
+
+    writeFile(target, "");
+    taskRan = true;
+    await taskRegistry.run(target);
+    assert(taskRan, "task should have executed: new target file");
 
     taskRan = false;
     await taskRegistry.run(target);
     assert(!taskRan, "task should not have executed: target file up to date");
 
     taskRan = false;
-    await sleep(1);
-    touch(prereq);
+    writeFile(prereq, "foobar");
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: prerequisite changed");
 
     taskRan = false;
-    // touch(target);
     await taskRegistry.run(target);
     assert(!taskRan, "task should not have executed: target file up to date");
 
