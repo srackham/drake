@@ -64,13 +64,8 @@ export class Task {
   checkPrerequisites(): void {
     if (!env("--dry-run")) {
       for (const prereq of this.prereqs) {
-        if (isFileTask(prereq)) {
-          if (!existsSync(prereq)) {
-            abort(`missing prerequisite file: ${prereq}`);
-          }
-          // if (!this.has(prereq)) {
-          //   abort(`no matching task for prerequisite file: ${prereq}`);
-          // }
+        if (isFileTask(prereq) && !existsSync(prereq)) {
+          abort(`missing prerequisite file: ${prereq}`);
         }
       }
     }
@@ -85,7 +80,6 @@ export class Task {
   }
 
   updateSnapshot(): void {
-    // assert(isFileTask(this.name));
     const snapshot: Snapshot = {};
     if (existsSync(this.name)) {
       snapshot[this.name] = Task.fileInfo(this.name);
@@ -100,7 +94,6 @@ export class Task {
         delete snapshot[prereq];
       }
     }
-    // debug("updateSnapshot", snapshot);
     debug("updateSnapshot", `${this.name}`);
     this.snapshot = snapshot;
   }
@@ -111,7 +104,6 @@ export class Task {
    * - Throw error if any prerequisite path does not exist.
    */
   isOutOfDate(): boolean {
-    // this.checkPrerequisites();
     let result = false;
     let debugMsg = "false";
     if (isNormalTask(this.name)) { // TODO: necessary?
@@ -143,11 +135,6 @@ export class Task {
           break;
         }
         const curr = Task.fileInfo(filename);
-        // console.log(
-        //   `${filename}\nnow: ${(new Date()).toISOString()}\nfrom: ${JSON.stringify(prev)}\nto:   ${
-        //     JSON.stringify(curr)
-        //   }`,
-        // );
         if (
           curr.size !== prev.size || curr.mtime !== prev.mtime
         ) {
@@ -228,6 +215,10 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   saveSnapshots(): void {
+    if (env("--dry-run")) {
+      debug("saveSnapshots", "skipped: dry run");
+      return;
+    }
     const filename = this.snapshotsFile();
     const snapshots: Snapshots = {};
     for (const task of this.values()) {
@@ -325,7 +316,6 @@ export class TaskRegistry extends Map<string, Task> {
 
   /**
    * Run tasks and prerequisite tasks in the correct dependency order.
-   * Tasks without an action function are skipped.
    */
   async run(...names: string[]) {
     this.loadSnapshots();
@@ -339,6 +329,7 @@ export class TaskRegistry extends Map<string, Task> {
       const savedAbortExits = env("--abort-exits");
       env("--abort-exits", false);
       try {
+        task.checkPrerequisites();
         if (isNormalTask(task.name)) {
           await this.executeNormalTask(task);
         } else {
@@ -360,37 +351,22 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Unconditionally execute normal task. Throw an error if any prerequisite file is missing or any
-   * prerequisite file does not have a matching task (a prerequisite file without a matching task
-   * does nothing in a normal task).
+   * Unconditionally execute normal task. Throw an error if any prerequisite file does not have a
+   * matching task (a prerequisite file without a matching task does nothing in a normal task).
    */
   private async executeNormalTask(task: Task) {
-    if (!env("--dry-run")) {
-      for (const prereq of task.prereqs) {
-        if (isFileTask(prereq)) {
-          if (!existsSync(prereq)) {
-            abort(`missing prerequisite file: ${prereq}`);
-          }
-          if (!this.has(prereq)) {
-            abort(`no matching task for prerequisite file: ${prereq}`);
-          }
-        }
+    for (const prereq of task.prereqs) {
+      if (!this.has(prereq)) {
+        abort(`no matching task for prerequisite file: ${prereq}`);
       }
     }
     await this.execute(task.name);
   }
 
   /**
-   * TODO
-   * Execute file task if it is out of date. Throw an error if any prerequisite files ares missing.
-   * If an error occurs the following precautions are taken to ensure the task remains out of date:
-   *
-   * - If a new target file has been created then it is deleted.
-   * - If an existing target file modification date has changed then it is reverted to the prior
-   *   date.
+   * Execute file task if it is out of date.
    */
   private async executeFileTask(task: Task) {
-    task.checkPrerequisites();
     if (!env("--always-make") && !task.isOutOfDate()) {
       log(yellow(`${task.name} skipped`) + " (up to date)");
       return;
