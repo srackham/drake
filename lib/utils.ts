@@ -67,7 +67,6 @@ export function newEnvFunction() {
           Deno.chdir(value);
           break;
         case "--default-task":
-        case "--drakefile":
           if (typeof value !== "string") {
             abort(`${name} must be a string`);
           }

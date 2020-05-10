@@ -208,7 +208,6 @@ export class TaskRegistry extends Map<string, Task> {
     debug("loadSnapshots");
     const json = readFile(filename);
     const snapshots: Snapshots = JSON.parse(json);
-    // debug("loadSnapshots", snapshots);
     for (const taskname of Object.keys(snapshots)) {
       this.get(taskname).snapshot = snapshots[taskname];
     }
@@ -227,10 +226,12 @@ export class TaskRegistry extends Map<string, Task> {
       }
     }
     if (Object.keys(snapshots).length !== 0) {
-      // debug("saveSnapshots", snapshots);
       debug("saveSnapshots");
       writeFile(filename, JSON.stringify(snapshots, null, 1));
     } else {
+      if (existsSync(filename)) {
+        Deno.removeSync(filename);
+      }
       debug("saveSnapshots", "skipped: no snapshots");
     }
   }

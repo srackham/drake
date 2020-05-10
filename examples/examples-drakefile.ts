@@ -1,6 +1,6 @@
 // import { desc, env, execute, run, sh, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
 import { readFile, updateFile, writeFile } from "../lib/utils.ts";
-import { desc, env, execute, run, sh, task } from "../mod.ts";
+import { desc, execute, run, sh, task } from "../mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function () {
@@ -12,7 +12,6 @@ task("prereqs", ["noop", "pause"]);
 
 desc("Synchronous task that does nothing");
 task("noop", ["pause"], function () {
-  console.log(env("--drakefile"));
   console.log(`${this.desc} executing in ${Deno.cwd()}`);
   console.log(`$HOME=${Deno.env.get("HOME")}`);
 });

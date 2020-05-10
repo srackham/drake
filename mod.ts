@@ -18,7 +18,6 @@ export {
 } from "./lib/utils.ts";
 export { desc, execute, run, task, vers };
 
-import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
 import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
@@ -37,13 +36,6 @@ if (env("--help")) {
   help();
 } else if (env("--version")) {
   console.log(vers());
-} else {
-  // Calculate drakefile path relative to cwd prior to processing --directory option.
-  let drakefile = env("--drakefile") ?? "Drakefile.ts";
-  if (!path.isAbsolute(drakefile)) {
-    drakefile = path.join(Deno.cwd(), drakefile);
-  }
-  env("--drakefile", drakefile);
 }
 
 /** Returns the Drake version number string. */

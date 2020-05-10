@@ -55,16 +55,19 @@ Deno.test("envTest", function () {
   const strOpts = [
     "--default-task",
     "--directory",
-    "--drakefile",
   ];
   for (const opt of boolOpts) {
-    //TODO
-    // assertEquals(env(opt), undefined);
+    assertEquals(env(opt), undefined);
     env(opt, false);
     assertEquals(env(opt), false);
   }
   for (const opt of strOpts) {
     switch (opt) {
+      case "--default-task":
+        assertEquals(env(opt), undefined);
+        env(opt, "foobar");
+        assertEquals(env(opt), "foobar");
+        break;
       case "--directory":
         assertEquals(env(opt), Deno.cwd());
         break;
