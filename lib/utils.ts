@@ -252,45 +252,22 @@ export function updateFile(
 }
 
 /**
- * Update the modification time of each file to the current time.
- * If a file does not exist then create a zero length file.
+ * Create zero length files.
  * Missing parent directory paths are also created.
- * Files are processed in `files` order.
+ * Throws error if file exists.
  */
-export function touch(...files: string[]): void {
-  debug("touch", `${files.join("\n")}`);
+export function createFile(...files: string[]): void {
+  debug("createFile", `${files.join("\n")}`);
   for (const file of files) {
     const dir = path.dirname(file);
     if (!existsSync(dir)) {
       Deno.mkdirSync(dir, { recursive: true });
     }
     if (existsSync(file)) {
-      // KLUDGE: Until Deno.utimeSync() is stable and sets millisecond resolution use utime().
-      // See https://github.com/denoland/deno/issues/5065
-      // Deno.utimeSync(file, new Date(), new Date());
-      utime(file);
+      abort(`file already exists: ${file}`);
     } else {
       Deno.createSync(file).close();
     }
-  }
-}
-
-/** Update `file` mtime and atime timestamps to the current time. */
-function utime(file: string): void {
-  // KLUDGE: The utime() function is neccessary because Deno.utimeSync() currently truncates
-  // timestamps down to nearest second and is classed as unstable.
-  // See https://github.com/denoland/deno/issues/5065
-  if (Deno.statSync(file).size === 0) {
-    Deno.truncateSync(file);
-  } else {
-    // Read then write the first byte of the file to update the file timestamp.
-    const buf = new Uint8Array(1);
-    let fd = Deno.openSync(file, { read: true });
-    fd.readSync(buf);
-    fd.close();
-    fd = Deno.openSync(file, { write: true });
-    fd.writeSync(buf);
-    fd.close();
   }
 }
 

@@ -10,6 +10,7 @@ import {
 } from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
 import {
   abort,
+  createFile,
   DrakeError,
   env,
   glob,
@@ -22,8 +23,6 @@ import {
   readFile,
   sh,
   shCapture,
-  sleep,
-  touch,
   updateFile,
   writeFile,
 } from "../lib/utils.ts";
@@ -109,46 +108,23 @@ Deno.test("fileFunctionsTest", function () {
     assertEquals(readFile(file), "fO!O!bar");
     assertEquals(updateFile(file, /o/g, "O!"), false);
     assertEquals(updateFile(file, /zzz/g, "O!"), false);
-  } finally {
-    Deno.removeSync(dir, { recursive: true });
-  }
-});
-
-Deno.test("touchTest", async function () {
-  const dir = Deno.makeTempDirSync();
-  try {
-    const file = path.join(dir, "a/b/foobar");
-    touch(file);
-    assert(existsSync(file), "touched file and directories should exist");
+    file = path.join(dir, "a/b/foobar");
+    createFile(file);
+    assert(existsSync(file), "created file and directories should exist");
     assertEquals(
       Deno.statSync(file).size,
       0,
-      "new touched file should have zero length",
+      "created file should have zero length",
     );
-    await touchAndCheck(file);
-    writeFile(file, "foobar");
-    await touchAndCheck(file);
+    assertThrows(
+      () => createFile(file),
+      DrakeError,
+      "file already exists:",
+    );
   } finally {
     Deno.removeSync(dir, { recursive: true });
   }
 });
-
-async function touchAndCheck(file: string) {
-  const oldTime = Deno.statSync(file).mtime!.getTime();
-  const oldSize = Deno.statSync(file).size;
-  await sleep(10); // File system timestamp uncertainty.
-  touch(file);
-  assert(existsSync(file), "touched file should exist");
-  assertEquals(
-    Deno.statSync(file).size,
-    oldSize,
-    "touched file size should not change",
-  );
-  assert(
-    Deno.statSync(file).mtime!.getTime() > oldTime,
-    "touched file timestamp should be newer",
-  );
-}
 
 Deno.test("globTest", function () {
   let files = glob("./mod.ts", "./lib/*.ts");
@@ -167,7 +143,7 @@ Deno.test("globTest", function () {
     const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
       path.join(dir, f)
     ).sort();
-    touch(...fixtures);
+    createFile(...fixtures);
     files = glob(...["**/*.ts", "u"].map((f) => path.join(dir, f)));
     assertEquals(files, fixtures);
     assertEquals(glob(path.join(dir, "non-existent-file")), []);
