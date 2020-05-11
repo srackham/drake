@@ -143,7 +143,7 @@ Deno.test("globTest", function () {
     const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
       path.join(dir, f)
     ).sort();
-    createFile(...fixtures);
+    fixtures.forEach((f) => createFile(f));
     files = glob(...["**/*.ts", "u"].map((f) => path.join(dir, f)));
     assertEquals(files, fixtures);
     assertEquals(glob(path.join(dir, "non-existent-file")), []);

@@ -252,22 +252,20 @@ export function updateFile(
 }
 
 /**
- * Create zero length files.
+ * Create zero length file.
  * Missing parent directory paths are also created.
  * Throws error if file exists.
  */
-export function createFile(...files: string[]): void {
-  debug("createFile", `${files.join("\n")}`);
-  for (const file of files) {
-    const dir = path.dirname(file);
-    if (!existsSync(dir)) {
-      Deno.mkdirSync(dir, { recursive: true });
-    }
-    if (existsSync(file)) {
-      abort(`file already exists: ${file}`);
-    } else {
-      Deno.createSync(file).close();
-    }
+export function createFile(file: string): void {
+  debug("createFile", file);
+  const dir = path.dirname(file);
+  if (!existsSync(dir)) {
+    Deno.mkdirSync(dir, { recursive: true });
+  }
+  if (existsSync(file)) {
+    abort(`file already exists: ${file}`);
+  } else {
+    Deno.createSync(file).close();
   }
 }
 
