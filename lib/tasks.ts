@@ -263,9 +263,6 @@ export class TaskRegistry extends Map<string, Task> {
       };
       writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
-      if (existsSync(filename)) {
-        Deno.removeSync(filename);
-      }
       debug("saveCache", "skipped: no snapshots");
     }
   }
