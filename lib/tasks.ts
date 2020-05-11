@@ -290,8 +290,12 @@ export class TaskRegistry extends Map<string, Task> {
       } else {
         msg = green(msg);
       }
-      if (env("--list-all")) {
-        msg += ` ${yellow(`[${task.prereqs}]`)}`;
+      if (env("--list-all") && task.prereqs.length > 0) {
+        msg += `\n${
+          task.prereqs.map((prereq) =>
+            `${" ".repeat(maxLen)} ${yellow(prereq)}`
+          ).join("\n")
+        }`;
       }
       result.push(msg);
     }

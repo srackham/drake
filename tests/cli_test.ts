@@ -35,7 +35,7 @@ Deno.test("cliTest", async function () {
     { env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 0);
-  assertStrContains(output, "Push changes to Github [test]");
+  assertStrContains(output, "     test\n");
 
   ({ code, error } = await shCapture(
     `${drake} --foobar`,
