@@ -5,7 +5,7 @@ import {
   assertThrowsAsync,
 } from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env, writeFile } from "../lib/utils.ts";
+import { DrakeError, env, normalizePath, writeFile } from "../lib/utils.ts";
 
 env("--abort-exits", false);
 
@@ -78,8 +78,8 @@ Deno.test("fileTaskTest", async function () {
   env("--quiet", true);
   const taskRegistry = new TaskRegistry();
 
-  const target = "./target";
-  const prereq = "./prereq";
+  const target = normalizePath("./target");
+  const prereq = normalizePath("./prereq");
   let taskRan = false;
   taskRegistry.register(target, [prereq], async function () {
     taskRan = true;
