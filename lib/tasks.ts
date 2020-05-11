@@ -6,6 +6,7 @@ import {
 } from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fmt/mod.ts";
 import { existsSync } from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fs/mod.ts";
 import * as path from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/path/mod.ts";
+import { vers } from "../mod.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -24,11 +25,25 @@ import {
 export type Action = (this: Task) => any;
 
 // Snapshot file info.
-type SnapshotFileInfo = { size: number; mtime: string };
+type SnapshotFileInfo = {
+  size: number;
+  mtime: string;
+};
 // Prerequisite file properties.
-type Snapshot = { [prereq: string]: SnapshotFileInfo };
+type Snapshot = {
+  [prereq: string]: SnapshotFileInfo;
+};
 // File task snapshots.
-type Snapshots = { [task: string]: Snapshot };
+type Snapshots = {
+  [task: string]: Snapshot;
+};
+// Cache file.
+type Cache = {
+  version: string;
+  platform: string;
+  date: string;
+  snapshots: Snapshots;
+};
 
 /** Drake task. */
 export class Task {
@@ -207,9 +222,14 @@ export class TaskRegistry extends Map<string, Task> {
     }
     debug("loadSnapshots");
     const json = readFile(filename);
-    const snapshots: Snapshots = JSON.parse(json);
-    for (const taskname of Object.keys(snapshots)) {
-      this.get(taskname).snapshot = snapshots[taskname];
+    let cache: Cache;
+    try {
+      cache = JSON.parse(json);
+      for (const taskname of Object.keys(cache.snapshots)) {
+        this.get(taskname).snapshot = cache.snapshots[taskname];
+      }
+    } catch {
+      abort(`corrupt cache file: ${filename}`);
     }
   }
 
@@ -227,7 +247,13 @@ export class TaskRegistry extends Map<string, Task> {
     }
     if (Object.keys(snapshots).length !== 0) {
       debug("saveSnapshots");
-      writeFile(filename, JSON.stringify(snapshots, null, 1));
+      const cache: Cache = {
+        version: vers(),
+        platform: Deno.build.os,
+        date: (new Date()).toISOString(),
+        snapshots: snapshots,
+      };
+      writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
       if (existsSync(filename)) {
         Deno.removeSync(filename);
