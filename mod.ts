@@ -22,7 +22,7 @@ import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
-const DRAKE_VERS = "1.0.0-rc1";
+const DRAKE_VERS = "1.0.0-rc2";
 
 env("--abort-exits", true);
 
@@ -81,7 +81,7 @@ async function run(...names: string[]) {
     return;
   }
   if (env("--list-tasks") || env("--list-all")) {
-    taskRegistry.list().forEach((t) => console.log(t));
+    taskRegistry.list().forEach((t: unknown) => console.log(t));
   } else {
     if (names.length === 0) {
       names = env("--tasks");

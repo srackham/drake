@@ -1,5 +1,5 @@
-import { existsSync } from "https://deno.land/std@v1.0.0-rc1/fs/exists.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
+import { existsSync } from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fs/mod.ts";
+import * as path from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/path/mod.ts";
 import {
   assert,
   assertEquals,
@@ -7,7 +7,7 @@ import {
   assertStrContains,
   assertThrows,
   assertThrowsAsync,
-} from "https://deno.land/std@v1.0.0-rc1/testing/asserts.ts";
+} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/testing/asserts.ts";
 import {
   abort,
   createFile,

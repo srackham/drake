@@ -2,12 +2,12 @@ import {
   bold,
   red,
   yellow,
-} from "https://deno.land/std@v1.0.0-rc1/fmt/colors.ts";
+} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fmt/mod.ts";
 import {
   existsSync,
   walkSync,
-} from "https://deno.land/std@v1.0.0-rc1/fs/mod.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc1/path/mod.ts";
+} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fs/mod.ts";
+import * as path from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -430,11 +430,13 @@ function shArgs(command: string): [string[], string] {
   }
 }
 
+type ProcessStdio = "inherit" | "piped" | "null";
+
 export interface ShOpts {
   cwd?: string;
   env?: { [key: string]: string };
-  stdout?: Deno.ProcessStdio;
-  stderr?: Deno.ProcessStdio;
+  stdout?: ProcessStdio | number;
+  stderr?: ProcessStdio | number;
 }
 
 /**

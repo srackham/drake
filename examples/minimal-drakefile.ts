@@ -1,8 +1,4 @@
-import {
-  desc,
-  run,
-  task,
-} from "https://raw.github.com/srackham/drake/v1.0.0-rc1/mod.ts";
+import { desc, run, task } from "../mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function () {
