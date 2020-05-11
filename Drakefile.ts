@@ -10,7 +10,7 @@ const TS_FILES = glob("**/*.ts").filter((p) => !p.endsWith(".d.ts"));
 desc("Run tests");
 task("test", ["fmt"], async function () {
   await sh(
-    `deno test -A --unstable ${env("--quiet") ? "--quiet" : ""} tests`,
+    `deno test -A ${env("--quiet") ? "--quiet" : ""} tests`,
     env("--debug") ? { env: { DRAKE_DEBUG: "true" } } : {},
   );
 });

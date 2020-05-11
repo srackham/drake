@@ -8,7 +8,7 @@ import { env, shCapture, vers } from "../mod.ts";
 env("--abort-exits", false);
 
 Deno.test("cliTest", async function () {
-  const denoRun = "deno run -A --quiet --unstable";
+  const denoRun = "deno run -A --quiet";
   const drake = `${denoRun} Drakefile.ts`;
 
   let { code, output, error } = await shCapture(
