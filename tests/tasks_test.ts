@@ -101,8 +101,8 @@ Deno.test("fileTaskTest", async function () {
     );
     writeFile(target, "quux");
     task.updateSnapshot();
-    taskRegistry.saveSnapshots();
-    taskRegistry.loadSnapshots();
+    taskRegistry.saveCache();
+    taskRegistry.loadCache();
     assertEquals(
       task.snapshot![prereq].size,
       0,
@@ -120,7 +120,7 @@ Deno.test("fileTaskTest", async function () {
       "isOutOfDate should return true: modified prerequisite file",
     );
 
-    taskRegistry.saveSnapshots();
+    taskRegistry.saveCache();
     Deno.removeSync(prereq);
     await assertThrows(
       () => task.isOutOfDate(),

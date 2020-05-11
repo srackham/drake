@@ -40,7 +40,7 @@ type Snapshots = {
 // Cache file.
 type Cache = {
   version: string;
-  platform: string;
+  os: string;
   date: string;
   snapshots: Snapshots;
 };
@@ -210,21 +210,29 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = ""; // Consume decription.
   }
 
-  private snapshotsFile(): string {
+  private cacheFile(): string {
     return path.join(env("--directory"), ".drake.cache.json");
   }
 
-  loadSnapshots(): void {
-    const filename = this.snapshotsFile();
+  loadCache(): void {
+    const filename = this.cacheFile();
     if (!existsSync(filename)) {
       debug("loadSnapshots:", `no snapshots file: ${filename}`);
       return;
     }
-    debug("loadSnapshots");
+    debug("loadCache");
     const json = readFile(filename);
     let cache: Cache;
     try {
       cache = JSON.parse(json);
+      if (cache.version !== vers()) {
+        log("Drake version changed");
+        return;
+      }
+      if (cache.os !== Deno.build.os) {
+        log("operating system changed");
+        return;
+      }
       for (const taskname of Object.keys(cache.snapshots)) {
         this.get(taskname).snapshot = cache.snapshots[taskname];
       }
@@ -233,12 +241,12 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  saveSnapshots(): void {
+  saveCache(): void {
     if (env("--dry-run")) {
-      debug("saveSnapshots", "skipped: dry run");
+      debug("saveCache", "skipped: dry run");
       return;
     }
-    const filename = this.snapshotsFile();
+    const filename = this.cacheFile();
     const snapshots: Snapshots = {};
     for (const task of this.values()) {
       if (isFileTask(task.name) && task.snapshot) {
@@ -246,10 +254,10 @@ export class TaskRegistry extends Map<string, Task> {
       }
     }
     if (Object.keys(snapshots).length !== 0) {
-      debug("saveSnapshots");
+      debug("saveCache");
       const cache: Cache = {
         version: vers(),
-        platform: Deno.build.os,
+        os: Deno.build.os,
         date: (new Date()).toISOString(),
         snapshots: snapshots,
       };
@@ -258,7 +266,7 @@ export class TaskRegistry extends Map<string, Task> {
       if (existsSync(filename)) {
         Deno.removeSync(filename);
       }
-      debug("saveSnapshots", "skipped: no snapshots");
+      debug("saveCache", "skipped: no snapshots");
     }
   }
 
@@ -345,7 +353,7 @@ export class TaskRegistry extends Map<string, Task> {
    * Run tasks and prerequisite tasks in the correct dependency order.
    */
   async run(...names: string[]) {
-    this.loadSnapshots();
+    this.loadCache();
     for (const name of names) {
       this.get(name); // Throws error if task is missing.
     }
@@ -364,7 +372,7 @@ export class TaskRegistry extends Map<string, Task> {
         }
       } catch (e) {
         env("--abort-exits", savedAbortExits);
-        this.saveSnapshots();
+        this.saveCache();
         if (e instanceof DrakeError) {
           abort(e.message);
         } else {
@@ -374,7 +382,7 @@ export class TaskRegistry extends Map<string, Task> {
         env("--abort-exits", savedAbortExits);
       }
     }
-    this.saveSnapshots();
+    this.saveCache();
   }
 
   /**
