@@ -369,7 +369,7 @@ export class TaskRegistry extends Map<string, Task> {
    */
   private async executeFileTask(task: Task) {
     if (!env("--always-make") && !task.isOutOfDate()) {
-      log(yellow(`${task.name} skipped`) + " (up to date)");
+      log(yellow(`${task.name}:`) + " skipped: up to date");
       return;
     }
     await this.execute(task.name);
@@ -383,11 +383,11 @@ export class TaskRegistry extends Map<string, Task> {
   async execute(...names: string[]) {
     names = names.map((name) => normalizeTaskName(name));
     if (env("--dry-run")) {
-      log(yellow(`${names} skipped`) + " (dry run)");
+      log(yellow(`${names}:`) + " skipped: dry run");
       return;
     }
     if (names.every((name) => !this.get(name).action)) {
-      log(yellow(`${names} skipped`) + " (no action)");
+      log(yellow(`${names}:`) + " skipped: no action");
       return;
     }
     log(green(bold(`${names} started`)));
@@ -396,7 +396,7 @@ export class TaskRegistry extends Map<string, Task> {
     for (const name of names) {
       const task = this.get(name);
       if (!task.action) {
-        log(yellow(`${name} skipped`) + " (no action)");
+        log(yellow(`${name}:`) + " skipped: no action");
         continue;
       }
       if (task.action.constructor.name === "AsyncFunction") {
