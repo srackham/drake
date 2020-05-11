@@ -386,12 +386,17 @@ export class TaskRegistry extends Map<string, Task> {
       log(yellow(`${names} skipped`) + " (dry run)");
       return;
     }
+    if (names.every((name) => !this.get(name).action)) {
+      log(yellow(`${names} skipped`) + " (no action)");
+      return;
+    }
     log(green(bold(`${names} started`)));
     const startTime = new Date().getTime();
     const promises: Promise<any>[] = [];
     for (const name of names) {
       const task = this.get(name);
       if (!task.action) {
+        log(yellow(`${name} skipped`) + " (no action)");
         continue;
       }
       if (task.action.constructor.name === "AsyncFunction") {
