@@ -430,13 +430,11 @@ function shArgs(command: string): [string[], string] {
   }
 }
 
-type ProcessStdio = "inherit" | "piped" | "null";
-
 export interface ShOpts {
   cwd?: string;
   env?: { [key: string]: string };
-  stdout?: ProcessStdio | number;
-  stderr?: ProcessStdio | number;
+  stdout?: "inherit" | "piped" | "null" | number;
+  stderr?: "inherit" | "piped" | "null" | number;
 }
 
 /**
@@ -520,7 +518,7 @@ export interface ShCaptureOpts extends ShOpts {
  *   parent process working directory).
  * - The `opts.env` mapping passes additional environment variables to
  *   the shell.
- * - `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics.
+ * - `opts.stdout` and `opts.stderr` have `Deno.RunOptions` semantics.
  *   `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
  *   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
  *
