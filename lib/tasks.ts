@@ -67,17 +67,6 @@ export class Task {
     }
   }
 
-  /** Throw an error if any prerequisite file is missing. */
-  checkPrerequisites(): void {
-    if (!env("--dry-run")) {
-      for (const prereq of this.prereqs) {
-        if (isFileTask(prereq) && !existsSync(prereq)) {
-          abort(`missing prerequisite file: ${prereq}`);
-        }
-      }
-    }
-  }
-
   private static fileInfo(path: string): SnapshotFileInfo {
     const info = Deno.statSync(path);
     return {
@@ -362,7 +351,13 @@ export class TaskRegistry extends Map<string, Task> {
       const savedAbortExits = env("--abort-exits");
       env("--abort-exits", false);
       try {
-        task.checkPrerequisites();
+        if (!env("--dry-run")) {
+          for (const prereq of task.prereqs) {
+            if (isFileTask(prereq) && !existsSync(prereq)) {
+              abort(`missing prerequisite file: ${prereq}`);
+            }
+          }
+        }
         if (isNormalTask(task.name)) {
           await this.executeNormalTask(task);
         } else {
