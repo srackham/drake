@@ -69,9 +69,12 @@ export class Task {
 
   private static fileInfo(path: string): SnapshotFileInfo {
     const info = Deno.statSync(path);
+    if (!info.mtime) {
+      abort(`${path}: invalid mtime: ${info.mtime}`);
+    }
     return {
       size: info.size,
-      mtime: info.mtime ? info.mtime.toISOString() : "null",
+      mtime: info.mtime.toISOString(),
     };
   }
 
