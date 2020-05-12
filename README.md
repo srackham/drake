@@ -11,13 +11,6 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**IMPORTANT**: Although Drake does not use any "unstable" Deno APIs
-currently (as of 1.0.0-rc2) it is necessary to include the Deno
-`--unstable` command-line option when you compile drakefiles, for
-example:
-
-    deno cache -r --unstable Drakefile.ts
-
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
