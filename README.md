@@ -14,7 +14,8 @@ for [Deno](https://deno.land/) inspired by
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
-1.0.
+1.0. If you get TypeScript compilation errors try reloading the Deno
+cache, for example: `deno cache -r Drakefile.ts`
 
 Tested with Deno 1.0.0-rc2 running on Ubuntu 18.04.
 
