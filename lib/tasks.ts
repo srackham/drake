@@ -3,9 +3,9 @@ import {
   green,
   underline,
   yellow,
-} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fmt/mod.ts";
-import { existsSync } from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fs/mod.ts";
-import * as path from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/path/mod.ts";
+} from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
+import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/mod.ts";
+import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
 import { vers } from "../mod.ts";
 import { Graph } from "./graph.ts";
 import {

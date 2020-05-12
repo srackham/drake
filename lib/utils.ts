@@ -1,13 +1,9 @@
-import {
-  bold,
-  red,
-  yellow,
-} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fmt/mod.ts";
+import { bold, red, yellow } from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
 import {
   existsSync,
   walkSync,
-} from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/fs/mod.ts";
-import * as path from "https://raw.githubusercontent.com/denoland/deno/v1.0.0-rc2/std/path/mod.ts";
+} from "https://deno.land/std@v1.0.0-rc2/fs/mod.ts";
+import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
