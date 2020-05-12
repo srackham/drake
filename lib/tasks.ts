@@ -41,7 +41,6 @@ type Snapshots = {
 type Cache = {
   version: string;
   os: string;
-  date: string;
   snapshots: Snapshots;
 };
 
@@ -257,7 +256,6 @@ export class TaskRegistry extends Map<string, Task> {
       const cache: Cache = {
         version: vers(),
         os: Deno.build.os,
-        date: (new Date()).toISOString(),
         snapshots: snapshots,
       };
       writeFile(filename, JSON.stringify(cache, null, 1));
