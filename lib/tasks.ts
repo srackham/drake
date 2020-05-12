@@ -4,7 +4,7 @@ import {
   underline,
   yellow,
 } from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
-import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/mod.ts";
+import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/exists.ts";
 import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
 import { vers } from "../mod.ts";
 import { Graph } from "./graph.ts";
