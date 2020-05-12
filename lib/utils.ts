@@ -270,43 +270,6 @@ export function createFile(file: string): void {
 }
 
 /**
- * Return `true` if either the target file does not exist or its modification time is older then one
- * or more prerequisite files. Otherwise return `false`. Throws an error if one or more prerequisite
- * files do not exist.
- */
-export function outOfDate(target: string, prereqs: string[]): boolean {
-  const resolution = 10; // The number of milliseconds file timestamp uncertainty.
-  for (const prereq of prereqs) {
-    if (!existsSync(prereq)) {
-      abort(`outOfDate: missing prerequisite file: ${prereq}`);
-    }
-  }
-  let result = false;
-  if (!existsSync(target)) {
-    result = true;
-  } else {
-    const targetStat = Deno.statSync(target);
-    for (const prereq of prereqs) {
-      const prereqStat = Deno.statSync(prereq);
-      if (targetStat.mtime === null || prereqStat.mtime === null) {
-        continue;
-      }
-      if (
-        targetStat.mtime.getTime() + resolution < prereqStat.mtime.getTime()
-      ) {
-        result = true;
-        break;
-      }
-    }
-  }
-  debug(
-    "outOfDate",
-    `${result}: ${target}:\n${prereqs.join("\n")}`,
-  );
-  return result;
-}
-
-/**
  * Return true if `name` is a normal task name. Normal task names contain one or more alphanumeric,
  * underscore and hyphen characters and cannot start with a hyphen.
  *
@@ -346,7 +309,7 @@ export function normalizePath(name: string): string {
   return name;
 }
 
-/** Normalise Drake task name. Throw an error if the name is blank or it contains wildcard
+/** Normalize Drake task name. Throw an error if the name is blank or it contains wildcard
  * characters.
  */
 export function normalizeTaskName(name: string): string {
@@ -406,13 +369,13 @@ export function glob(...patterns: string[]): string[] {
   for (const pattern of patterns) {
     result = [...result, ...glob1(pattern)];
   }
-  // Drop dups, normalise and sort paths.
+  // Drop duplicates, normalize and sort paths.
   result = [...new Set(result)].map((p) => normalizePath(p)).sort();
   debug("glob", `${quote(patterns, ", ")}:\n${result.join("\n")}`);
   return result;
 }
 
-/** Sythesize platform dependent shell command arguments and Windows command file. */
+/** Synthesize platform dependent shell command arguments and Windows command file. */
 function shArgs(command: string): [string[], string] {
   let cmdArgs: string[];
   if (Deno.build.os === "windows") {
