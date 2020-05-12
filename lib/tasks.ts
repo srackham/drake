@@ -234,7 +234,9 @@ export class TaskRegistry extends Map<string, Task> {
         return;
       }
       for (const taskname of Object.keys(cache.snapshots)) {
-        this.get(taskname).snapshot = cache.snapshots[taskname];
+        if (this.has(taskname)) {
+          this.get(taskname).snapshot = cache.snapshots[taskname];
+        }
       }
     } catch {
       abort(`corrupt cache file: ${filename}`);
