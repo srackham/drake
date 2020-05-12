@@ -1,7 +1,8 @@
 # Drake &mdash; a task runner for Deno
 
-Drake is a Make-like task runner for [Deno](https://deno.land/)
-inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
+[Drake](https://github.com/srackham/drake) is a Make-like task runner
+for [Deno](https://deno.land/) inspired by
+[Make](https://en.wikipedia.org/wiki/Make_(software)),
 [Rake](https://github.com/ruby/rake) and
 [Jake](https://github.com/jakejs/jake).
 
@@ -10,20 +11,19 @@ inspired by [Make](https://en.wikipedia.org/wiki/Make_(software)),
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**IMPORTANT**: Currently (as of 1.0.0-rc1) it is necessary to include
-the Deno `--unstable` command-line option when you compile drakefiles.
-If you still get compile errors try reloading the Deno cache with:
+**IMPORTANT**: Although Drake does not use any "unstable" Deno APIs
+currently (as of 1.0.0-rc2) it is necessary to include the Deno
+`--unstable` command-line option when you compile drakefiles, for
+example:
 
     deno cache -r --unstable Drakefile.ts
-
-This should not be necessary in future Drake releases.
 
 **NOTE**: This is a development release and will be subject to
 breaking changes until 1.0 (search the Git commit log for `BREAKING
 CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0.
 
-Tested with Deno 1.0.0-rc1 running on Ubuntu 18.04.
+Tested with Deno 1.0.0-rc2 running on Ubuntu 18.04.
 
 
 ## Drakefiles
@@ -78,12 +78,9 @@ Here are some of real-world drakefiles:
 ## Tasks
 
 ### Task types
-There are two types of task: _Normal tasks_ and _File tasks_.
-
-A _Normal task_ executes unconditionally.  A _File task_ is only
-executed if it is out of date i.e. immediately prior to  execution
-either the task name file path does not exist or one or more
-prerequisite files has a more recent modification time.
+There are two types of task: _Normal tasks_ and _File tasks_.  A
+_Normal task_ executes unconditionally.  A _File task_ is only
+executed if it is out of date.
 
 Task types are distinguished by their names.  _Normal task_ names can
 only contain alphanumeric, underscore and hyphen characters and cannot
@@ -120,27 +117,39 @@ never run twice.
 
 - Task name and prerequisite file paths are normalized at task
   registration.
+
 - Prerequisite globs are expanded when the task is registered.
+
 - Prerequisites are resolved at the time the task is run.
+
 - All prerequisite files must exist by the time the task executes. An
   error is thrown if any are missing.
-- Prerequisite file paths in normal tasks must have matching tasks
-  (because a prerequisite file without a matching task does nothing in
-  a normal task)
 
-If a _File task_ execution error occurs the following precautions are
-taken to ensure the task remains out of date:
+- A file task is considered to be out of date if:
 
-- If a new target file has been created then it is deleted.
-- If an existing target file modification date has changed then it is
-  reverted to the prior date.
+  * The target file does not exist.
+  * The target file or any of the prerequisite files have changed
+    since the task was last executed successfully.
+  * The Drake version or the operating system has changed
+    since the task was last executed successfully.
+
+- A file is considered to have changed if its current modification
+  time or size no longer matches those recorded after the task had
+  last executed successfully.
+
+- Drake saves target and prerequisite file properties to a file named
+  `.drake.cache.json` in the drakefile execution directory. The
+  execution directory defaults to the current working directory and
+  can be changed using the Drake `--directory` command-line option. A
+  `.drake.cache.json` file will not be created until a file task has
+  successfully executed.
 
 ### Asynchronous task actions
 Normally you will want tasks to execute sequentially i.e. the next
 task should not start until the current task has finished.  To ensure
 this happens action functions that call asynchronous functions should:
 
-1. Be delared `async`.
+1. Be declared `async`.
 2. Call asynchronous functions with the `await` operator.
 
 For example, the following task does not return until the shell
@@ -355,7 +364,7 @@ stderr output).
   parent process working directory).
 - The `opts.env` mapping passes additional environment variables to
   the shell.
-- `opts.stdout` and `opts.stderr` have `Deno.ProcessStdio` semantics.
+- `opts.stdout` and `opts.stderr` have `Deno.RunOptions` semantics.
   `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
 
@@ -467,24 +476,26 @@ Returns the Drake version number string.
   * `\${` translates to `${` 
 
 - You can use Drake API functions in non-drakefiles.  Useful utility
-  functions include: `abort`, `glob`, `log`, `quote`, `readFile`,
-  `sh`, `shCapture`, `updateFile`, `writeFile`.
+  functions include: `abort`, `debug`, `glob`, `log`, `quote`,
+  `readFile`, `sh`, `shCapture`, `updateFile`, `writeFile`.
 
 - Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
   environment variable is set. This can be useful when executing
   non-Drakefiles (in lieu of the Drake `--debug` command-line option).
+  You can also "debug" sections of code with `env("--debug",true)` and
+  `env("--debug",false)`.
 
 - By default Drake functions manifest errors by printing an error
   message and exiting with a non-zero exit code.  You can change the
-  default behaviour so that errors throw a `DrakeError` exception by
+  default behavior so that errors throw a `DrakeError` exception by
   setting `env("--abort-exits", false)`.
 
-- Specify the Drake version to import in the `import` statment URL.
+- Specify the Drake version to import in the `import` statement URL.
   The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v1.0.0-rc1`:
+  second imports the commit tagged `v1.0.0-rc2`:
 
       import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      import { desc, run, task } from "https://raw.github.com/srackham/drake/v1.0.0-rc1/mod.ts";
+      import { desc, run, task } from "https://raw.github.com/srackham/drake/v1.0.0-rc2/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests

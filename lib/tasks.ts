@@ -68,14 +68,7 @@ export class Task {
     }
   }
 
-  /**
-   * TODO
-   * Throw an error if any prerequisite file is missing or any prerequisite file does.
-   * 
-   * Unconditionally execute normal task. Throw an error if any prerequisite file is missing or any
-   * prerequisite file does not have a matching task (a prerequisite file without a matching task
-   * does nothing in a normal task).
-   */
+  /** Throw an error if any prerequisite file is missing. */
   checkPrerequisites(): void {
     if (!env("--dry-run")) {
       for (const prereq of this.prereqs) {
@@ -86,7 +79,7 @@ export class Task {
     }
   }
 
-  static fileInfo(path: string): SnapshotFileInfo {
+  private static fileInfo(path: string): SnapshotFileInfo {
     const info = Deno.statSync(path);
     return {
       size: info.size,
@@ -114,14 +107,18 @@ export class Task {
   }
 
   /**
-   * TODO
-   *
-   * - Throw error if any prerequisite path does not exist.
+   * Return `true` if:
+   * 
+   * - The target file does not exist.
+   * - The target file or any of the prerequisite files have changed
+   *   since the task was last executed successfully.
+   * - The Drake version or the operating system has changed
+   *   since the task was last executed successfully.
    */
   isOutOfDate(): boolean {
     let result = false;
     let debugMsg = "false";
-    if (isNormalTask(this.name)) { // TODO: necessary?
+    if (isNormalTask(this.name)) {
       debugMsg = "true: normal task";
       result = true;
     } else if (!this.snapshot) {
@@ -207,7 +204,7 @@ export class TaskRegistry extends Map<string, Task> {
   /** Create and register a task. */
   register(name: string, prereqs: string[], action?: Action): void {
     this.set(name, new Task(name, this.lastDesc, prereqs, action));
-    this.lastDesc = ""; // Consume decription.
+    this.lastDesc = ""; // Consume description.
   }
 
   private cacheFile(): string {
@@ -331,7 +328,7 @@ export class TaskRegistry extends Map<string, Task> {
     names = names.map((name) => normalizeTaskName(name));
     const result: Task[] = [];
     for (const task of this.expand(names)) {
-      // Drop downstream dups.
+      // Drop downstream duplicates.
       if (result.find((t) => t.name === task.name)) {
         continue;
       }
