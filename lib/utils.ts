@@ -1,7 +1,7 @@
-import { bold, red, yellow } from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
-import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/exists.ts";
-import { walkSync } from "https://deno.land/std@v1.0.0-rc2/fs/walk.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
+import { bold, red, yellow } from "https://deno.land/std@0.50.0/fmt/mod.ts";
+import { existsSync } from "https://deno.land/std@0.50.0/fs/exists.ts";
+import { walkSync } from "https://deno.land/std@0.50.0/fs/walk.ts";
+import * as path from "https://deno.land/std@0.50.0/path/mod.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -278,11 +278,11 @@ export function isNormalTask(name: string): boolean {
 
 /**
  * Return true if `name` is a file task name. File task names are valid file paths.
- * 
+ *
  *     isFileTask("io.ts")          // true
  *     isFileTask("hello-world")    // false
  *     isFileTask("./hello-world")  // true
- * 
+ *
  */
 export function isFileTask(name: string): boolean {
   return !isNormalTask(name);
@@ -396,16 +396,16 @@ export interface ShOpts {
 
 /**
  * Execute commands in the command shell.
- * 
+ *
  * - If `commands` is a string execute it.
  * - If `commands` is an array of commands execute them asynchronously.
  * - If any command fails throw an error.
  * - If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are ignored.
  * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
  * - The `opts.env` mapping passes additional environment variables to the shell.
- * 
+ *
  * Examples:
- * 
+ *
  *     await sh("echo Hello World");
  *     await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
  *     await sh("echo Hello World", { stdout: "null" });
@@ -481,9 +481,9 @@ export interface ShCaptureOpts extends ShOpts {
  *
  * Examples:
  *
- *    const { code, stdout } = await shCapture("echo Hello"); 
- *    const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" }); 
- * 
+ *    const { code, stdout } = await shCapture("echo Hello");
+ *    const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" });
+ *
  */
 export async function shCapture(
   command: string,

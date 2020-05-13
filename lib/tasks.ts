@@ -3,9 +3,9 @@ import {
   green,
   underline,
   yellow,
-} from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
-import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/exists.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
+} from "https://deno.land/std@0.50.0/fmt/mod.ts";
+import { existsSync } from "https://deno.land/std@0.50.0/fs/exists.ts";
+import * as path from "https://deno.land/std@0.50.0/path/mod.ts";
 import { vers } from "../mod.ts";
 import { Graph } from "./graph.ts";
 import {
@@ -99,7 +99,7 @@ export class Task {
 
   /**
    * Return `true` if:
-   * 
+   *
    * - The target file does not exist.
    * - The target file or any of the prerequisite files have changed
    *   since the task was last executed successfully.

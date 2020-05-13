@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertThrows,
   assertThrowsAsync,
-} from "https://deno.land/std@v1.0.0-rc2/testing/asserts.ts";
+} from "https://deno.land/std@0.50.0/testing/asserts.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
 import { DrakeError, env, normalizePath, writeFile } from "../lib/utils.ts";
 
