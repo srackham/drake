@@ -1,4 +1,4 @@
-import { desc, run, task } from "../mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function () {

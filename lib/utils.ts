@@ -392,7 +392,7 @@ export interface ShOpts {
 }
 
 /**
- * Execute commands in the command shell.
+ * Execute commands asynchronously in the command shell.
  * 
  * - If `commands` is a string execute it.
  * - If `commands` is an array of commands execute them asynchronously.

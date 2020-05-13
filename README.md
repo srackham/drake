@@ -17,7 +17,7 @@ CHANGE`). A 1.0 production release will follow once Deno has reached
 1.0. If you get TypeScript compilation errors try reloading the Deno
 cache, for example: `deno cache -r Drakefile.ts`
 
-Tested with Deno 1.0.0-rc2 running on Ubuntu 18.04.
+Tested with Deno 1.0.0-rc3 running on Ubuntu 18.04.
 
 
 ## Drakefiles
@@ -30,7 +30,7 @@ A drakefile is a TypeScript module that:
 Example drakefile:
 
 ``` typescript
-import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc2/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -127,7 +127,7 @@ never run twice.
   * The Drake version or the operating system has changed
     since the task was last executed successfully.
 
-- A file is considered to have changed if its current modification
+- A file is considered to have changed if it's current modification
   time or size no longer matches those recorded after the task had
   last executed successfully.
 
@@ -326,7 +326,7 @@ prior to their parent task. The same task is never run twice.
 async function sh(commands: string | string[], opts: ShOpts = {});
 ```
 
-Execute commands in the command shell.
+Execute commands asynchronously in the command shell.
 
 - If `commands` is a string execute it.
 - If `commands` is an array of commands execute them asynchronously.
@@ -486,10 +486,10 @@ Returns the Drake version number string.
 
 - Specify the Drake version to import in the `import` statement URL.
   The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v1.0.0-rc2`:
+  second imports the commit tagged `v1.0.0-rc3`:
 
-      import { desc, run, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
-      import { desc, run, task } from "https://raw.github.com/srackham/drake/v1.0.0-rc2/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc3/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests

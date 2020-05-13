@@ -1,4 +1,3 @@
-// import { desc, env, execute, run, sh, task } from "https://raw.github.com/srackham/drake/master/mod.ts";
 import { readFile, updateFile, writeFile } from "../lib/utils.ts";
 import { desc, execute, run, sh, task } from "../mod.ts";
 
