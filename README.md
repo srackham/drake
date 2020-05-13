@@ -30,7 +30,7 @@ A drakefile is a TypeScript module that:
 Example drakefile:
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc2/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc3/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
