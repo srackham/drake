@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertThrowsAsync,
-} from "https://deno.land/std@v1.0.0-rc2/testing/asserts.ts";
+import { assertEquals, assertThrowsAsync } from "../deps.ts";
 import { writeFile } from "../lib/utils.ts";
 import { desc, DrakeError, env, run, task } from "../mod.ts";
 

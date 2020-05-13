@@ -1,7 +1,4 @@
-import { bold, red, yellow } from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
-import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/exists.ts";
-import { walkSync } from "https://deno.land/std@v1.0.0-rc2/fs/walk.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
+import { colors, existsSync, path, walkSync } from "../deps.ts";
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -156,7 +153,7 @@ export function parseEnv(args: string[], env: EnvFunction): void {
  */
 export function abort(message: string): never {
   if (env("--abort-exits")) {
-    console.error(`${red(bold("drake error:"))} ${message}`);
+    console.error(`${colors.red(colors.bold("drake error:"))} ${message}`);
     Deno.exit(1);
   } else {
     throw new DrakeError(message);
@@ -183,7 +180,7 @@ export function debug(title: string, message: any = ""): void {
     message = JSON.stringify(message, null, 1);
   }
   if (env("--debug") && Deno.isatty(Deno.stderr.rid)) {
-    console.error(`${yellow(bold(title + ":"))} ${message}`);
+    console.error(`${colors.yellow(colors.bold(title + ":"))} ${message}`);
   }
 }
 

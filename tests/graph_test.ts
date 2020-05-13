@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@v1.0.0-rc2/testing/asserts.ts";
+import { assertEquals } from "../deps.ts";
 import { Graph } from "../lib/graph.ts";
 
 Deno.test("graphTest", function () {

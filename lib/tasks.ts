@@ -1,11 +1,4 @@
-import {
-  bold,
-  green,
-  underline,
-  yellow,
-} from "https://deno.land/std@v1.0.0-rc2/fmt/mod.ts";
-import { existsSync } from "https://deno.land/std@v1.0.0-rc2/fs/exists.ts";
-import * as path from "https://deno.land/std@v1.0.0-rc2/path/mod.ts";
+import { colors, existsSync, path } from "../deps.ts";
 import { vers } from "../mod.ts";
 import { Graph } from "./graph.ts";
 import {
@@ -271,18 +264,18 @@ export class TaskRegistry extends Map<string, Task> {
       const padding = " ".repeat(maxLen - k.length);
       let msg = k;
       if (k === env("--default-task")) {
-        msg = underline(msg);
+        msg = colors.underline(msg);
       }
       msg += padding;
       if (task.desc) {
-        msg = `${green(bold(msg))} ${task.desc}`;
+        msg = `${colors.green(colors.bold(msg))} ${task.desc}`;
       } else {
-        msg = green(msg);
+        msg = colors.green(msg);
       }
       if (env("--list-all") && task.prereqs.length > 0) {
         msg += `\n${
           task.prereqs.map((prereq) =>
-            `${" ".repeat(maxLen)} ${yellow(prereq)}`
+            `${" ".repeat(maxLen)} ${colors.yellow(prereq)}`
           ).join("\n")
         }`;
       }
@@ -399,7 +392,7 @@ export class TaskRegistry extends Map<string, Task> {
    */
   private async executeFileTask(task: Task) {
     if (!env("--always-make") && !task.isOutOfDate()) {
-      log(yellow(`${task.name}:`) + " skipped: up to date");
+      log(colors.yellow(`${task.name}:`) + " skipped: up to date");
       return;
     }
     await this.execute(task.name);
@@ -413,20 +406,20 @@ export class TaskRegistry extends Map<string, Task> {
   async execute(...names: string[]) {
     names = names.map((name) => normalizeTaskName(name));
     if (env("--dry-run")) {
-      log(yellow(`${names}:`) + " skipped: dry run");
+      log(colors.yellow(`${names}:`) + " skipped: dry run");
       return;
     }
     if (names.every((name) => !this.get(name).action)) {
-      log(yellow(`${names}:`) + " skipped: no action");
+      log(colors.yellow(`${names}:`) + " skipped: no action");
       return;
     }
-    log(green(bold(`${names} started`)));
+    log(colors.green(colors.bold(`${names} started`)));
     const startTime = new Date().getTime();
     const promises: Promise<any>[] = [];
     for (const name of names) {
       const task = this.get(name);
       if (!task.action) {
-        log(yellow(`${name}:`) + " skipped: no action");
+        log(colors.yellow(`${name}:`) + " skipped: no action");
         continue;
       }
       if (task.action.constructor.name === "AsyncFunction") {
@@ -438,7 +431,8 @@ export class TaskRegistry extends Map<string, Task> {
     await Promise.all(promises);
     const endTime = new Date().getTime();
     log(
-      `${green(bold(`${names} finished`))} (${endTime - startTime}ms)`,
+      `${colors.green(colors.bold(`${names} finished`))} (${endTime -
+        startTime}ms)`,
     );
   }
 }
