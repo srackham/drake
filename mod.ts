@@ -51,13 +51,11 @@ export function desc(description: string): void {
  * Create and register a task. Returns the task object.
  *
  * - `name` is a unique task name.
- * - `prereqs` is an array of prerequisite task names.  Prerequisites can
- *   be Normal task names, File task names, file paths or globs
- *   (wildcards).
- * - `action` is an optional function that is run if the task is selected
- *   for execution (`type Action = (this: Task) => any;`).
- * - To fetch an existing task omit both the `prereqs` and `action`
- *   parameters.
+ * - `prereqs` is an array of prerequisite task names.  Prerequisites can be
+ *   Normal task names, File task names, file paths or globs (wildcards).
+ * - `action` is an optional function that is run if the task is selected for
+ *   execution (`type Action = (this: Task) => any;`).
+ * - To fetch an existing task omit both the `prereqs` and `action` parameters.
  *
  */
 export function task(name: string, prereqs?: string[], action?: Action): Task {
@@ -68,12 +66,13 @@ export function task(name: string, prereqs?: string[], action?: Action): Task {
 }
 
 /**
- * Execute named tasks along with their prerequisite tasks (direct and indirect). If no `names` are
- * specified then the command-line tasks are run. If no command-line tasks were specified the
- * default task (set in `env("--default-task")`) is run.
+ * Execute named tasks along with their prerequisite tasks (direct and
+ * indirect). If no `names` are specified then the command-line tasks are run.
+ * If no command-line tasks were specified the default task (set in
+ * `env("--default-task")`) is run.
  *
- * Task execution is ordered such that prerequisite tasks are executed prior to their parent task.
- * The same task is never run twice.
+ * Task execution is ordered such that prerequisite tasks are executed prior to
+ * their parent task. The same task is never run twice.
  */
 export async function run(...names: string[]) {
   if (env("--help") || env("--version")) {

@@ -8,19 +8,19 @@ export class DrakeError extends Error {
 }
 
 /**
-  * The Drake `env` API function gets and optionally sets the command-line options,
-  * task names and variables.
-  *
-  * Options are keyed by their long option name e.g.  `env("--dry-run")`.
-  * Command-line flag options are set to `true`.
-  * Unspecified option values default to `undefined`.
-  *
-  * Tasks names are stored in the `env("--tasks")` string array. A default task can be specified by
-  * setting the `"--default-task"` value to the task name.
-  *
-  * Command-line variables are keyed by name. For example `vers=1.0.1` on the command-line sets
-  * the `"vers"` value to `"1.0.1"`.
-  */
+ * The Drake `env` API function gets and optionally sets the command-line
+ * options, task names and variables.
+ *
+ * Options are keyed by their long option name e.g.  `env("--dry-run")`.
+ * Command-line flag options are set to `true`. Unspecified option values
+ * default to `undefined`.
+ *
+ * Tasks names are stored in the `env("--tasks")` string array. A default task
+ * can be specified by setting the `"--default-task"` value to the task name.
+ *
+ * Command-line variables are keyed by name. For example `vers=1.0.1` on the
+ * command-line sets the `"vers"` value to `"1.0.1"`.
+ */
 export const env = newEnvFunction();
 
 type EnvData = { [name: string]: any };
@@ -478,8 +478,8 @@ export interface ShCaptureOpts extends ShOpts {
  *
  * Examples:
  *
- *    const { code, stdout } = await shCapture("echo Hello"); 
- *    const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" }); 
+ *     const { code, stdout } = await shCapture("echo Hello"); 
+ *     const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" }); 
  * 
  */
 export async function shCapture(

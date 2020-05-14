@@ -375,8 +375,9 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Unconditionally execute normal task. Throw an error if any prerequisite file does not have a
-   * matching task (a prerequisite file without a matching task does nothing in a normal task).
+   * Unconditionally execute normal task. Throw an error if any prerequisite
+   * file does not have a matching task (a prerequisite file without a matching
+   * task does nothing in a normal task).
    */
   private async executeNormalTask(task: Task) {
     for (const prereq of task.prereqs) {
