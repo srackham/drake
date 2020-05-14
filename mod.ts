@@ -21,7 +21,7 @@ import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
 import { abort, env, parseEnv } from "./lib/utils.ts";
 
-const DRAKE_VERS = "1.0.0-rc3";
+const DRAKE_VERS = "1.0.0";
 
 env("--abort-exits", true);
 
