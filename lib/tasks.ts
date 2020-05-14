@@ -203,29 +203,27 @@ export class TaskRegistry extends Map<string, Task> {
     debug("loadCache");
     const json = readFile(filename);
     let cache: DrakeCache;
+    let deleteCache = false;
     try {
       cache = JSON.parse(json);
-    } catch {
-      abort(`corrupt cache file: ${filename}`);
-    }
-    if (cache.version !== vers()) {
-      log(`drake version changed: deleting cache file: ${filename}`);
-      Deno.removeSync(filename);
-      return;
-    }
-    if (cache.os !== Deno.build.os) {
-      log(`operating system changed: deleting cache file: ${filename}`);
-      Deno.removeSync(filename);
-      return;
-    }
-    try {
-      for (const taskname of Object.keys(cache.tasks)) {
-        if (this.has(taskname)) {
-          this.get(taskname).cache = cache.tasks[taskname];
+      if (cache.version !== vers()) {
+        log(`drake version changed: deleting cache file: ${filename}`);
+        deleteCache = true;
+      } else if (cache.os !== Deno.build.os) {
+        log(`operating system changed: deleting cache file: ${filename}`);
+        deleteCache = true;
+      } else {
+        for (const taskname of Object.keys(cache.tasks)) {
+          if (this.has(taskname)) {
+            this.get(taskname).cache = cache.tasks[taskname];
+          }
         }
       }
     } catch {
-      abort(`corrupt cache object: ${filename}`);
+      abort(`corrupt cache file: ${filename}`);
+    }
+    if (deleteCache) {
+      Deno.removeSync(filename);
     }
   }
 
