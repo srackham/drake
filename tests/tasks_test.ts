@@ -93,25 +93,25 @@ Deno.test("fileTaskTest", async function () {
     writeFile(prereq, "");
     assert(
       task.isOutOfDate(),
-      "isOutOfDate should return true: no previous snapshot",
+      "isOutOfDate should return true: no previous task cache",
     );
     assert(
       task.isOutOfDate(),
       "isOutOfDate should return true: missing target file",
     );
     writeFile(target, "quux");
-    task.updateSnapshot();
+    task.updateCache();
     taskRegistry.saveCache();
     taskRegistry.loadCache();
     assertEquals(
-      task.snapshot![prereq].size,
+      task.cache![prereq].size,
       0,
-      "loaded snapshot prereq size should match",
+      "loaded file cache prereq size should match",
     );
     assertEquals(
-      task.snapshot![target].size,
+      task.cache![target].size,
       4,
-      "loaded snapshot target size should match",
+      "loaded file cache target size should match",
     );
 
     writeFile(prereq, "baz");

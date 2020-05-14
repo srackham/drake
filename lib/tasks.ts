@@ -17,24 +17,22 @@ import {
 
 export type Action = (this: Task) => any;
 
-// Snapshot file info.
-type SnapshotFileInfo = {
+type FileCache = {
   size: number;
   mtime: string;
 };
-// Prerequisite file properties.
-type Snapshot = {
-  [prereq: string]: SnapshotFileInfo;
+type TaskCache = {
+  [filename: string]: FileCache;
 };
-// File task snapshots.
-type Snapshots = {
-  [task: string]: Snapshot;
+type RegistryCache = {
+  [task: string]: TaskCache;
 };
-// Cache file.
-type Cache = {
+
+/** Drake cache file contents. */
+type DrakeCache = {
   version: string;
   os: string;
-  snapshots: Snapshots;
+  tasks: RegistryCache;
 };
 
 /** Drake task. */
@@ -44,7 +42,7 @@ export class Task {
   desc: string;
   prereqs: string[];
   action?: Action;
-  snapshot?: Snapshot;
+  cache?: TaskCache;
 
   /**
    * Create a new task.
@@ -60,7 +58,7 @@ export class Task {
     }
   }
 
-  private static fileInfo(path: string): SnapshotFileInfo {
+  private static fileInfo(path: string): FileCache {
     const info = Deno.statSync(path);
     if (!info.mtime) {
       abort(`${path}: invalid mtime: ${info.mtime}`);
@@ -71,23 +69,23 @@ export class Task {
     };
   }
 
-  updateSnapshot(): void {
-    const snapshot: Snapshot = {};
+  updateCache(): void {
+    const taskCache: TaskCache = {};
     if (existsSync(this.name)) {
-      snapshot[this.name] = Task.fileInfo(this.name);
+      taskCache[this.name] = Task.fileInfo(this.name);
     }
     for (const prereq of this.prereqs) {
       if (isFileTask(prereq)) {
         if (existsSync(prereq)) {
           const info = Deno.statSync(prereq);
-          snapshot[prereq] = Task.fileInfo(prereq);
+          taskCache[prereq] = Task.fileInfo(prereq);
         }
       } else {
-        delete snapshot[prereq];
+        delete taskCache[prereq];
       }
     }
-    debug("updateSnapshot", `${this.name}`);
-    this.snapshot = snapshot;
+    debug("updateCache", `${this.name}`);
+    this.cache = taskCache;
   }
 
   /**
@@ -105,8 +103,8 @@ export class Task {
     if (isNormalTask(this.name)) {
       debugMsg = "true: normal task";
       result = true;
-    } else if (!this.snapshot) {
-      debugMsg = "true: no previous snapshot";
+    } else if (!this.cache) {
+      debugMsg = "true: no previous task cache";
       result = true;
     } else if (!existsSync(this.name)) {
       debugMsg = "true: no target file";
@@ -124,9 +122,9 @@ export class Task {
             `missing prerequisite file: "${filename}"`,
           );
         }
-        const prev = this.snapshot[filename];
+        const prev = this.cache[filename];
         if (!prev) {
-          debugMsg = `true: no previous snapshot: ${filename}`;
+          debugMsg = `true: no previous file cachegg: ${filename}`;
           result = true;
           break;
         }
@@ -198,12 +196,12 @@ export class TaskRegistry extends Map<string, Task> {
   loadCache(): void {
     const filename = this.cacheFile();
     if (!existsSync(filename)) {
-      debug("loadSnapshots:", `no snapshots file: ${filename}`);
+      debug("loadCache:", `no cache file: ${filename}`);
       return;
     }
     debug("loadCache");
     const json = readFile(filename);
-    let cache: Cache;
+    let cache: DrakeCache;
     try {
       cache = JSON.parse(json);
       if (cache.version !== vers()) {
@@ -214,9 +212,9 @@ export class TaskRegistry extends Map<string, Task> {
         log("operating system changed");
         return;
       }
-      for (const taskname of Object.keys(cache.snapshots)) {
+      for (const taskname of Object.keys(cache.tasks)) {
         if (this.has(taskname)) {
-          this.get(taskname).snapshot = cache.snapshots[taskname];
+          this.get(taskname).cache = cache.tasks[taskname];
         }
       }
     } catch {
@@ -230,22 +228,22 @@ export class TaskRegistry extends Map<string, Task> {
       return;
     }
     const filename = this.cacheFile();
-    const snapshots: Snapshots = {};
+    const tasksCache: RegistryCache = {};
     for (const task of this.values()) {
-      if (isFileTask(task.name) && task.snapshot) {
-        snapshots[task.name] = task.snapshot;
+      if (isFileTask(task.name) && task.cache) {
+        tasksCache[task.name] = task.cache;
       }
     }
-    if (Object.keys(snapshots).length !== 0) {
+    if (Object.keys(tasksCache).length !== 0) {
       debug("saveCache");
-      const cache: Cache = {
+      const cache: DrakeCache = {
         version: vers(),
         os: Deno.build.os,
-        snapshots: snapshots,
+        tasks: tasksCache,
       };
       writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
-      debug("saveCache", "skipped: no snapshots");
+      debug("saveCache", "skipped: no cache");
     }
   }
 
@@ -397,7 +395,7 @@ export class TaskRegistry extends Map<string, Task> {
       return;
     }
     await this.execute(task.name);
-    task.updateSnapshot();
+    task.updateCache();
   }
 
   /**
