@@ -16,7 +16,6 @@ export {
   updateFile,
   writeFile,
 } from "./lib/utils.ts";
-export { desc, execute, run, task, vers };
 
 import { help } from "./lib/help.ts";
 import { Action, Task, TaskRegistry } from "./lib/tasks.ts";
@@ -39,12 +38,12 @@ if (env("--help")) {
 }
 
 /** Returns the Drake version number string. */
-function vers(): string {
+export function vers(): string {
   return DRAKE_VERS;
 }
 
 /** Set description of next registered task. */
-function desc(description: string): void {
+export function desc(description: string): void {
   taskRegistry.desc(description);
 }
 
@@ -61,7 +60,7 @@ function desc(description: string): void {
  *   parameters.
  *
  */
-function task(name: string, prereqs?: string[], action?: Action): Task {
+export function task(name: string, prereqs?: string[], action?: Action): Task {
   if (prereqs !== undefined) {
     taskRegistry.register(name, prereqs, action);
   }
@@ -76,7 +75,7 @@ function task(name: string, prereqs?: string[], action?: Action): Task {
  * Task execution is ordered such that prerequisite tasks are executed prior to their parent task.
  * The same task is never run twice.
  */
-async function run(...names: string[]) {
+export async function run(...names: string[]) {
   if (env("--help") || env("--version")) {
     return;
   }
@@ -100,6 +99,6 @@ async function run(...names: string[]) {
  * Unconditionally execute task action functions asynchronously.
  * Silently skip tasks that have no action function.
  */
-async function execute(...names: string[]) {
+export async function execute(...names: string[]) {
   await taskRegistry.execute(...names);
 }
