@@ -185,6 +185,7 @@ export class TaskRegistry extends Map<string, Task> {
 
   /** Create and register a task. */
   register(name: string, prereqs: string[], action?: Action): void {
+    debug("register", `${name}: ${this.lastDesc}`);
     this.set(name, new Task(name, this.lastDesc, prereqs, action));
     this.lastDesc = ""; // Consume description.
   }
