@@ -11,13 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**NOTE**: This is a development release and will be subject to
-breaking changes until 1.0 (search the Git commit log for `BREAKING
-CHANGE`). A 1.0 production release will follow once Deno has reached
-1.0. If you get TypeScript compilation errors try reloading the Deno
-cache, for example: `deno cache -r Drakefile.ts`
-
-Tested with Deno 1.0.0-rc3 running on Ubuntu 18.04.
+Tested with Deno 1.0.0 running on Ubuntu 18.04.
 
 
 ## Drakefiles
@@ -30,7 +24,7 @@ A drakefile is a TypeScript module that:
 Example drakefile:
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc3/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.0.0/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -469,16 +463,6 @@ Returns the Drake version number string.
   * `` \` `` translates to `` ` ``
   * `\${` translates to `${` 
 
-- You can use Drake API functions in non-drakefiles.  Useful utility
-  functions include: `abort`, `debug`, `glob`, `log`, `quote`,
-  `readFile`, `sh`, `shCapture`, `updateFile`, `writeFile`.
-
-- Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
-  environment variable is set. This can be useful when executing
-  non-Drakefiles (in lieu of the Drake `--debug` command-line option).
-  You can also "debug" sections of code with `env("--debug",true)` and
-  `env("--debug",false)`.
-
 - By default Drake functions manifest errors by printing an error
   message and exiting with a non-zero exit code.  You can change the
   default behavior so that errors throw a `DrakeError` exception by
@@ -486,10 +470,10 @@ Returns the Drake version number string.
 
 - Specify the Drake version to import in the `import` statement URL.
   The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v1.0.0-rc3`:
+  second imports the commit tagged `v1.0.0`:
 
       import { desc, run, task } from "https://deno.land/x/drake/mod.ts";
-      import { desc, run, task } from "https://deno.land/x/drake@v1.0.0-rc3/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake@v1.0.0/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
