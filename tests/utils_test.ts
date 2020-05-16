@@ -96,6 +96,11 @@ Deno.test("envTest", function () {
     DrakeError,
     "--tasks must be a string array",
   );
+  assertThrows(
+    () => env("--tasks", [1, 2, 3] as any),
+    DrakeError,
+    "--tasks must be a string array",
+  );
 });
 
 Deno.test("fileFunctionsTest", function () {

@@ -71,7 +71,10 @@ export function newEnvFunction() {
           }
           break;
         case "--tasks":
-          if (!(value instanceof Array)) {
+          if (
+            !(value instanceof Array) ||
+            !value.every((v) => typeof v === "string")
+          ) {
             abort("--tasks must be a string array");
           }
           break;
