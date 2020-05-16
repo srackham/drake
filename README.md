@@ -448,14 +448,6 @@ Returns the Drake version number string.
         });
       }
 
-- The built-in [Deno API](https://deno.land/typedoc/) has many useful
-  functions e.g.
-
-      Deno.mkdirSync(dirname);
-      const tempDir= Deno.makeTempDirSync();
-      const modTime = Deno.statSync(filename).modified;
-      Deno.copyFileSync(from, to);
-
 - Escape backslash and backtick characters and placeholders in
   template string literals with a backslash:
 
@@ -467,13 +459,6 @@ Returns the Drake version number string.
   message and exiting with a non-zero exit code.  You can change the
   default behavior so that errors throw a `DrakeError` exception by
   setting `env("--abort-exits", false)`.
-
-- Specify the Drake version to import in the `import` statement URL.
-  The first example imports the HEAD of the `master` branch; the
-  second imports the commit tagged `v1.0.0`:
-
-      import { desc, run, task } from "https://deno.land/x/drake/mod.ts";
-      import { desc, run, task } from "https://deno.land/x/drake@v1.0.0/mod.ts";
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
