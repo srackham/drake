@@ -36,10 +36,12 @@ Deno.test("abortTest", function () {
 
 Deno.test("envTest", function () {
   const env = newEnvFunction();
-  const boolOpts = [
+  const opts = [
     // "--abort-exits",
     "--always-make",
     // "--debug",
+    "--default-task",
+    "--directory",
     "--dry-run",
     "--help",
     "--list-all",
@@ -47,37 +49,34 @@ Deno.test("envTest", function () {
     "--quiet",
     "--version",
   ];
-  const strOpts = [
-    "--default-task",
-    "--directory",
-  ];
-  for (const opt of boolOpts) {
-    assertEquals(env(opt), false);
-    assertThrows(
-      () => env(opt, undefined),
-      DrakeError,
-      `${opt} must be a boolean`,
-    );
-    env(opt, true);
-    assertEquals(env(opt), true);
-    env(opt, false);
-    assertEquals(env(opt), false);
-  }
-  for (const opt of strOpts) {
+  for (const opt of opts) {
     switch (opt) {
       case "--default-task":
-        assertEquals(env(opt), undefined);
+        assertEquals(env(opt), "");
         env(opt, "foobar");
         assertEquals(env(opt), "foobar");
+        env(opt, "");
+        assertEquals(env(opt), "");
         break;
       case "--directory":
         assertEquals(env(opt), Deno.cwd());
         break;
+      default:
+        assertEquals(env(opt), false);
+        env(opt, true);
+        assertEquals(env(opt), true);
+        env(opt, false);
+        assertEquals(env(opt), false);
     }
     assertThrows(
-      () => env(opt, 42),
+      () => env(opt, undefined),
       DrakeError,
-      `${opt} must be a string`,
+      `${opt} must be a`,
+    );
+    assertThrows(
+      () => env(opt, 42 as any),
+      DrakeError,
+      `${opt} must be a`,
     );
   }
   assertThrows(

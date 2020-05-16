@@ -30,6 +30,7 @@ export class DrakeError extends Error {
  */
 export const env = newEnvFunction();
 
+type EnvValue = boolean | string | Array<string>;
 type EnvData = { [name: string]: any };
 type EnvFunction = (name: string, value?: any) => any;
 
@@ -38,7 +39,7 @@ export function newEnvFunction() {
   return function (
     this: EnvData,
     name: string,
-    value?: any,
+    value?: EnvValue,
   ): any {
     if (arguments.length !== 1) {
       switch (name) {
@@ -92,6 +93,7 @@ export function newEnvFunction() {
   }.bind({
     "--tasks": [],
     "--debug": !!Deno.env.get("DRAKE_DEBUG"),
+    "--default-task": "",
     "--directory": Deno.cwd(),
     "--abort-exits": false,
     "--always-make": false,
