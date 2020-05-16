@@ -113,47 +113,39 @@ export function parseEnv(args: string[], env: EnvFunction): void {
   while (!!(arg = args.shift())) {
     const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
     if (match) {
-      env(match[1], match[2]);
+      env(match[1], match[2]); // Set named variable.
       continue;
     }
+    const shortOpts: { [arg: string]: string } = {
+      "-a": "--always-make",
+      "-d": "--directory",
+      "-D": "--debug",
+      "-h": "--help",
+      "-l": "--list-tasks",
+      "-L": "--list-all",
+      "-n": "--dry-run",
+      "-q": "--quiet",
+    };
+    if (shortOpts[arg] !== undefined) {
+      arg = shortOpts[arg];
+    }
     switch (arg) {
-      case "-a":
       case "--always-make":
-        env("--always-make", true);
+      case "--debug":
+      case "--dry-run":
+      case "--help":
+      case "--list-tasks":
+      case "--list-all":
+      case "--quiet":
+      case "--version":
+        env(arg, true);
         break;
-      case "-d":
       case "--directory":
         arg = args.shift();
         if (arg === undefined) {
           abort("missing --directory option value");
         }
         env("--directory", arg);
-        break;
-      case "-D":
-      case "--debug":
-        env("--debug", true);
-        break;
-      case "-h":
-      case "--help":
-        env("--help", true);
-        break;
-      case "-l":
-      case "--list-tasks":
-        env("--list-tasks", true);
-        break;
-      case "-L":
-        env("--list-all", true);
-        break;
-      case "-n":
-      case "--dry-run":
-        env("--dry-run", true);
-        break;
-      case "-q":
-      case "--quiet":
-        env("--quiet", true);
-        break;
-      case "--version":
-        env("--version", true);
         break;
       default:
         if (arg.startsWith("-")) {
