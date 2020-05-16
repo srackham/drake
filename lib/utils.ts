@@ -34,7 +34,7 @@ type EnvValue = boolean | string | Array<string>;
 type EnvData = { [name: string]: any };
 type EnvFunction = (name: string, value?: any) => any;
 
-/** Return an environment getter/setter function with `this` set to `envData`. */
+/** Return an environment getter/setter function with `this` set to default options values. */
 export function newEnvFunction() {
   return function (
     this: EnvData,
@@ -89,8 +89,7 @@ export function newEnvFunction() {
       this[name] = value;
     }
     return this[name];
-    // TODO is a new bound object created every time envFunction is called?
-  }.bind({
+  }.bind(clone({
     "--tasks": [],
     "--debug": !!Deno.env.get("DRAKE_DEBUG"),
     "--default-task": "",
@@ -103,7 +102,7 @@ export function newEnvFunction() {
     "--list-tasks": false,
     "--quiet": false,
     "--version": false,
-  });
+  }));
 }
 
 export function parseEnv(args: string[], env: EnvFunction): void {
@@ -161,6 +160,11 @@ export function parseEnv(args: string[], env: EnvFunction): void {
         break;
     }
   }
+}
+
+/** Naive object clone. */
+export function clone(obj: Object): Object {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 /**
