@@ -1,7 +1,5 @@
-import { assertEquals, assertStrContains, path } from "../deps.ts";
-import { env, shCapture, vers } from "../mod.ts";
-
-env("--abort-exits", false);
+import { shCapture, vers } from "../lib/utils.ts";
+import { assertEquals, assertStrContains, path } from "./deps.ts";
 
 Deno.test("cliTest", async function () {
   const denoRun = "deno run -A --quiet";

@@ -1,8 +1,7 @@
-import { assertEquals, assertThrowsAsync } from "../deps.ts";
-import { writeFile } from "../lib/utils.ts";
-import { desc, DrakeError, env, run, task } from "../mod.ts";
+import { desc, run, task } from "../lib/registry.ts";
+import { DrakeError, env, writeFile } from "../lib/utils.ts";
+import { assertEquals, assertThrowsAsync } from "./deps.ts";
 
-env("--abort-exits", false);
 env("--quiet", true);
 
 Deno.test("apiTest", async function () {

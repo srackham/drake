@@ -1,4 +1,11 @@
-import { colors, existsSync, path, walkSync } from "../deps.ts";
+import { colors, existsSync, path, walkSync } from "./deps.ts";
+
+const DRAKE_VERS = "1.0.0";
+
+/** Returns the Drake version number string. */
+export function vers(): string {
+  return DRAKE_VERS;
+}
 
 export class DrakeError extends Error {
   constructor(message?: string) {
@@ -33,7 +40,7 @@ export function newEnvFunction() {
     name: string,
     value?: any,
   ): any {
-    if (value !== undefined) {
+    if (arguments.length !== 1) {
       switch (name) {
         case "--abort-exits":
         case "--always-make":
@@ -86,6 +93,14 @@ export function newEnvFunction() {
     "--tasks": [],
     "--debug": !!Deno.env.get("DRAKE_DEBUG"),
     "--directory": Deno.cwd(),
+    "--abort-exits": false,
+    "--always-make": false,
+    "--dry-run": false,
+    "--help": false,
+    "--list-all": false,
+    "--list-tasks": false,
+    "--quiet": false,
+    "--version": false,
   });
 }
 

@@ -1,5 +1,4 @@
-import { colors, existsSync, path } from "../deps.ts";
-import { vers } from "../mod.ts";
+import { colors, existsSync, path } from "./deps.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
@@ -12,6 +11,7 @@ import {
   normalizePrereqs,
   normalizeTaskName,
   readFile,
+  vers,
   writeFile,
 } from "./utils.ts";
 

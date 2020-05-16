@@ -1,18 +1,7 @@
 import {
-  assert,
-  assertEquals,
-  assertNotEquals,
-  assertStrContains,
-  assertThrows,
-  assertThrowsAsync,
-  existsSync,
-  path,
-} from "../deps.ts";
-import {
   abort,
   createFile,
   DrakeError,
-  env,
   glob,
   isFileTask,
   isNormalTask,
@@ -26,8 +15,16 @@ import {
   updateFile,
   writeFile,
 } from "../lib/utils.ts";
-
-env("--abort-exits", false);
+import {
+  assert,
+  assertEquals,
+  assertNotEquals,
+  assertStrContains,
+  assertThrows,
+  assertThrowsAsync,
+  existsSync,
+  path,
+} from "./deps.ts";
 
 Deno.test("abortTest", function () {
   assertThrows(
@@ -39,7 +36,6 @@ Deno.test("abortTest", function () {
 
 Deno.test("envTest", function () {
   const env = newEnvFunction();
-  env("--abort-exits", false);
   const boolOpts = [
     // "--abort-exits",
     "--always-make",
@@ -56,7 +52,14 @@ Deno.test("envTest", function () {
     "--directory",
   ];
   for (const opt of boolOpts) {
-    assertEquals(env(opt), undefined);
+    assertEquals(env(opt), false);
+    assertThrows(
+      () => env(opt, undefined),
+      DrakeError,
+      `${opt} must be a boolean`,
+    );
+    env(opt, true);
+    assertEquals(env(opt), true);
     env(opt, false);
     assertEquals(env(opt), false);
   }
@@ -130,10 +133,18 @@ Deno.test("globTest", function () {
   let files = glob("./mod.ts", "./lib/*.ts");
   assertEquals(
     files,
-    ["lib/graph.ts", "lib/help.ts", "lib/tasks.ts", "lib/utils.ts", "mod.ts"]
+    [
+      "lib/deps.ts",
+      "lib/graph.ts",
+      "lib/help.ts",
+      "lib/registry.ts",
+      "lib/tasks.ts",
+      "lib/utils.ts",
+      "mod.ts",
+    ]
       .map((p) => normalizePath(p)),
   );
-  files = glob("./mod.ts", "./lib/!(graph|utils).ts");
+  files = glob("./mod.ts", "./lib/!(deps|registry|graph|utils).ts");
   assertEquals(
     files,
     ["lib/help.ts", "lib/tasks.ts", "mod.ts"].map((p) => normalizePath(p)),

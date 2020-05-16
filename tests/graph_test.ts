@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps.ts";
 import { Graph } from "../lib/graph.ts";
+import { assertEquals } from "./deps.ts";
 
 Deno.test("graphTest", function () {
   const g = new Graph();

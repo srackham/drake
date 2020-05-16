@@ -1,13 +1,11 @@
+import { Task, TaskRegistry } from "../lib/tasks.ts";
+import { DrakeError, env, normalizePath, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
   assertThrows,
   assertThrowsAsync,
-} from "../deps.ts";
-import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env, normalizePath, writeFile } from "../lib/utils.ts";
-
-env("--abort-exits", false);
+} from "./deps.ts";
 
 Deno.test("taskRegistryTests", async function () {
   env("--quiet", true);
@@ -60,7 +58,7 @@ Deno.test("taskRegistryTests", async function () {
       "--list-all lists hidden tasks",
     );
   } finally {
-    env("--list-all", undefined);
+    env("--list-all", false);
   }
 
   taskRegistry.desc("Task 4");
@@ -164,7 +162,7 @@ Deno.test("fileTaskTest", async function () {
       // Missing prerequisite should not throw error if --dry-run.
       await taskRegistry.run(target);
     } finally {
-      env("--dry-run", undefined);
+      env("--dry-run", false);
     }
   } finally {
     env("--directory", savedCwd);
