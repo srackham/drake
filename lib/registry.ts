@@ -1,5 +1,6 @@
+import { env } from "./env.ts";
 import { Action, Task, TaskRegistry } from "./tasks.ts";
-import { abort, env } from "./utils.ts";
+import { abort } from "./utils.ts";
 
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();

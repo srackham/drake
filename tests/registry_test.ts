@@ -1,5 +1,6 @@
+import { env } from "../lib/env.ts";
 import { desc, run, task } from "../lib/registry.ts";
-import { DrakeError, env, writeFile } from "../lib/utils.ts";
+import { DrakeError, writeFile } from "../lib/utils.ts";
 import { assertEquals, assertThrowsAsync } from "./deps.ts";
 
 env("--quiet", true);

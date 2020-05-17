@@ -5,7 +5,9 @@
 import { abort, desc, env, glob, quote, run, sh, task, vers } from "./mod.ts";
 
 env("--default-task", "test");
-const TS_FILES = glob("**/*.ts").filter((p) => !p.endsWith(".d.ts"));
+const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
+  !p.endsWith(".d.ts")
+);
 
 desc("Run tests");
 task("test", ["fmt"], async function () {

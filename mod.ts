@@ -1,10 +1,10 @@
 // Drake API.
+export { env } from "./lib/env.ts";
 export { desc, execute, run, task } from "./lib/registry.ts";
 export {
   abort,
   debug,
   DrakeError,
-  env,
   glob,
   log,
   quote,
@@ -19,8 +19,9 @@ export {
   writeFile,
 } from "./lib/utils.ts";
 
+import { env, parseEnv } from "./lib/env.ts";
 import { help } from "./lib/help.ts";
-import { env, parseEnv, vers } from "./lib/utils.ts";
+import { vers } from "./lib/utils.ts";
 
 env("--abort-exits", true);
 

@@ -1,10 +1,10 @@
 import { colors, existsSync, path } from "./deps.ts";
+import { env } from "./env.ts";
 import { Graph } from "./graph.ts";
 import {
   abort,
   debug,
   DrakeError,
-  env,
   isFileTask,
   isNormalTask,
   log,

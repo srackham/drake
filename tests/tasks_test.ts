@@ -1,5 +1,6 @@
+import { env } from "../lib/env.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, env, normalizePath, writeFile } from "../lib/utils.ts";
+import { DrakeError, normalizePath, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
