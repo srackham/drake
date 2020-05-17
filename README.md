@@ -60,7 +60,7 @@ in the drakefile.  Tasks are executed in the correct dependency order.
 Here are some of real-world drakefiles:
 
 - https://github.com/srackham/drake/blob/master/Drakefile.ts
-- https://github.com/srackham/rimu-deno/blob/master/Drakefile.ts
+- https://github.com/srackham/rimu/blob/master/Drakefile.ts
 
 
 ## Tasks
