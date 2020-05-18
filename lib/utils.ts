@@ -15,11 +15,6 @@ export class DrakeError extends Error {
   }
 }
 
-/** Naive object clone. */
-export function clone(obj: Object): Object {
-  return JSON.parse(JSON.stringify(obj));
-}
-
 /**
  * Write an error message to to `stderr` and terminate execution.
  * If the `"--abort-exits"` environment option is true throw a

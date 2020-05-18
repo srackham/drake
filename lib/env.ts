@@ -1,5 +1,5 @@
 import { existsSync } from "./deps.ts";
-import { abort, clone } from "./utils.ts";
+import { abort } from "./utils.ts";
 
 type EnvValue = boolean | string | Array<string>;
 type EnvValues = { [name: string]: EnvValue };
@@ -10,20 +10,22 @@ export class Env {
   values: EnvValues;
 
   private constructor() {
-    this.values = clone({
-      "--tasks": [],
-      "--debug": !!Deno.env.get("DRAKE_DEBUG"),
-      "--default-task": "",
-      "--directory": Deno.cwd(),
-      "--abort-exits": false,
-      "--always-make": false,
-      "--dry-run": false,
-      "--help": false,
-      "--list-all": false,
-      "--list-tasks": false,
-      "--quiet": false,
-      "--version": false,
-    }) as EnvValues;
+    this.values = {
+      ...{
+        "--tasks": [],
+        "--debug": !!Deno.env.get("DRAKE_DEBUG"),
+        "--default-task": "",
+        "--directory": Deno.cwd(),
+        "--abort-exits": false,
+        "--always-make": false,
+        "--dry-run": false,
+        "--help": false,
+        "--list-all": false,
+        "--list-tasks": false,
+        "--quiet": false,
+        "--version": false,
+      },
+    } as EnvValues;
   }
 
   /** Set command-line options and variables. */
