@@ -66,9 +66,11 @@ Here are some of real-world drakefiles:
 ## Tasks
 
 ### Task types
-There are two types of task: _Normal tasks_ and _File tasks_.  A
-_Normal task_ executes unconditionally.  A _File task_ is only
-executed if it is out of date.
+There are two types of task:
+
+**Normal task**: A _Normal task_ executes unconditionally.
+
+**File task**: A _File task_ is only executed if it is out of date.
 
 Task types are distinguished by their names.  _Normal task_ names can
 only contain alphanumeric, underscore and hyphen characters and cannot
@@ -247,19 +249,24 @@ used.
 function env(name: string, value?: any): any;
 ```
 
-The Drake `env` API function gets and optionally sets the Drake command-line
+The Drake `env` API function gets and optionally sets the command-line
 options, task names and variables.
 
-Options are keyed by their long option name e.g.  `env("--dry-run")`.
-Command-line flag options are set to `true`.
-Unspecified option values default to `undefined`.
+Options are keyed by their long option name e.g. `env("--dry-run")`.
+Command-line flag options return a boolean; the `--directory` option
+returns a string.
 
-Tasks names are stored in the `env("--tasks")` string array. A default
-task can be specified by setting the `"--default-task"` value to the
-task name.
+Command-line variables are keyed by name. For example `vers=1.0.1` on the
+command-line sets the `vers` value to `"1.0.1"`.
 
-Command-line variables are keyed by name. For example `vers=1.0.1` on
-the command-line sets the `"vers"` value to `"1.0.1"`.
+Command-line tasks are stored in the `--tasks` string array.
+
+Examples:
+
+    env("--abort-exits", true);
+    env("--default-task", "test");
+    console.log(`version: ${env("vers")}`);
+    if (!env("--quiet")) console.log(message);
 
 ### execute
 ``` typescript

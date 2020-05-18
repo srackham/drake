@@ -83,7 +83,10 @@ export function readFile(filename: string): string {
   return result;
 }
 
-/* Write text to a file synchronously. If the file exists it will be overwritten. */
+/**
+ * Write text to a file synchronously.
+ * If the file exists it will be overwritten.
+ * */
 export function writeFile(filename: string, text: string): void {
   debug(
     "writeFile",
@@ -258,8 +261,11 @@ function shArgs(command: string): [string[], string] {
   }
 }
 
+/** `sh` API options. */
 export interface ShOpts {
+  /** Working directory. */
   cwd?: string;
+  /** Map containing additional shell environment variables. */
   env?: { [key: string]: string };
   stdout?: "inherit" | "piped" | "null" | number;
   stderr?: "inherit" | "piped" | "null" | number;
@@ -331,7 +337,9 @@ export type ShOutput = {
   error: string;
 };
 
+/** `shCapture` API options. */
 export interface ShCaptureOpts extends ShOpts {
+  /** Piped to shell stdin. */
   input?: string;
 }
 
