@@ -78,22 +78,22 @@ export class Env {
     this.values[name] = value;
   }
 
-  /** Return a new environment getter/setter function with `this` set to options values. */
+  /** Return a new environment getter/setter function with `this` set to a new Env object. */
   static create(): EnvFunction {
     const env = new Env();
     return function (
-      this: EnvValues,
+      this: Env,
       name?: string,
       value?: EnvValue,
     ): any {
       if (name === undefined) {
-        return env; // Return parent Env object if called without parameters.
+        return this; // Return function's Env object if called without parameters.
       }
       if (arguments.length !== 1) {
-        env.setValue(name, value!);
+        this.setValue(name, value!);
       }
-      return this[name];
-    }.bind(env.values);
+      return this.values[name];
+    }.bind(env);
   }
 
   /** Parse command-line arguments. */
@@ -162,9 +162,9 @@ export class Env {
  * 
  * Examples:
  * 
- *      env("--abort-exits", true);
- *      env("--default-task", "test");
- *      console.log(`version: ${env("vers")}`);
- *      if (!env("--quiet")) console.log(message);
+ *     env("--abort-exits", true);
+ *     env("--default-task", "test");
+ *     console.log(`version: ${env("vers")}`);
+ *     if (!env("--quiet")) console.log(message);
  */
 export const env = Env.create();
