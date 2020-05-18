@@ -116,7 +116,7 @@ export class Env {
         "-l": "--list-tasks",
         "-L": "--list-all",
         "-q": "--quiet",
-      };
+      } as const;
       if (shortOpts[arg] !== undefined) {
         arg = shortOpts[arg];
       }

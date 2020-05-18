@@ -245,7 +245,7 @@ export class TaskRegistry extends Map<string, Task> {
         version: vers(),
         os: Deno.build.os,
         tasks: tasksCache,
-      };
+      } as const;
       writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
       debug("saveCache", "skipped: no cache");

@@ -218,7 +218,7 @@ export function normalizePrereqs(prereqs: string[]): string[] {
  */
 export function glob(...patterns: string[]): string[] {
   function glob1(pattern: string): string[] {
-    const globOptions = { extended: true, globstar: true };
+    const globOptions = { extended: true, globstar: true } as const;
     pattern = path.normalizeGlob(pattern, globOptions);
     let root = path.dirname(pattern);
     while (root !== "." && path.isGlob(root)) {
@@ -396,7 +396,7 @@ export async function shCapture(
     code: status.code,
     output: new TextDecoder().decode(outputBytes),
     error: new TextDecoder().decode(errorBytes),
-  };
+  } as const;
   debug(
     "shCapture",
     `${command}\nopts:      ${JSON.stringify(opts)}\noutputs:   ${
