@@ -19,14 +19,13 @@ export {
   writeFile,
 } from "./lib/utils.ts";
 
-import { env, parseEnv } from "./lib/env.ts";
+import { env, Env } from "./lib/env.ts";
 import { help } from "./lib/help.ts";
 import { vers } from "./lib/utils.ts";
 
 env("--abort-exits", true);
 
-// Parse command-line options into Drake environment.
-parseEnv(Deno.args.slice(), env);
+(env() as Env).parseArgs(Deno.args.slice());
 
 if (env("--help")) {
   help();

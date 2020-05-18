@@ -1,9 +1,9 @@
-import { newEnvFunction } from "../lib/env.ts";
+import { Env } from "../lib/env.ts";
 import { DrakeError } from "../lib/utils.ts";
 import { assertEquals, assertThrows } from "./deps.ts";
 
 Deno.test("envTest", function () {
-  const env = newEnvFunction();
+  const env = Env.create();
   const opts = [
     // "--abort-exits",
     "--always-make",

@@ -124,7 +124,7 @@ export class Task {
         }
         const prev = this.cache[filename];
         if (!prev) {
-          debugMsg = `true: no previous file cachegg: ${filename}`;
+          debugMsg = `true: no previous cache: ${filename}`;
           result = true;
           break;
         }
