@@ -8,7 +8,7 @@ import {
   assertThrowsAsync,
 } from "./deps.ts";
 
-Deno.test("taskRegistryTests", async function () {
+Deno.test("taskRegistryTest", async function () {
   env("--quiet", true);
   const taskRegistry = new TaskRegistry();
 

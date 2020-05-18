@@ -7,7 +7,7 @@ type EnvFunction = (name?: string, value?: EnvValue) => any;
 
 /** Factory class for creating environment functions. */
 export class Env {
-  values: EnvValues;
+  private values: EnvValues;
 
   private constructor() {
     this.values = {

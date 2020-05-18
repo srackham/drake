@@ -1,4 +1,4 @@
-// Drake API.
+/* Drake APIs. */
 export { env } from "./lib/env.ts";
 export { desc, execute, run, task } from "./lib/registry.ts";
 export {
