@@ -417,8 +417,8 @@ export class TaskRegistry extends Map<string, Task> {
       log(colors.yellow(`${names}:`) + " no action");
       return;
     }
-    log(`${colors.green(colors.bold(`${names}:`))} started`);
-    const startTime = new Date().getTime();
+    const msg = names.join(" ");
+    const startTime = logStart(msg);
     const promises: Promise<any>[] = [];
     for (const name of names) {
       const task = this.get(name);
@@ -433,10 +433,19 @@ export class TaskRegistry extends Map<string, Task> {
       }
     }
     await Promise.all(promises);
-    const endTime = new Date().getTime();
-    log(
-      `${colors.green(colors.bold(`${names}:`))} finished (${endTime -
-        startTime}ms)`,
-    );
+    logFinish(msg, startTime);
   }
+}
+
+function logStart(message: string): number {
+  log(`${colors.green(colors.bold(`${message}:`))} started`);
+  return new Date().getTime();
+}
+
+function logFinish(message: string, startTime: number): void {
+  const endTime = new Date().getTime();
+  log(
+    `${colors.green(colors.bold(`${message}:`))} finished (${endTime -
+      startTime}ms)`,
+  );
 }
