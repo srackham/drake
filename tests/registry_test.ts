@@ -31,9 +31,8 @@ Deno.test("registryTest", async function () {
     const target = "./target-file";
     const normalTask = "normalTask";
 
-    let t = task("task1");
-    assertEquals(t.name, "task1");
-    assertEquals(t.desc, "Test task one");
+    assertEquals(task("task1").name, "task1");
+    assertEquals(task("task1").desc, "Test task one");
 
     desc("File task");
     task(target, [prereq]);

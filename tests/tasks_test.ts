@@ -1,6 +1,11 @@
 import { env } from "../lib/env.ts";
 import { Task, TaskRegistry } from "../lib/tasks.ts";
-import { DrakeError, normalizePath, writeFile } from "../lib/utils.ts";
+import {
+  DrakeError,
+  normalizePath,
+  readFile,
+  writeFile,
+} from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
@@ -158,6 +163,7 @@ Deno.test("fileTaskTest", async function () {
       "missing prerequisite file:",
       "missing prerequisite file should throw error",
     );
+
     env("--dry-run", true);
     try {
       // Missing prerequisite should not throw error if --dry-run.
@@ -165,6 +171,24 @@ Deno.test("fileTaskTest", async function () {
     } finally {
       env("--dry-run", false);
     }
+
+    const target2 = normalizePath("./target2");
+    taskRegistry.register(target2, [target], async function () {
+      throw new DrakeError();
+    });
+    writeFile(prereq, "");
+    const oldCache = readFile(taskRegistry.cacheFile());
+    let didThrow = false;
+    try {
+      await taskRegistry.run(target, target2);
+    } catch {
+      didThrow = true;
+    }
+    assert(didThrow, "target2 task should throw an error");
+    assert(
+      readFile(taskRegistry.cacheFile()) !== oldCache,
+      "cache file should have updated after the error was thrown",
+    );
   } finally {
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });

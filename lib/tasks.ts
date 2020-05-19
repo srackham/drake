@@ -190,7 +190,7 @@ export class TaskRegistry extends Map<string, Task> {
     this.lastDesc = ""; // Consume description.
   }
 
-  private cacheFile(): string {
+  cacheFile(): string {
     return path.join(env("--directory"), ".drake.cache.json");
   }
 
