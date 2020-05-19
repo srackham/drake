@@ -229,7 +229,7 @@ export class TaskRegistry extends Map<string, Task> {
 
   saveCache(): void {
     if (env("--dry-run")) {
-      debug("saveCache", "skipped: dry run");
+      debug("saveCache", "dry run");
       return;
     }
     const filename = this.cacheFile();
@@ -248,7 +248,7 @@ export class TaskRegistry extends Map<string, Task> {
       } as const;
       writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
-      debug("saveCache", "skipped: no cache");
+      debug("saveCache", "no cache");
     }
   }
 
@@ -396,7 +396,7 @@ export class TaskRegistry extends Map<string, Task> {
    */
   private async executeFileTask(task: Task) {
     if (!env("--always-make") && !task.isOutOfDate()) {
-      log(colors.yellow(`${task.name}:`) + " skipped: up to date");
+      log(colors.yellow(`${task.name}:`) + " up to date");
       return;
     }
     await this.execute(task.name);
@@ -410,20 +410,20 @@ export class TaskRegistry extends Map<string, Task> {
   async execute(...names: string[]) {
     names = names.map((name) => normalizeTaskName(name));
     if (env("--dry-run")) {
-      log(colors.yellow(`${names}:`) + " skipped: dry run");
+      log(colors.yellow(`${names}:`) + " dry run");
       return;
     }
     if (names.every((name) => !this.get(name).action)) {
-      log(colors.yellow(`${names}:`) + " skipped: no action");
+      log(colors.yellow(`${names}:`) + " no action");
       return;
     }
-    log(colors.green(colors.bold(`${names} started`)));
+    log(`${colors.green(colors.bold(`${names}:`))} started`);
     const startTime = new Date().getTime();
     const promises: Promise<any>[] = [];
     for (const name of names) {
       const task = this.get(name);
       if (!task.action) {
-        log(colors.yellow(`${name}:`) + " skipped: no action");
+        log(colors.yellow(`${name}:`) + " no action");
         continue;
       }
       if (task.action.constructor.name === "AsyncFunction") {
@@ -435,7 +435,7 @@ export class TaskRegistry extends Map<string, Task> {
     await Promise.all(promises);
     const endTime = new Date().getTime();
     log(
-      `${colors.green(colors.bold(`${names} finished`))} (${endTime -
+      `${colors.green(colors.bold(`${names}:`))} finished (${endTime -
         startTime}ms)`,
     );
   }
