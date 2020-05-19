@@ -409,12 +409,12 @@ export class TaskRegistry extends Map<string, Task> {
    */
   async execute(...names: string[]) {
     names = names.map((name) => normalizeTaskName(name));
-    if (env("--dry-run")) {
-      log(colors.yellow(`${names}:`) + " dry run");
-      return;
-    }
     if (names.every((name) => !this.get(name).action)) {
       log(colors.yellow(`${names}:`) + " no action");
+      return;
+    }
+    if (env("--dry-run")) {
+      log(`${colors.green(colors.bold(`${names}:`))} dry run`);
       return;
     }
     const msg = names.join(" ");
