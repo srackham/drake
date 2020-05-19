@@ -1,11 +1,10 @@
 import { env } from "../lib/env.ts";
 import { desc, run, task } from "../lib/registry.ts";
 import { DrakeError, writeFile } from "../lib/utils.ts";
-import { assertEquals, assertThrowsAsync } from "./deps.ts";
-
+import { assert, assertEquals, assertThrowsAsync, existsSync } from "./deps.ts";
 env("--quiet", true);
 
-Deno.test("apiTest", async function () {
+Deno.test("registryTest", async function () {
   const dir = Deno.makeTempDirSync();
   const savedCwd = Deno.cwd();
   try {
@@ -30,6 +29,7 @@ Deno.test("apiTest", async function () {
 
     const prereq = "./prerequisite-file";
     const target = "./target-file";
+    const normalTask = "normalTask";
 
     let t = task("task1");
     assertEquals(t.name, "task1");
@@ -39,7 +39,7 @@ Deno.test("apiTest", async function () {
     task(target, [prereq]);
 
     desc("Normal task");
-    task("normalTask", [prereq]);
+    task(normalTask, [prereq]);
 
     await assertThrowsAsync(
       async () => await run(target),
@@ -49,21 +49,28 @@ Deno.test("apiTest", async function () {
     );
 
     await assertThrowsAsync(
-      async () => await run("normalTask"),
+      async () => await run(normalTask),
       DrakeError,
       "missing prerequisite file:",
       "prerequisite files should exist when normal task executes",
     );
 
     writeFile(prereq, "");
-    run(target);
+    await run(target); // File task should now run OK.
+    assert(
+      existsSync("./.drake.cache.json"),
+      "drake cache should have been created",
+    );
 
     await assertThrowsAsync(
-      async () => await run("normalTask"),
+      async () => await run(normalTask),
       DrakeError,
       "no matching task for prerequisite file:",
       "missing prerequisite file task should throw error in a normal task",
     );
+
+    task(normalTask).prereqs = [];
+    await run(target); // Normal task should now run OK.
   } finally {
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });
