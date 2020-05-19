@@ -345,7 +345,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    debug("run", `${names.join(" ")}\n${tasks.map((t) => t.name).join("\n")}`);
+    debug("run", `${names.join(" ")}`);
     for (const task of tasks) {
       const savedAbortExits = env("--abort-exits");
       env("--abort-exits", false);

@@ -1,5 +1,5 @@
 import { existsSync } from "./deps.ts";
-import { abort } from "./utils.ts";
+import { abort, debug } from "./utils.ts";
 
 type EnvValue = boolean | string | Array<string>;
 type EnvValues = { [name: string]: EnvValue };
@@ -77,6 +77,7 @@ export class Env {
           abort(`variable value must be a string: ${name}`);
         }
     }
+    debug("set", `${name}: ${value}`);
     this.values[name] = value;
   }
 
