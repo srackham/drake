@@ -5,6 +5,7 @@
 - Log message format consistency.
 - Tightened `env` runtime parameter checks.
 - A lot of code refactoring including spliting `deps.ts` into separate test and runtime deps.
+- Upgraded to Deno `std/0.52.0`.
 
 
 ## 1.0.0 / 2020-05-15

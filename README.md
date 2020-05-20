@@ -51,7 +51,7 @@ with their prerequisite tasks. `run()` is normally the last statement
 in the drakefile.  Tasks are executed in the correct dependency order.
 
 - Use the Drake `--help` option to list [Drake command-line
-  options](#drake-man-page).  For example:
+  options](#drakefile-execution).  For example:
 
       deno run -A minimal-drakefile.ts --help
 
