@@ -10,6 +10,13 @@ Deno.test("registryTest", async function () {
   try {
     env("--directory", dir);
 
+    env("--directory", ".");
+    assertEquals(
+      env("--directory"),
+      dir,
+      "--directory path should be absolute",
+    );
+
     await assertThrowsAsync(
       async () => await run("missing-normal-task"),
       DrakeError,
