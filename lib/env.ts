@@ -51,6 +51,7 @@ export class Env {
         if (!existsSync(value) || !Deno.statSync(value).isDirectory) {
           abort(`--directory missing or not a directory: ${value}`);
         }
+        value = Deno.realPathSync(value);
         Deno.chdir(value);
         break;
       case "--default-task":
