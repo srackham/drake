@@ -1,7 +1,13 @@
 import { env } from "../lib/env.ts";
 import { desc, run, task } from "../lib/registry.ts";
 import { DrakeError, writeFile } from "../lib/utils.ts";
-import { assert, assertEquals, assertThrowsAsync, existsSync } from "./deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertThrowsAsync,
+  existsSync,
+  path,
+} from "./deps.ts";
 env("--quiet", true);
 
 Deno.test("registryTest", async function () {
@@ -12,7 +18,7 @@ Deno.test("registryTest", async function () {
 
     env("--directory", ".");
     assertEquals(
-      env("--directory"),
+      env("--directory").replace(/\//g, path.SEP),
       dir,
       "--directory path should be absolute",
     );
