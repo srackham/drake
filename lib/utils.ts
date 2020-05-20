@@ -73,7 +73,7 @@ export function readFile(filename: string): string {
   const result = new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
   debug(
     "readFile",
-    `filename: ${filename}: ${result.length} characters read`,
+    `${filename}: ${result.length} characters read`,
   );
   return result;
 }
@@ -85,7 +85,7 @@ export function readFile(filename: string): string {
 export function writeFile(filename: string, text: string): void {
   debug(
     "writeFile",
-    `filename: ${filename}: ${text.length} characters written`,
+    `${filename}: ${text.length} characters written`,
   );
   Deno.writeFileSync(filename, new TextEncoder().encode(text));
 }
@@ -102,7 +102,7 @@ export function updateFile(
 ): boolean {
   debug(
     "updateFile",
-    `filename: ${filename}: find: ${find}, replace: "${replace}"`,
+    `${filename}: find: ${find}, replace: "${replace}"`,
   );
   let result = false;
   const text = readFile(filename);
