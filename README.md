@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.0.1 running on Ubuntu 18.04. See
+**Status**: Tested with Deno 1.0.1 running on Ubuntu 18.04, Windows 10. See
 [releases](https://github.com/srackham/drake/blob/master/releases.md).
 
 
@@ -25,7 +25,7 @@ A drakefile is a TypeScript module that:
 Example drakefile:
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.1.0/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.1.1/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -254,8 +254,8 @@ an alpha character.
       for (const prereq of glob("*.md")) {
         const target = `${path.basename(prereq, ".md")}.html`;
         desc(`compile "${target}"`);
-        task(target, [prereq], function () {
-          sh(`markdown "${prereq}" > "${target}"`);
+        task(target, [prereq], async function () {
+          await sh(`markdown "${prereq}" > "${target}"`);
         });
       }
 

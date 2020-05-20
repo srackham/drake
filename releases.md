@@ -1,5 +1,9 @@
 # Drake releases
 
+## 1.1.1 / 2020-05-21
+- FIX: Cache file write error when using `--directory` option.
+
+
 ## 1.1.0 / 2020-05-21
 - APIs that are can be used in non-Drake modules are exposed via `lib.ts`.
 - Log message format consistency.
