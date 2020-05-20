@@ -22,10 +22,13 @@ task("fmt", [], async function () {
   await sh(`deno fmt ${quote(TS_FILES)}`);
 });
 
-desc("Run examples drakefile");
-task("run", ["test"], async function () {
+desc("Run some example drakefiles");
+task("examples", [], async function () {
   await sh(`
-    deno run -A ./examples/examples-drakefile.ts prereqs pause "qux=Foo Bar" noop
+    deno run -A examples/examples-drakefile.ts prereqs pause "qux=Foo Bar" noop
+  `);
+  await sh(`
+    deno run -A examples/dynamic-tasks.ts -d examples/ README.html releases.html
   `);
 });
 
