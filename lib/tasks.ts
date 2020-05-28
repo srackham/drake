@@ -348,7 +348,7 @@ export class TaskRegistry extends Map<string, Task> {
     debug("run", `${names.join(" ")}`);
     for (const task of tasks) {
       const savedAbortExits = env("--abort-exits");
-      env("--abort-exits", false);
+      env().setValue("--abort-exits", false);
       try {
         if (!env("--dry-run")) {
           for (const prereq of task.prereqs) {
@@ -362,16 +362,15 @@ export class TaskRegistry extends Map<string, Task> {
         } else {
           await this.executeFileTask(task);
         }
+        env().setValue("--abort-exits", savedAbortExits);
       } catch (e) {
-        env("--abort-exits", savedAbortExits);
+        env().setValue("--abort-exits", savedAbortExits);
         this.saveCache();
         if (e instanceof DrakeError) {
           abort(e.message);
         } else {
           throw e;
         }
-      } finally {
-        env("--abort-exits", savedAbortExits);
       }
     }
     this.saveCache();
