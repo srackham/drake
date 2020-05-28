@@ -85,7 +85,7 @@ A unique task name.
 
 **desc**:
 An optional task description that is set by the `desc()` API. Tasks
-without a description are not displayed by the `---list-tasks`
+without a description are not displayed by the `--list-tasks`
 command-line option (use the `-L` option to include hidden tasks and
 task prerequisites in the tasks list).
 
@@ -322,7 +322,7 @@ used.
 
 ### env
 ``` typescript
-function env(name: string, value?: any): any;
+function env(name?: string, value?: EnvValue): any;
 ```
 
 The Drake `env` API function gets and optionally sets the command-line
@@ -405,7 +405,7 @@ prior to their parent task. The same task is never run twice.
 async function sh(commands: string | string[], opts: ShOpts = {});
 ```
 
-Execute commands asynchronously in the command shell.
+Execute commands in the command shell.
 
 - If `commands` is a string execute it.
 - If `commands` is an array of commands execute them asynchronously.
@@ -466,11 +466,12 @@ Create and register a task. Returns the task object.
 
 ### writeFile
 ``` typescript
-function writeFile(filename: string, text: string): void;
+function writeFile(filename: string, text: string): boolean;
 ```
 
-Write text to a file synchronously. If the file exists it will be
-overwritten.
+Write text to a file synchronously. If the file exists it will be overwritten.
+Returns `true` if a new file was created. Returns `false` if the file already
+exists.
 
 ### updateFile
 ``` typescript
