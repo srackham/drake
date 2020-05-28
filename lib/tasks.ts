@@ -385,7 +385,9 @@ export class TaskRegistry extends Map<string, Task> {
   private async executeNormalTask(task: Task) {
     for (const prereq of task.prereqs) {
       if (!this.has(prereq)) {
-        abort(`no matching task for prerequisite file: ${prereq}`);
+        abort(
+          `${task.name}: no matching task for prerequisite file: ${prereq}`,
+        );
       }
     }
     await this.execute(task.name);
