@@ -52,7 +52,14 @@ export class Task {
     name = normalizeTaskName(name);
     this.name = name;
     this.desc = desc;
-    this.prereqs = normalizePrereqs(prereqs);
+    prereqs = normalizePrereqs(prereqs);
+    const dup = prereqs.find((x) =>
+      prereqs.indexOf(x) !== prereqs.lastIndexOf(x)
+    );
+    if (dup) {
+      abort(`${name}: duplicate prerequisite: ${dup}`);
+    }
+    this.prereqs = prereqs;
     if (action) {
       this.action = action.bind(this);
     }
