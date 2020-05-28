@@ -70,7 +70,7 @@ export async function sleep(ms: number): Promise<unknown> {
 
 /** Read the entire contents of a file synchronously to a UTF-8 string. */
 export function readFile(filename: string): string {
-  const result = new TextDecoder("utf-8").decode(Deno.readFileSync(filename));
+  const result = Deno.readTextFileSync(filename);
   debug(
     "readFile",
     `${filename}: ${result.length} characters read`,
@@ -81,13 +81,17 @@ export function readFile(filename: string): string {
 /**
  * Write text to a file synchronously.
  * If the file exists it will be overwritten.
+ * Returns `true` if a new file was created.
+ * Returns `false` if the file already exists.
  * */
-export function writeFile(filename: string, text: string): void {
+export function writeFile(filename: string, text: string): boolean {
+  const exists = existsSync(filename);
   debug(
     "writeFile",
     `${filename}: ${text.length} characters written`,
   );
-  Deno.writeFileSync(filename, new TextEncoder().encode(text));
+  Deno.writeTextFileSync(filename, text);
+  return !exists;
 }
 
 /**
@@ -104,32 +108,29 @@ export function updateFile(
     "updateFile",
     `${filename}: find: ${find}, replace: "${replace}"`,
   );
-  let result = false;
+  let changed = false;
   const text = readFile(filename);
   const updatedText = text.replace(find, replace);
   if (text !== updatedText) {
     writeFile(filename, updatedText);
-    result = true;
+    changed = true;
   }
-  return result;
+  return changed;
 }
 
 /**
- * Create zero length file.
- * Missing parent directory paths are also created.
- * Throws error if file exists.
+ * Create directory.
+ * Missing parent directory paths are created.
+ * Returns `true` if a new directory was created.
+ * Returns `false` if the directory already exists.
  */
-export function createFile(file: string): void {
-  debug("createFile", file);
-  const dir = path.dirname(file);
+export function createDir(dir: string): boolean {
+  const exists = existsSync(dir);
   if (!existsSync(dir)) {
+    debug("createDir", dir);
     Deno.mkdirSync(dir, { recursive: true });
   }
-  if (existsSync(file)) {
-    abort(`file already exists: ${file}`);
-  } else {
-    Deno.createSync(file).close();
-  }
+  return !exists;
 }
 
 /**

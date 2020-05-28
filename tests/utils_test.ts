@@ -1,6 +1,6 @@
 import {
   abort,
-  createFile,
+  createDir,
   DrakeError,
   glob,
   isFileTask,
@@ -21,7 +21,6 @@ import {
   assertStrContains,
   assertThrows,
   assertThrowsAsync,
-  existsSync,
   path,
 } from "./deps.ts";
 
@@ -34,10 +33,10 @@ Deno.test("abortTest", function () {
 });
 
 Deno.test("fileFunctionsTest", function () {
-  const dir = Deno.makeTempDirSync();
+  const tmpDir = Deno.makeTempDirSync();
   try {
     // Read, write update tests.
-    let file = path.join(dir, "fileTest");
+    let file = path.join(tmpDir, "fileTest");
     const text = "foobar";
     writeFile(file, text);
     assertEquals(readFile(file), text);
@@ -45,21 +44,15 @@ Deno.test("fileFunctionsTest", function () {
     assertEquals(readFile(file), "fO!O!bar");
     assertEquals(updateFile(file, /o/g, "O!"), false);
     assertEquals(updateFile(file, /zzz/g, "O!"), false);
-    file = path.join(dir, "a/b/foobar");
-    createFile(file);
-    assert(existsSync(file), "created file and directories should exist");
-    assertEquals(
-      Deno.statSync(file).size,
-      0,
-      "created file should have zero length",
+    const dir = path.join(tmpDir, "c/d/e");
+    assert(createDir(dir), "directory should not have already existed");
+    assert(
+      Deno.statSync(dir).isDirectory,
+      "directory should have been created",
     );
-    assertThrows(
-      () => createFile(file),
-      DrakeError,
-      "file already exists:",
-    );
+    assert(!createDir(dir), "directory should have already existed");
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Deno.removeSync(tmpDir, { recursive: true });
   }
 });
 
@@ -86,18 +79,19 @@ Deno.test("globTest", function () {
       normalizePath(p)
     ),
   );
-  const dir = Deno.makeTempDirSync();
+  const tmpDir = Deno.makeTempDirSync();
   try {
+    createDir(path.join(tmpDir, "a/b"));
     const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
-      path.join(dir, f)
+      path.join(tmpDir, f)
     ).sort();
-    fixtures.forEach((f) => createFile(f));
-    files = glob(...["**/*.ts", "u"].map((f) => path.join(dir, f)));
+    fixtures.forEach((f) => writeFile(f, ""));
+    files = glob(...["**/*.ts", "u"].map((f) => path.join(tmpDir, f)));
     assertEquals(files, fixtures);
-    assertEquals(glob(path.join(dir, "non-existent-file")), []);
+    assertEquals(glob(path.join(tmpDir, "non-existent-file")), []);
     const saved = Deno.cwd();
     try {
-      Deno.chdir(dir);
+      Deno.chdir(tmpDir);
       files = glob("./**/*.ts", "u");
       assertEquals(
         files,
@@ -115,7 +109,7 @@ Deno.test("globTest", function () {
       Deno.chdir(saved);
     }
   } finally {
-    Deno.removeSync(dir, { recursive: true });
+    Deno.removeSync(tmpDir, { recursive: true });
   }
 });
 
