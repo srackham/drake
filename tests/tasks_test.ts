@@ -76,6 +76,7 @@ Deno.test("taskRegistryTest", async function () {
     "cyclic dependency between '4' and '1', cyclic dependency between '4' and '4'",
     "cyclic dependency should throw error",
   );
+
   taskRegistry.desc("Task 5");
   assertThrows(
     () => taskRegistry.register("5", ["1", "6", "4", "6"], action),

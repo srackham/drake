@@ -300,13 +300,22 @@ export class TaskRegistry extends Map<string, Task> {
    */
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
-    names = names.slice();
+    names = [...names];
     names.reverse(); // Result maintains the same order as the list of names.
     for (const name of names) {
       if (isFileTask(name) && !this.has(name)) {
         continue; // Ignore prerequisite paths that don't have a task.
       }
       const task = this.get(name);
+      for (const prereq of task.prereqs) {
+        if (isNormalTask(prereq) && !this.has(prereq)) {
+          abort(`${name}: missing prerequisite task: ${prereq}`);
+        }
+        if (isNormalTask(name) && isFileTask(prereq) && !this.has(prereq)) {
+          // A prerequisite path without a matching task does nothing in a normal task.
+          abort(`${name}: missing prerequisite task: ${prereq}`);
+        }
+      }
       result.unshift(task);
       result = [...this.resolveDependencies(task.prereqs), ...result];
     }
@@ -318,7 +327,6 @@ export class TaskRegistry extends Map<string, Task> {
    * Ordered in first to last execution order,
    */
   resolveDependencies(names: string[]): Task[] {
-    names = names.map((name) => normalizeTaskName(name));
     const result: Task[] = [];
     for (const task of this.expand(names)) {
       // Drop downstream duplicates.
@@ -346,10 +354,13 @@ export class TaskRegistry extends Map<string, Task> {
    * Run tasks and prerequisite tasks in the correct dependency order.
    */
   async run(...names: string[]) {
-    this.loadCache();
+    names = names.map((name) => normalizeTaskName(name));
     for (const name of names) {
-      this.get(name); // Throws error if task is missing.
+      if (!this.has(name)) {
+        abort(`missing task: ${name}`);
+      }
     }
+    this.loadCache();
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
     debug("run", `${names.join(" ")}`);
@@ -384,18 +395,9 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   /**
-   * Unconditionally execute normal task. Throw an error if any prerequisite
-   * file does not have a matching task (a prerequisite file without a matching
-   * task does nothing in a normal task).
+   * Unconditionally execute normal task.
    */
   private async executeNormalTask(task: Task) {
-    for (const prereq of task.prereqs) {
-      if (!this.has(prereq)) {
-        abort(
-          `${task.name}: no matching task for prerequisite file: ${prereq}`,
-        );
-      }
-    }
     await this.execute(task.name);
   }
 

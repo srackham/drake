@@ -60,15 +60,8 @@ Deno.test("registryTest", async function () {
       "prerequisite files should exist when file task executes",
     );
 
-    await assertThrowsAsync(
-      async () => await run(normalTask),
-      DrakeError,
-      "missing prerequisite file:",
-      "prerequisite files should exist when normal task executes",
-    );
-
     writeFile(prereq, "");
-    await run(target); // File task should now run OK.
+    await run(target);
     assert(
       existsSync("./.drake.cache.json"),
       "drake cache should have been created",
@@ -77,12 +70,20 @@ Deno.test("registryTest", async function () {
     await assertThrowsAsync(
       async () => await run(normalTask),
       DrakeError,
-      "no matching task for prerequisite file:",
+      `${normalTask}: missing prerequisite task: ${prereq}`,
       "missing prerequisite file task should throw error in a normal task",
     );
-
-    task(normalTask).prereqs = [];
-    await run(target); // Normal task should now run OK.
+    task(prereq, []);
+    await run(normalTask), // Should now run OK.
+     task(normalTask).prereqs = ["missing-task"];
+    await assertThrowsAsync(
+      async () => await run(normalTask),
+      DrakeError,
+      `${normalTask}: missing prerequisite task: missing-task`,
+      "missing task should throw error",
+    );
+    task("missing-task", []);
+    await run(normalTask); // Should now run OK.
   } finally {
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });

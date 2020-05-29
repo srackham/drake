@@ -25,7 +25,7 @@ import { vers } from "./lib/utils.ts";
 
 env("--abort-exits", true);
 
-(env() as Env).parseArgs(Deno.args.slice());
+(env() as Env).parseArgs([...Deno.args]);
 
 if (env("--help")) {
   help();
