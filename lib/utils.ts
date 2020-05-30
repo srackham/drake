@@ -126,7 +126,7 @@ export function updateFile(
  */
 export function createDir(dir: string): boolean {
   const exists = existsSync(dir);
-  if (!existsSync(dir)) {
+  if (!exists) {
     debug("createDir", dir);
     Deno.mkdirSync(dir, { recursive: true });
   }
