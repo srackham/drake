@@ -1,6 +1,6 @@
 # Drake releases
 
-## 1.1.2 / 2020-05-31
+## 1.2.0 / 2020-05-31
 - Include a stack trace in the `abort` API output if the `"--debug"` environment
   option is `true`.
 - Added `makeDir` API.
