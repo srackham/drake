@@ -103,13 +103,25 @@ export class Task {
    *   since the task was last executed successfully.
    * - The Drake version or the operating system has changed
    *   since the task was last executed successfully.
+   * 
+   * Throw error is one or more prerequisite files are missing.
    */
   isOutOfDate(): boolean {
     let result = false;
     let debugMsg = "false";
-    if (isNormalTask(this.name)) {
-      debugMsg = "true: normal task";
-      result = true;
+    for (const prereq of this.prereqs) {
+      if (!existsSync(prereq)) {
+        if (env("--dry-run")) {
+          // Assume the missing prerequisite would have been created thus rendering the target out of date.
+          debugMsg = `true: dry run`;
+          result = true;
+          break;
+        }
+        abort(`${this.name}: missing prerequisite file: "${prereq}"`);
+      }
+    }
+    if (result) {
+      // Break.
     } else if (!this.cache) {
       debugMsg = "true: no previous task cache";
       result = true;
@@ -118,17 +130,6 @@ export class Task {
       result = true;
     } else {
       for (const filename of [this.name, ...this.prereqs]) {
-        if (filename != this.name && !existsSync(filename)) {
-          if (env("--dry-run")) {
-            // Assume the missing prerequisite would have been created thus rendering the target out of date.
-            debugMsg = `true: dry run`;
-            result = true;
-            break;
-          }
-          abort(
-            `missing prerequisite file: "${filename}"`,
-          );
-        }
         const prev = this.cache[filename];
         if (!prev) {
           debugMsg = `true: no previous cache: ${filename}`;
@@ -296,7 +297,6 @@ export class TaskRegistry extends Map<string, Task> {
 
   /**
    * Recursively expand prerequisites and return a list of prerequisite tasks.
-   * Throw error if non-file task is missing.
    */
   private expand(names: string[]): Task[] {
     let result: Task[] = [];
@@ -368,13 +368,6 @@ export class TaskRegistry extends Map<string, Task> {
       const savedAbortExits = env("--abort-exits");
       env().setValue("--abort-exits", false);
       try {
-        if (!env("--dry-run")) {
-          for (const prereq of task.prereqs) {
-            if (isFileTask(prereq) && !existsSync(prereq)) {
-              abort(`missing prerequisite file: ${prereq}`);
-            }
-          }
-        }
         if (isNormalTask(task.name)) {
           await this.executeNormalTask(task);
         } else {
