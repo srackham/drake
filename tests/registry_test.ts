@@ -73,6 +73,7 @@ Deno.test("registryTest", async function () {
       `${normalTask}: missing prerequisite task: ${prereq}`,
       "missing prerequisite file task should throw error in a normal task",
     );
+
     task(prereq, []);
     await run(normalTask), // Should now run OK.
      task(normalTask).prereqs = ["missing-task"];
@@ -82,8 +83,12 @@ Deno.test("registryTest", async function () {
       `${normalTask}: missing prerequisite task: missing-task`,
       "missing task should throw error",
     );
+
     task("missing-task", []);
     await run(normalTask); // Should now run OK.
+
+    task(target).prereqs.push(normalTask);
+    await run(target); // Normal prerequisites do not throw a "missing prerequisite" error.
   } finally {
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });

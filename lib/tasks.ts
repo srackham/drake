@@ -107,9 +107,10 @@ export class Task {
    * Throw error is one or more prerequisite files are missing.
    */
   isOutOfDate(): boolean {
+    const prereqs = this.prereqs.filter((p) => isFileTask(p));
     let result = false;
     let debugMsg = "false";
-    for (const prereq of this.prereqs) {
+    for (const prereq of prereqs) {
       if (!existsSync(prereq)) {
         if (env("--dry-run")) {
           // Assume the missing prerequisite would have been created thus rendering the target out of date.
@@ -129,7 +130,7 @@ export class Task {
       debugMsg = "true: no target file";
       result = true;
     } else {
-      for (const filename of [this.name, ...this.prereqs]) {
+      for (const filename of [this.name, ...prereqs]) {
         const prev = this.cache[filename];
         if (!prev) {
           debugMsg = `true: no previous cache: ${filename}`;
