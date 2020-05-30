@@ -1,10 +1,10 @@
 import {
   abort,
-  createDir,
   DrakeError,
   glob,
   isFileTask,
   isNormalTask,
+  makeDir,
   normalizePath,
   normalizeTaskName,
   quote,
@@ -45,12 +45,23 @@ Deno.test("fileFunctionsTest", function () {
     assertEquals(updateFile(file, /o/g, "O!"), false);
     assertEquals(updateFile(file, /zzz/g, "O!"), false);
     const dir = path.join(tmpDir, "c/d/e");
-    assert(createDir(dir), "directory should not have already existed");
+    assert(makeDir(dir), "directory should not have already existed");
     assert(
       Deno.statSync(dir).isDirectory,
       "directory should have been created",
     );
-    assert(!createDir(dir), "directory should have already existed");
+    assert(!makeDir(dir), "directory should have already existed");
+    assert(
+      Deno.statSync(dir).isDirectory,
+      "directory should exist",
+    );
+    Deno.removeSync(dir);
+    writeFile(dir, "");
+    assertThrows(
+      () => makeDir(dir),
+      DrakeError,
+      `file is not directory: ${dir}`,
+    );
   } finally {
     Deno.removeSync(tmpDir, { recursive: true });
   }
@@ -81,7 +92,7 @@ Deno.test("globTest", function () {
   );
   const tmpDir = Deno.makeTempDirSync();
   try {
-    createDir(path.join(tmpDir, "a/b"));
+    makeDir(path.join(tmpDir, "a/b"));
     const fixtures = ["a/b/z.ts", "a/y.ts", "u", "x.ts"].map((f) =>
       path.join(tmpDir, f)
     ).sort();

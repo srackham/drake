@@ -260,7 +260,7 @@ an alpha character.
       }
 
 - Some Drake APIs are useful in non-drakefiles. They include: `abort`,
-  `debug`, `env`, `glob`, `log`, `quote`, `readFile`, `sh`,
+  `makeDir`, `debug`, `env`, `glob`, `log`, `quote`, `readFile`, `sh`,
   `shCapture`, `updateFile`, `writeFile`.  Use `lib.ts` (not `mod.ts`)
   to import them into non-drakefile modules.
 
@@ -303,6 +303,17 @@ Write an error message to `stderr` and terminate execution.
 - If the `"--abort-exits"` environment option is true throw a `DrakeError`.
 - If the `"--debug"` environment option is true include the stack trace in
   the error message.
+
+### makeDir
+``` typescript
+function makeDir(dir: string): boolean;
+```
+
+Create directory.
+
+- Missing parent directory paths are created.
+- Returns `true` if a new directory was created.
+- Returns `false` if the directory already exists.
 
 ### debug
 ``` typescript

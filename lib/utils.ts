@@ -129,14 +129,19 @@ export function updateFile(
 
 /**
  * Create directory.
- * Missing parent directory paths are created.
- * Returns `true` if a new directory was created.
- * Returns `false` if the directory already exists.
+ * 
+ * - Missing parent directory paths are created.
+ * - Returns `true` if a new directory was created.
+ * - Returns `false` if the directory already exists.
  */
-export function createDir(dir: string): boolean {
+export function makeDir(dir: string): boolean {
+  debug("makeDir", dir);
   const exists = existsSync(dir);
-  if (!exists) {
-    debug("createDir", dir);
+  if (exists) {
+    if (!Deno.statSync(dir).isDirectory) {
+      abort(`file is not directory: ${dir}`);
+    }
+  } else {
     Deno.mkdirSync(dir, { recursive: true });
   }
   return !exists;

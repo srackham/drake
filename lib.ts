@@ -6,6 +6,7 @@ export {
   DrakeError,
   glob,
   log,
+  makeDir,
   quote,
   readFile,
   sh,
