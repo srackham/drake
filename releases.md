@@ -1,5 +1,10 @@
 # Drake releases
 
+## 1.1.2 / 2020-05-31
+- FIX: An error occured if a File task contained a Normal task prerequisite.
+- Upgraded to Deno `std/0.54.0`.
+
+
 ## 1.1.1 / 2020-05-21
 - FIX: Cache file write error when using `--directory` option.
 
