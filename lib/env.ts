@@ -78,7 +78,6 @@ export class Env {
           abort(`variable value must be a string: ${name}`);
         }
     }
-    debug("set", `${name}: ${value}`);
     this.values[name] = value;
   }
 
@@ -94,6 +93,7 @@ export class Env {
         return this; // Return function's Env object if called without parameters.
       }
       if (arguments.length !== 1) {
+        debug("set", `${name}: ${value}`);
         this.setValue(name, value!);
       }
       return this.values[name];
