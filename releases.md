@@ -1,6 +1,8 @@
 # Drake releases
 
 ## 1.1.2 / 2020-05-31
+- Include a stack trace in the `abort` API output if the `"--debug"` environment
+  option is `true`.
 - FIX: An error occured if a File task contained a Normal task prerequisite.
 - Upgraded to Deno `std/0.54.0`.
 

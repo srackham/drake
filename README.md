@@ -298,9 +298,11 @@ The Drake library module exports the following functions:
 function abort(message: string): void;
 ```
 
-Write an error message to `stderr` and terminate execution.  If the
-`"--abort-exits"` environment option is `false` throw a `DrakeError`
-instead.
+Write an error message to `stderr` and terminate execution.
+
+- If the `"--abort-exits"` environment option is true throw a `DrakeError`.
+- If the `"--debug"` environment option is true include the stack trace in
+  the error message.
 
 ### debug
 ``` typescript

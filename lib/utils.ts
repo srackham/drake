@@ -17,12 +17,21 @@ export class DrakeError extends Error {
 
 /**
  * Write an error message to to `stderr` and terminate execution.
- * If the `"--abort-exits"` environment option is true throw a
- * `DrakeError` instead.
+ * 
+ * - If the `"--abort-exits"` environment option is true throw a `DrakeError`.
+ * - If the `"--debug"` environment option is true include the stack trace in
+ *   the error message.
  */
 export function abort(message: string): never {
   if (env("--abort-exits")) {
-    console.error(`${colors.red(colors.bold("drake error:"))} ${message}`);
+    message = `${colors.red(colors.bold("drake error:"))} ${message}`;
+    if (env("--debug")) {
+      const e = new Error();
+      if (e.stack) {
+        message += `\n${e.stack}`;
+      }
+    }
+    console.error(message);
     Deno.exit(1);
   } else {
     throw new DrakeError(message);

@@ -69,4 +69,18 @@ Deno.test("cliTest", async function () {
   ));
   assertEquals(code, 0);
   assertEquals(output.trimRight(), path.join(Deno.cwd(), "examples"));
+
+  ({ code, error } = await shCapture(
+    `NO_COLOR=true ${denoRun} examples/examples-drakefile.ts abort`,
+    { stderr: "piped" },
+  ));
+  assertEquals(code, 1);
+  assertStrContains(error, "drake error: abort message");
+
+  ({ code, error } = await shCapture(
+    `NO_COLOR=true ${denoRun} examples/examples-drakefile.ts abort --debug`,
+    { stderr: "piped" },
+  ));
+  assertEquals(code, 1);
+  assertStrContains(error, "at async run");
 });

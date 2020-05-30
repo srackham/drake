@@ -1,4 +1,4 @@
-import { readFile, updateFile, writeFile } from "../lib/utils.ts";
+import { abort, readFile, updateFile, writeFile } from "../lib/utils.ts";
 import { desc, execute, run, sh, task } from "../mod.ts";
 
 desc("Minimal Drake task");
@@ -94,6 +94,11 @@ task("rwu", [], function () {
   writeFile("/tmp/drake-test.txt", "Hello World!");
   updateFile("/tmp/drake-test.txt", /Hello/, "Hello cruel");
   console.log(readFile("/tmp/drake-test.txt"));
+});
+
+desc("Failing Drake task");
+task("abort", [], function () {
+  abort("abort message");
 });
 
 run();
