@@ -70,7 +70,7 @@ Deno.test("registryTest", async function () {
     await assertThrowsAsync(
       async () => await run(normalTask),
       DrakeError,
-      `${normalTask}: missing prerequisite task: ${prereq}`,
+      `${normalTask}: missing prerequisite task: `,
       "missing prerequisite file task should throw error in a normal task",
     );
 
