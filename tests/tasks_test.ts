@@ -1,17 +1,72 @@
 import { env } from "../lib/env.ts";
-import { Task, TaskRegistry } from "../lib/tasks.ts";
 import {
-  DrakeError,
+  isFileTask,
+  isNormalTask,
   normalizePath,
-  readFile,
-  writeFile,
-} from "../lib/utils.ts";
+  normalizeTaskName,
+  Task,
+  TaskRegistry,
+} from "../lib/tasks.ts";
+import { DrakeError, readFile, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
   assertThrows,
   assertThrowsAsync,
 } from "./deps.ts";
+
+Deno.test("normalizePathTest", function () {
+  const tests: [string, string][] = [
+    ["foobar", "./foobar"],
+    ["lib/io.ts", "lib/io.ts"],
+    ["/tmp//foobar", "/tmp/foobar"],
+    ["/tmp/./foobar", "/tmp/foobar"],
+    ["/tmp/../foobar", "/foobar"],
+  ];
+  for (let [name, expected] of tests) {
+    assertEquals(normalizePath(name), normalizePath(expected));
+  }
+});
+
+Deno.test("normalizeTaskNameTest", function () {
+  const tests = [
+    [" foobar", "foobar"],
+    ["lib/io.ts", "lib/io.ts"].map((p) => normalizePath(p)),
+  ];
+  for (let [name, expected] of tests) {
+    assertEquals(normalizeTaskName(name), expected);
+  }
+  assertThrows(
+    () => normalizeTaskName(" "),
+    DrakeError,
+    "blank task name",
+  );
+  const name = "**/*.ts";
+  assertThrows(
+    () => normalizeTaskName(name),
+    DrakeError,
+    `wildcard task name not allowed: ${name}`,
+  );
+});
+
+Deno.test("isTasksTest", function () {
+  const tests: [string, boolean][] = [
+    ["foobar", true],
+    ["--foobar", false],
+    ["_foo_bar_", true],
+    ["42-foobar", true],
+    ["./foobar", false],
+    ["foobar.ts", false],
+    ["/tmp/foobar", false],
+    ["../foobar/", false],
+    ["./foobar/quux", false],
+    [".foobar", false],
+  ];
+  for (let [name, expected] of tests) {
+    assertEquals(isNormalTask(name), expected);
+    assertEquals(isFileTask(name), !expected);
+  }
+});
 
 Deno.test("taskRegistryTest", async function () {
   env("--quiet", true);

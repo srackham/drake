@@ -5,11 +5,8 @@ import {
   abort,
   debug,
   DrakeError,
-  isFileTask,
-  isNormalTask,
+  glob,
   log,
-  normalizePrereqs,
-  normalizeTaskName,
   readFile,
   vers,
   writeFile,
@@ -452,4 +449,85 @@ function logFinish(message: string, startTime: number): void {
     `${colors.green(colors.bold(`${message}:`))} finished (${endTime -
       startTime}ms)`,
   );
+}
+
+/* Helper functions */
+
+/**
+ * Return true if `name` is a normal task name. Normal task names contain one or more alphanumeric,
+ * underscore and hyphen characters and cannot start with a hyphen.
+ *
+ *     isNormalTask("hello-world")    // true
+ *     isNormalTask("io.ts")          // false
+ *     isNormalTask("./hello-world")  // false
+ *
+ */
+export function isNormalTask(name: string): boolean {
+  return /^\w[\w-]*$/.test(name);
+}
+
+/**
+ * Return true if `name` is a file task name. File task names are valid file paths.
+ * 
+ *     isFileTask("io.ts")          // true
+ *     isFileTask("hello-world")    // false
+ *     isFileTask("./hello-world")  // true
+ * 
+ */
+export function isFileTask(name: string): boolean {
+  return !isNormalTask(name);
+}
+
+/**
+ * The path name is normalized and, if necessary, prefixed with a period and path separator to
+ * distinguish it from non-file task name.
+ *
+ *     normalizePath("hello-world")   // "./hello-world"
+ *     normalizePath("./lib/io.ts")   // "lib/io.ts"
+ */
+export function normalizePath(name: string): string {
+  name = path.normalize(name);
+  if (isNormalTask(name)) {
+    name = "." + path.sep + name;
+  }
+  return name;
+}
+
+/** Normalize Drake task name. Throw an error if the name is blank or it contains wildcard
+ * characters.
+ */
+export function normalizeTaskName(name: string): string {
+  name = name.trim();
+  if (name === "") {
+    abort("blank task name");
+  }
+  if (path.isGlob(name)) {
+    abort(`wildcard task name not allowed: ${name}`);
+  }
+  if (isFileTask(name)) {
+    name = normalizePath(name);
+  }
+  return name;
+}
+
+/**
+ * Return a list prerequisite task names.
+ * Globs are expanded and path names are normalized.
+ */
+export function normalizePrereqs(prereqs: string[]): string[] {
+  const result: string[] = [];
+  for (let prereq of prereqs) {
+    prereq = prereq.trim();
+    if (prereq === "") {
+      abort("blank prerequisite name");
+    }
+    if (!isFileTask(prereq)) {
+      result.push(prereq);
+    } else if (path.isGlob(prereq)) {
+      result.push(...glob(prereq).map((p) => normalizePath(p)));
+    } else {
+      result.push(normalizePath(prereq));
+    }
+  }
+  return result;
 }

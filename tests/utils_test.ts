@@ -2,11 +2,7 @@ import {
   abort,
   DrakeError,
   glob,
-  isFileTask,
-  isNormalTask,
   makeDir,
-  normalizePath,
-  normalizeTaskName,
   quote,
   readFile,
   sh,
@@ -81,14 +77,14 @@ Deno.test("globTest", function () {
       "lib/utils.ts",
       "mod.ts",
     ]
-      .map((p) => normalizePath(p)),
+      .map((p) => path.normalize(p)).sort(),
   );
   files = glob("./mod.ts", "./lib/!(deps|registry|graph|utils).ts");
   assertEquals(
     files,
     ["lib/env.ts", "lib/help.ts", "lib/tasks.ts", "mod.ts"].map((p) =>
-      normalizePath(p)
-    ),
+      path.normalize(p)
+    ).sort(),
   );
   const tmpDir = Deno.makeTempDirSync();
   try {
@@ -106,15 +102,20 @@ Deno.test("globTest", function () {
       files = glob("./**/*.ts", "u");
       assertEquals(
         files,
-        ["./u", "a/b/z.ts", "a/y.ts", "x.ts"].map((p) => normalizePath(p)),
+        ["./u", "a/b/z.ts", "a/y.ts", "x.ts"].map((p) => path.normalize(p))
+          .sort(),
       );
       files = glob("./**/@(x|y).ts");
-      assertEquals(files, ["a/y.ts", "x.ts"].map((p) => normalizePath(p)));
+      assertEquals(
+        files,
+        ["a/y.ts", "x.ts"].map((p) => path.normalize(p)).sort(),
+      );
       Deno.chdir("a");
       files = glob("../**/*.ts");
       assertEquals(
         files,
-        ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map((p) => normalizePath(p)),
+        ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map((p) => path.normalize(p))
+          .sort(),
       );
     } finally {
       Deno.chdir(saved);
@@ -122,59 +123,6 @@ Deno.test("globTest", function () {
   } finally {
     Deno.removeSync(tmpDir, { recursive: true });
   }
-});
-
-Deno.test("isTasksTest", function () {
-  const tests: [string, boolean][] = [
-    ["foobar", true],
-    ["--foobar", false],
-    ["_foo_bar_", true],
-    ["42-foobar", true],
-    ["./foobar", false],
-    ["foobar.ts", false],
-    ["/tmp/foobar", false],
-    ["../foobar/", false],
-    ["./foobar/quux", false],
-    [".foobar", false],
-  ];
-  for (let [name, expected] of tests) {
-    assertEquals(isNormalTask(name), expected);
-    assertEquals(isFileTask(name), !expected);
-  }
-});
-
-Deno.test("normalizePathTest", function () {
-  const tests: [string, string][] = [
-    ["foobar", "./foobar"],
-    ["lib/io.ts", "lib/io.ts"],
-    ["/tmp//foobar", "/tmp/foobar"],
-    ["/tmp/./foobar", "/tmp/foobar"],
-    ["/tmp/../foobar", "/foobar"],
-  ];
-  for (let [name, expected] of tests) {
-    assertEquals(normalizePath(name), normalizePath(expected));
-  }
-});
-
-Deno.test("normalizeTaskNameTest", function () {
-  const tests = [
-    [" foobar", "foobar"],
-    ["lib/io.ts", "lib/io.ts"].map((p) => normalizePath(p)),
-  ];
-  for (let [name, expected] of tests) {
-    assertEquals(normalizeTaskName(name), expected);
-  }
-  assertThrows(
-    () => normalizeTaskName(" "),
-    DrakeError,
-    "blank task name",
-  );
-  const name = "**/*.ts";
-  assertThrows(
-    () => normalizeTaskName(name),
-    DrakeError,
-    `wildcard task name not allowed: ${name}`,
-  );
 });
 
 Deno.test("quoteTest", function () {

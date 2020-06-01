@@ -148,85 +148,6 @@ export function makeDir(dir: string): boolean {
 }
 
 /**
- * Return true if `name` is a normal task name. Normal task names contain one or more alphanumeric,
- * underscore and hyphen characters and cannot start with a hyphen.
- *
- *     isNormalTask("hello-world")    // true
- *     isNormalTask("io.ts")          // false
- *     isNormalTask("./hello-world")  // false
- *
- */
-export function isNormalTask(name: string): boolean {
-  return /^\w[\w-]*$/.test(name);
-}
-
-/**
- * Return true if `name` is a file task name. File task names are valid file paths.
- * 
- *     isFileTask("io.ts")          // true
- *     isFileTask("hello-world")    // false
- *     isFileTask("./hello-world")  // true
- * 
- */
-export function isFileTask(name: string): boolean {
-  return !isNormalTask(name);
-}
-
-/**
- * The path name is normalized and, if necessary, prefixed with a period and path separator to
- * distinguish it from non-file task name.
- *
- *     normalizePath("hello-world")   // "./hello-world"
- *     normalizePath("./lib/io.ts")   // "lib/io.ts"
- */
-export function normalizePath(name: string): string {
-  name = path.normalize(name);
-  if (isNormalTask(name)) {
-    name = "." + path.sep + name;
-  }
-  return name;
-}
-
-/** Normalize Drake task name. Throw an error if the name is blank or it contains wildcard
- * characters.
- */
-export function normalizeTaskName(name: string): string {
-  name = name.trim();
-  if (name === "") {
-    abort("blank task name");
-  }
-  if (path.isGlob(name)) {
-    abort(`wildcard task name not allowed: ${name}`);
-  }
-  if (isFileTask(name)) {
-    name = normalizePath(name);
-  }
-  return name;
-}
-
-/**
- * Return a list prerequisite task names.
- * Globs are expanded and path names are normalized.
- */
-export function normalizePrereqs(prereqs: string[]): string[] {
-  const result: string[] = [];
-  for (let prereq of prereqs) {
-    prereq = prereq.trim();
-    if (prereq === "") {
-      abort("blank prerequisite name");
-    }
-    if (!isFileTask(prereq)) {
-      result.push(prereq);
-    } else if (path.isGlob(prereq)) {
-      result.push(...glob(prereq));
-    } else {
-      result.push(normalizePath(prereq));
-    }
-  }
-  return result;
-}
-
-/**
  * Return a sorted array of normalized file names matching the wildcard glob patterns.
  * Valid glob patterns are those supported by Deno's `path` library.
  * Example: `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
@@ -248,7 +169,7 @@ export function glob(...patterns: string[]): string[] {
     result = [...result, ...glob1(pattern)];
   }
   // Drop duplicates, normalize and sort paths.
-  result = [...new Set(result)].map((p) => normalizePath(p)).sort();
+  result = [...new Set(result)].map((p) => path.normalize(p)).sort();
   debug("glob", `${quote(patterns, ", ")}:\n${result.join("\n")}`);
   return result;
 }
