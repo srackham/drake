@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@v0.55.0/path/mod.ts";
+import * as path from "https://deno.land/std@v0.56.0/path/mod.ts";
 import { desc, glob, run, sh, task } from "../mod.ts";
 
 for (const prereq of glob("*.md")) {
