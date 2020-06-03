@@ -1,5 +1,8 @@
 # Drake releases
 
+## 1.2.1 / 2020-06-04
+- Upgraded to Deno `std/0.55.0`.
+
 ## 1.2.0 / 2020-05-31
 - Include a stack trace in the `abort` API output if the `"--debug"` environment
   option is `true`.
@@ -13,7 +16,7 @@
 
 
 ## 1.1.0 / 2020-05-21
-- APIs that are can be used in non-Drake modules are exposed via `lib.ts`.
+- APIs that are can be used in non-drakefiles are exposed via `lib.ts`.
 - Log message format consistency.
 - Tightened `env` runtime parameter checks.
 - A lot of code refactoring including spliting `deps.ts` into separate test and runtime deps.

@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.0.3 running on Ubuntu 18.04, Windows 10. See
+**Status**: Tested with Deno 1.0.4 running on Ubuntu 18.04, Windows 10. See
 [releases](https://github.com/srackham/drake/blob/master/releases.md).
 
 
@@ -249,7 +249,14 @@ an alpha character.
           ls
           wc Drakefile.ts`);
 
-- Tasks can be created dynamically, for example:
+- Escape backslash and backtick characters and placeholders in
+  template string literals with a backslash:
+
+  * `\\` translates to `\`
+  * `` \` `` translates to `` ` ``
+  * `\${` translates to `${` 
+
+- Tasks can be created dynamically at runtime, for example:
 
       for (const prereq of glob("*.md")) {
         const target = `${path.basename(prereq, ".md")}.html`;
@@ -259,30 +266,35 @@ an alpha character.
         });
       }
 
-- Some Drake APIs are useful in non-drakefiles. They include: `abort`,
-  `makeDir`, `debug`, `env`, `glob`, `log`, `quote`, `readFile`, `sh`,
-  `shCapture`, `updateFile`, `writeFile`.  Use `lib.ts` (not `mod.ts`)
-  to import them into non-drakefile modules.
+- More meaningful file task names can be created with a dummy normal task. In
+  the following example the `build-docs` task executes the `./docs/index.html`
+  task. The `./docs/index.html` task will be hidden from the `--list-tasks`
+  command because it has not been assigned a description.
+
+      desc("Build documents");
+      task("build-docs", ["./docs/index.html]);
+      task("./docs/index.html", [...]) {
+        ...
+      });
+
+- Some Drake APIs are useful in non-drakefiles. They include: `abort`, `debug`,
+  `env`, `glob`, `log`, `makeDir`, `quote`, `readFile`, `sh`, `shCapture`,
+  `updateFile`, `writeFile`.  Use `lib.ts` (not `mod.ts`) to import them into
+  non-drakefile modules.
+
+- When executing in a drakefile, Drake functions manifest errors by printing an
+  error message and exiting with a non-zero exit code.  You can change this
+  behavior so that errors throw a `DrakeError` exception by setting
+  `env("--abort-exits", false)`. In non-drakefiles errors throw a `DrakeError`
+  exception by default.
 
 -  Selected sections of code can be "debugged" by bracketing with
    `env("--debug",true)` and `env("--debug",false)` statements.
 
 - Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
   environment variable is set. This can be useful in conjunction with
-  the `debug` API in non-Drakefiles (in lieu of the Drake `--debug`
+  the `debug` API in non-drakefiles (in lieu of the Drake `--debug`
   command-line option).
-
-- Escape backslash and backtick characters and placeholders in
-  template string literals with a backslash:
-
-  * `\\` translates to `\`
-  * `` \` `` translates to `` ` ``
-  * `\${` translates to `${` 
-
-- By default Drake functions manifest errors by printing an error
-  message and exiting with a non-zero exit code.  You can change the
-  default behavior so that errors throw a `DrakeError` exception by
-  setting `env("--abort-exits", false)`.
 
 - The Deno `run` command automatically compiles updated source and
   writes compilation messages to `stderr`. This can interfere with tests
@@ -303,17 +315,6 @@ Write an error message to `stderr` and terminate execution.
 - If the `"--abort-exits"` environment option is true throw a `DrakeError`.
 - If the `"--debug"` environment option is true include the stack trace in
   the error message.
-
-### makeDir
-``` typescript
-function makeDir(dir: string): boolean;
-```
-
-Create directory.
-
-- Missing parent directory paths are created.
-- Returns `true` if a new directory was created.
-- Returns `false` if the directory already exists.
 
 ### debug
 ``` typescript
@@ -383,6 +384,17 @@ function log(message: string): void;
 
 Log a message to stdout. Do not log the message if the `--quiet`
 command-line option is set.
+
+### makeDir
+``` typescript
+function makeDir(dir: string): boolean;
+```
+
+Create directory.
+
+- Missing parent directory paths are created.
+- Returns `true` if a new directory was created.
+- Returns `false` if the directory already exists.
 
 ### quote
 ``` typescript
