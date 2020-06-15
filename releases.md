@@ -1,17 +1,20 @@
 # Drake releases
 
-## 1.2.2 / 2020-06-04
-- Upgraded to Deno `std/0.56.0`.
+## 1.2.3 / 2020-06-16
+- Upgraded to Deno version 1.1.0,`std/0.57.0`.
 
 ## 1.2.2 / 2020-06-04
-- Upgraded to Deno `std/0.55.0`.
+- Upgraded to Deno version 1.0.5, `std/0.56.0`.
+
+## 1.2.1 / 2020-06-04
+- Upgraded to Deno version 1.0.4, `std/0.55.0`.
 
 ## 1.2.0 / 2020-05-31
 - Include a stack trace in the `abort` API output if the `"--debug"` environment
   option is `true`.
 - Added `makeDir` API.
 - FIX: An error occured if a File task contained a Normal task prerequisite.
-- Upgraded to Deno `std/0.54.0`.
+- Upgraded to Deno version 1.0.3, `std/0.54.0`.
 
 
 ## 1.1.1 / 2020-05-21
@@ -23,7 +26,7 @@
 - Log message format consistency.
 - Tightened `env` runtime parameter checks.
 - A lot of code refactoring including spliting `deps.ts` into separate test and runtime deps.
-- Upgraded to Deno `std/0.52.0`.
+- Upgraded to Deno version 1.0.1, `std/0.52.0`.
 
 
 ## 1.0.0 / 2020-05-15
