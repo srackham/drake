@@ -25,7 +25,7 @@ A drakefile is a TypeScript module that:
 Example drakefile:
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.2.4/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.2.5/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -125,7 +125,7 @@ never run twice.
     since the task was last executed successfully.
 
 - A file is considered to have changed if it's current modification
-  time or size no longer matches those recorded after the task had
+  time or size no longer matches those recorded immediately after the task had
   last executed successfully.
 
 - Drake saves target and prerequisite file properties to a file named

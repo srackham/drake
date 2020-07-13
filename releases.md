@@ -1,5 +1,8 @@
 # Drake releases
 
+## 1.2.5 / 2020-07-14
+- Upgraded to Deno version 1.2.0,`std/0.61.0`.
+
 ## 1.2.4 / 2020-06-27
 - Upgraded to Deno version 1.1.2,`std/0.59.0`.
 
