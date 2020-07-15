@@ -314,12 +314,10 @@ export async function shCapture(
   let outputBytes, errorBytes: Uint8Array;
   try {
     if (p.stdin) {
-      // Workaround for Narrowing type guard bug https://github.com/denoland/deno/issues/6270
-      await (p.stdin as unknown as Deno.Writer).write(
+      await p.stdin.write(
         new TextEncoder().encode(opts.input),
       );
-      // Workaround for Narrowing type guard bug https://github.com/denoland/deno/issues/6270
-      (p.stdin as unknown as Deno.Closer).close();
+      p.stdin.close();
     }
     [status, outputBytes, errorBytes] = await Promise.all(
       [
