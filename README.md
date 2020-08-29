@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.3.1 running on Ubuntu 20.04, Windows 10. See
+**Status**: Tested with Deno 1.3.2 running on Ubuntu 20.04, Windows 10. See
 [releases](https://github.com/srackham/drake/blob/master/releases.md).
 
 
@@ -495,7 +495,7 @@ function writeFile(filename: string, text: string): boolean;
 ```
 
 Write text to a file synchronously. If the file exists it will be overwritten.
-Returns `true` if a new file was created. Returns `false` if the file already
+Returns `true` if a new file was created; returns `false` if the file already
 exists.
 
 ### updateFile

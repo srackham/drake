@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@0.66.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.67.0/path/mod.ts";
 import { env } from "../lib/env.ts";
 import { desc, glob, run, sh, task } from "../mod.ts";
 
