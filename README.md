@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.3.2 running on Ubuntu 20.04, Windows 10. See
+**Status**: Tested with Deno 1.3.3 running on Ubuntu 20.04, Windows 10. See
 [releases](https://github.com/srackham/drake/blob/master/releases.md).
 
 
@@ -362,10 +362,12 @@ if (!env("--quiet")) console.log(message);
 
 ### execute
 ``` typescript
-async function execute(...names: string[]);
+async function execute(...taskNames: string[]);
 ```
 
-Unconditionally execute task action functions asynchronously.
+Execute task action functions.
+The non-async actions are executed synchronously then the
+async actions are exectuted asynchronously.
 Silently skip tasks that have no action function.
 
 ### glob
@@ -414,11 +416,11 @@ Read the entire contents of a file synchronously to a UTF-8 string.
 
 ### run
 ``` typescript
-async function run(...names: string[]);
+async function run(...taskNames: string[]);
 ```
 
 Execute named tasks along with their prerequisite tasks (direct and
-indirect). If no `names` are specified then the command-line tasks
+indirect). If no task names are specified then the command-line tasks
 are run. If no command-line tasks were specified the default task is
 run (specified by setting the `env` API `"--default-task"` value).
 
