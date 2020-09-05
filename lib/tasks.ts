@@ -74,6 +74,9 @@ export class Task {
   }
 
   updateCache(): void {
+    if (!isFileTask(this.name)) {
+      return;
+    }
     const taskCache: TaskCache = {};
     if (existsSync(this.name)) {
       taskCache[this.name] = Task.fileInfo(this.name);
@@ -361,16 +364,14 @@ export class TaskRegistry extends Map<string, Task> {
     this.loadCache();
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    debug("run", `${names.join(" ")}`);
+    const msg = `${colors.green(colors.bold(`run:`))}`;
+    const startTime = new Date().getTime();
+    log(`${msg} started`);
     for (const task of tasks) {
       const savedAbortExits = env("--abort-exits");
       env().setValue("--abort-exits", false);
       try {
-        if (isNormalTask(task.name)) {
-          await this.executeNormalTask(task);
-        } else {
-          await this.executeFileTask(task);
-        }
+        await this.execute(task.name);
         env().setValue("--abort-exits", savedAbortExits);
       } catch (e) {
         env().setValue("--abort-exits", savedAbortExits);
@@ -383,72 +384,66 @@ export class TaskRegistry extends Map<string, Task> {
       }
     }
     this.saveCache();
+    log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
   }
 
   /**
-   * Unconditionally execute normal task.
-   */
-  private async executeNormalTask(task: Task) {
-    await this.execute(task.name);
-  }
-
-  /**
-   * Execute file task if it is out of date.
-   */
-  private async executeFileTask(task: Task) {
-    if (!env("--always-make") && !task.isOutOfDate()) {
-      log(colors.yellow(`${task.name}:`) + " up to date");
-      return;
-    }
-    await this.execute(task.name);
-    task.updateCache();
-  }
-
-  /**
-   * Unconditionally execute task action functions asynchronously.
+   * Execute task action functions asynchronously.
    * Silently skip tasks that have no action function.
    */
   async execute(...names: string[]) {
+    if (names.length === 0) {
+      return;
+    }
     names = names.map((name) => normalizeTaskName(name));
     if (names.every((name) => !this.get(name).action)) {
-      log(colors.yellow(`${names}:`) + " no action");
+      debug(names.join(" "), "no action");
       return;
     }
     if (env("--dry-run")) {
       log(`${colors.green(colors.bold(`${names}:`))} dry run`);
       return;
     }
-    const msg = names.join(" ");
-    const startTime = logStart(msg);
-    const promises: Promise<any>[] = [];
+    let msg = "";
+    let startTime: number = 0;
+    if (names.length === 1) {
+      msg = `${colors.green(colors.bold(`${names[0]}:`))}`;
+    } else {
+      msg = colors.green(colors.bold(`execute ${names.length} tasks:`));
+      log(`${msg} started`);
+      startTime = new Date().getTime();
+    }
+    const asyncTasks: Task[] = [];
     for (const name of names) {
       const task = this.get(name);
       if (!task.action) {
-        log(colors.yellow(`${name}:`) + " no action");
+        debug(name, "no action");
         continue;
       }
+      if (
+        isFileTask(task.name) && !env("--always-make") && !task.isOutOfDate()
+      ) {
+        continue;
+      }
+      if (names.length === 1) {
+        log(`${msg} started`);
+        startTime = new Date().getTime();
+      }
       if (task.action.constructor.name === "AsyncFunction") {
-        promises.push(task.action());
+        asyncTasks.push(task);
       } else {
         task.action();
+        task.updateCache();
       }
     }
-    await Promise.all(promises);
-    logFinish(msg, startTime);
+    await Promise.all(asyncTasks.map((t) => t.action!()));
+    for (const task of asyncTasks) {
+      task.updateCache();
+    }
+    if (startTime) {
+      log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
+    }
   }
-}
-
-function logStart(message: string): number {
-  log(`${colors.green(colors.bold(`${message}:`))} started`);
-  return new Date().getTime();
-}
-
-function logFinish(message: string, startTime: number): void {
-  const endTime = new Date().getTime();
-  log(
-    `${colors.green(colors.bold(`${message}:`))} finished (${endTime -
-      startTime}ms)`,
-  );
 }
 
 /* Helper functions */

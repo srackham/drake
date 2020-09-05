@@ -48,7 +48,7 @@ Deno.test("registryTest", async function () {
     assertEquals(task("task1").desc, "Test task one");
 
     desc("File task");
-    task(target, [prereq]);
+    task(target, [prereq], () => undefined);
 
     desc("Normal task");
     task(normalTask, [prereq]);
