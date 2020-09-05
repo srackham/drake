@@ -4,6 +4,7 @@ import { abort } from "./utils.ts";
 
 /** Global task registry. */
 const taskRegistry = new TaskRegistry();
+let isRunning = false;
 
 /** Set description of next registered task. */
 export function desc(description: string): void {
@@ -51,16 +52,26 @@ export async function run(...names: string[]) {
       }
     }
     if (names.length === 0) {
-      abort("no task specified");
+      abort(
+        "no task specified (use the --list-tasks option to list tasks, --help for help)",
+      );
     }
-    await taskRegistry.run(...names);
+    isRunning = true;
+    try {
+      await taskRegistry.run(...names);
+    } finally {
+      isRunning = false;
+    }
   }
 }
 
 /**
- * Unconditionally execute task action functions asynchronously.
+ * Execute task action functions asynchronously.
  * Silently skip tasks that have no action function.
  */
 export async function execute(...names: string[]) {
+  if (!isRunning) {
+    abort("'execute' API must be called by 'run' API");
+  }
   await taskRegistry.execute(...names);
 }
