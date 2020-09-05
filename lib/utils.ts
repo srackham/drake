@@ -58,7 +58,10 @@ export function debug(title: string, message: any = ""): void {
     message = JSON.stringify(message, null, 1);
   }
   if (env("--debug") && Deno.isatty(Deno.stderr.rid)) {
-    console.error(`${colors.yellow(colors.bold(title + ":"))} ${message}`);
+    if (title !== "") {
+      message = `${colors.yellow(colors.bold(title + ":"))} ${message}`;
+    }
+    console.error(message);
   }
 }
 
@@ -164,13 +167,21 @@ export function glob(...patterns: string[]): string[] {
     const iter = walkSync(root, { match: [regexp], includeDirs: false });
     return Array.from(iter, (info) => info.path);
   }
+  debug("glob", `${quote(patterns, ", ")}`);
   let result: string[] = [];
   for (const pattern of patterns) {
-    result = [...result, ...glob1(pattern)];
+    try {
+      result = [...result, ...glob1(pattern)];
+    } catch (e) {
+      abort(`${pattern}: ${e.message}`);
+    }
   }
   // Drop duplicates, normalize and sort paths.
   result = [...new Set(result)].map((p) => path.normalize(p)).sort();
-  debug("glob", `${quote(patterns, ", ")}:\n${result.join("\n")}`);
+  debug("", `${result.slice(0, 100).join("\n")}`);
+  if (result.length > 100) {
+    debug("", `... (${result.length} files)`);
+  }
   return result;
 }
 
