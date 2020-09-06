@@ -1,6 +1,6 @@
 # Drake releases
 
-## 1.3.0 / 2020-09-06
+## 1.3.1 / 2020-09-07
 - The `execute` API conditionally executes file task actions.
 - Add `compile-async` task to the `examples/dynamic-tasks.ts` example Drakefile.
 - An error is thrown if the `execute` API is not called from the `run` API.
