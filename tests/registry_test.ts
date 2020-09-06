@@ -1,5 +1,5 @@
 import { env } from "../lib/env.ts";
-import { desc, run, task } from "../lib/registry.ts";
+import { desc, execute, run, task } from "../lib/registry.ts";
 import { DrakeError, writeFile } from "../lib/utils.ts";
 import {
   assert,
@@ -43,15 +43,19 @@ Deno.test("registryTest", async function () {
     const prereq = "./prerequisite-file";
     const target = "./target-file";
     const normalTask = "normalTask";
+    let signature = "";
 
     assertEquals(task("task1").name, "task1");
     assertEquals(task("task1").desc, "Test task one");
 
     desc("File task");
-    task(target, [prereq], () => undefined);
+    task(target, [prereq], function () {
+      signature += target;
+      writeFile(target, "");
+    });
 
     desc("Normal task");
-    task(normalTask, [prereq]);
+    task(normalTask, [prereq], () => signature += normalTask);
 
     await assertThrowsAsync(
       async () => await run(target),
@@ -89,6 +93,44 @@ Deno.test("registryTest", async function () {
 
     task(target).prereqs.push(normalTask);
     await run(target); // Normal prerequisites do not throw a "missing prerequisite" error.
+
+    await assertThrowsAsync(
+      async () => await execute(normalTask),
+      DrakeError,
+      "'execute' API must be called by 'run' API",
+    );
+
+    signature = "";
+    Deno.removeSync(target);
+    task("exec", [], async () => await execute(normalTask, normalTask, target));
+    await run("exec");
+    assertEquals(
+      signature,
+      normalTask + normalTask + target,
+      "'execute' API should should execute serially",
+    );
+
+    signature = "";
+    await run("exec");
+    assertEquals(
+      signature,
+      normalTask + normalTask,
+      "'execute' API should skip up to date task actions",
+    );
+
+    let counter = 0;
+    task("async", [], async () => counter += 1);
+    task(
+      "execAsync",
+      [],
+      async () => await execute(...Array(10).fill("async")),
+    );
+    await run("execAsync");
+    assertEquals(
+      counter,
+      10,
+      "'execute' API should run async task actions 10 times",
+    );
   } finally {
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });
