@@ -1,5 +1,16 @@
 # Drake releases
 
+## 1.3.0 / 2020-09-06
+- The `execute` API conditionally executes file task actions.
+- Add `compile-async` task to the `examples/dynamic-tasks.ts` example Drakefile.
+- An error is thrown if the `execute` API is not called from the `run` API.
+- Report total time to run all tasks.
+- Reassign `no action` and `out of date` info messages to debug messages.
+- `glob` API debug message truncates files list to 100 files.
+- `debug` API does not print `title` if it is blank.
+- Upgraded to Deno version 1.3.3,`std/0.68.0`.
+
+
 ## 1.2.6 / 2020-08-03
 - Upgraded to Deno version 1.2.2,`std/0.63.0`.
 
