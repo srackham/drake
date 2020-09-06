@@ -239,15 +239,17 @@ an alpha character.
 - The Drake `sh` API can be used to run multi-line template string
   scripts e.g.
 
-      await sh(`set -e  # Exit immediately on error.
-          echo Hello World
-          if [ "$EUID" -eq 0 ]; then
-              echo "Running as root"
-          else
-              echo "Running as $USER"
-          fi
-          ls
-          wc Drakefile.ts`);
+    ``` sh
+    await sh(`set -e  # Exit immediately on error.
+        echo Hello World
+        if [ "$EUID" -eq 0 ]; then
+            echo "Running as root"
+        else
+            echo "Running as $USER"
+        fi
+        ls
+        wc Drakefile.ts`);
+    ```
 
 - Escape backslash and backtick characters and placeholders in
   template string literals with a backslash:
@@ -259,15 +261,23 @@ an alpha character.
 - Tasks can be created dynamically at runtime. The following example is from
   [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
 
-      for (const prereq of glob("*.md")) {
-        const target = `${path.basename(prereq, ".md")}.html`;
-        task(target, [prereq], async function () {
-          await sh(`markdown "${prereq}" > "${target}"`);
-        });
-      }
+    ``` typescript
+    for (const prereq of glob("*.md")) {
+      const target = `${path.basename(prereq, ".md")}.html`;
+      task(target, [prereq], async function () {
+        await sh(`markdown "${prereq}" > "${target}"`);
+      });
+    }
+    ```
 
 - Task actions can be run asynchronously using the `execute` API. The following
-  example is from the 
+  example is from
+  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
+
+    ``` typescript
+    await execute(...tasks);  // 'tasks' is a list of tasks with asynchronous action functions.
+    ```
+
 - When running multiple tasks asynchronously, for example using the `execute`
   API, take care that there are no mutual dependencies that could cause race
   conditions.
@@ -277,11 +287,13 @@ an alpha character.
   task. The `./docs/index.html` task will be hidden from the `--list-tasks`
   command because it has not been assigned a description.
 
-      desc("Build documents");
-      task("build-docs", ["./docs/index.html]);
-      task("./docs/index.html", [...]) {
-        ...
-      });
+    ``` typescript
+    desc("Build documents");
+    task("build-docs", ["./docs/index.html]);
+    task("./docs/index.html", [...]) {
+      ...
+    });
+    ```
 
 - Some Drake APIs are useful in non-drakefiles. They include: `abort`, `debug`,
   `env`, `glob`, `log`, `makeDir`, `quote`, `readFile`, `sh`, `shCapture`,
@@ -372,7 +384,7 @@ async function execute(...taskNames: string[]);
 ```
 
 Execute task action functions.
-The non-async actions are executed synchronously then the
+First the non-async actions are executed synchronously then the
 async actions are exectuted asynchronously.
 Silently skip tasks that have no action function.
 
