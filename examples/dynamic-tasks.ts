@@ -1,5 +1,14 @@
 import * as path from "https://deno.land/std@0.68.0/path/mod.ts";
-import { desc, env, execute, glob, run, sh, task } from "../mod.ts";
+import {
+  desc,
+  env,
+  execute,
+  glob,
+  run,
+  sh,
+  task,
+} from "https://deno.land/x/drake@v1.3.1/mod.ts";
+// } from "../mod.ts";
 
 const tasks: string[] = [];
 const mdfiles = env("mdfiles") || "*.md";

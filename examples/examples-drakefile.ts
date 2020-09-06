@@ -1,5 +1,15 @@
-import { abort, readFile, updateFile, writeFile } from "../lib/utils.ts";
-import { desc, execute, run, sh, task } from "../mod.ts";
+import {
+  abort,
+  desc,
+  execute,
+  readFile,
+  run,
+  sh,
+  task,
+  updateFile,
+  writeFile,
+} from "https://deno.land/x/drake@v1.3.1/mod.ts";
+// } from "../mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function () {
