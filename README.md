@@ -256,15 +256,21 @@ an alpha character.
   * `` \` `` translates to `` ` ``
   * `\${` translates to `${` 
 
-- Tasks can be created dynamically at runtime, for example:
+- Tasks can be created dynamically at runtime. The following example is from
+  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
 
       for (const prereq of glob("*.md")) {
         const target = `${path.basename(prereq, ".md")}.html`;
-        desc(`compile "${target}"`);
         task(target, [prereq], async function () {
           await sh(`markdown "${prereq}" > "${target}"`);
         });
       }
+
+- Task actions can be run asynchronously using the `execute` API. The following
+  example is from the 
+- When running multiple tasks asynchronously, for example using the `execute`
+  API, take care that there are no mutual dependencies that could cause race
+  conditions.
 
 - More meaningful file task names can be created with a dummy normal task. In
   the following example the `build-docs` task executes the `./docs/index.html`
