@@ -11,6 +11,13 @@ import {
 } from "https://deno.land/x/drake@v1.3.1/mod.ts";
 // } from "../mod.ts";
 
+desc("command-line usage");
+task("help", [], function () {
+  console.log(`
+Example Drakefile containing a number of frivilous example tasks.
+`);
+});
+
 desc("Minimal Drake task");
 task("hello", [], function () {
   console.log("Hello World!");

@@ -2,7 +2,17 @@
  * Drake drakefile.
  */
 
-import { abort, desc, env, glob, quote, run, sh, task, vers } from "./mod.ts";
+import {
+  abort,
+  desc,
+  env,
+  glob,
+  quote,
+  run,
+  sh,
+  task,
+  vers,
+} from "./mod.ts";
 
 env("--default-task", "test");
 const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
@@ -25,10 +35,10 @@ task("fmt", [], async function () {
 desc("Run some example drakefiles");
 task("examples", [], async function () {
   await sh(`
-    deno run -A examples/examples-drakefile.ts prereqs pause "qux=Foo Bar" noop
+    deno run -A examples/examples-drakefile.ts help prereqs pause "qux=Foo Bar" noop
   `);
   await sh(`
-    deno run -A examples/dynamic-tasks.ts -d examples/ README.html releases.html
+    deno run -A examples/dynamic-tasks.ts -d examples/ help
   `);
 });
 
