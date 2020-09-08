@@ -37,9 +37,6 @@ task("examples", [], async function () {
   await sh(`
     deno run -A examples/examples-drakefile.ts help prereqs pause "qux=Foo Bar" noop
   `);
-  await sh(`
-    deno run -A examples/dynamic-tasks.ts -d examples/ help
-  `);
 });
 
 desc(
