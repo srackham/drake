@@ -1,5 +1,9 @@
 # Drake Changelog
 
+## 1.3.2 / 2020-09-08
+- Update examples.
+- Rename `releases.md` to the more idiomatic `CHANGELOG.md`.
+
 ## 1.3.1 / 2020-09-07
 - The `execute` API conditionally executes file task actions.
 - Add `compile-async` task to the `examples/dynamic-tasks.ts` example Drakefile.
@@ -9,7 +13,6 @@
 - `glob` API debug message truncates files list to 100 files.
 - `debug` API does not print `title` if it is blank.
 - Upgraded to Deno version 1.3.3,`std/0.68.0`.
-
 
 ## 1.2.6 / 2020-08-03
 - Upgraded to Deno version 1.2.2,`std/0.63.0`.
@@ -36,10 +39,8 @@
 - FIX: An error occured if a File task contained a Normal task prerequisite.
 - Upgraded to Deno version 1.0.3, `std/0.54.0`.
 
-
 ## 1.1.1 / 2020-05-21
 - FIX: Cache file write error when using `--directory` option.
-
 
 ## 1.1.0 / 2020-05-21
 - APIs that are can be used in non-drakefiles are exposed via `lib.ts`.
@@ -47,7 +48,6 @@
 - Tightened `env` runtime parameter checks.
 - A lot of code refactoring including spliting `deps.ts` into separate test and runtime deps.
 - Upgraded to Deno version 1.0.1, `std/0.52.0`.
-
 
 ## 1.0.0 / 2020-05-15
 Version 1.0.0 released.
