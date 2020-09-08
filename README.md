@@ -12,7 +12,7 @@ for [Deno](https://deno.land/) inspired by
 - Drake API functions for defining, registering and running tasks.
 
 **Status**: Tested with Deno 1.3.3 running on Ubuntu 20.04, Windows 10. See
-[releases](https://github.com/srackham/drake/blob/master/releases.md).
+the [changelog](CHANGELOG.md).
 
 
 ## Drakefiles
