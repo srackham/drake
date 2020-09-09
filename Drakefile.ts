@@ -8,6 +8,8 @@ import {
   env,
   glob,
   quote,
+
+  readFile,
   run,
   sh,
   task,
@@ -60,6 +62,18 @@ task("tag", ["test"], async function () {
 desc("Push changes to Github");
 task("push", ["test"], async function () {
   await sh("git push -u --tags origin master");
+});
+
+desc("Publish release to nest.lang registry");
+task("publish-nest-egg", [], async function () {
+  const egg = JSON.parse(readFile("egg.json"));
+  if (vers() !== egg.version) {
+    abort(
+      `egg.json version ${egg.version} does not match Drake version ${vers()}`,
+    );
+  }
+  // TODO: Should check that files for tagged version match those in the working directory.
+  await sh("eggs publish");
 });
 
 run();
