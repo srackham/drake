@@ -8,7 +8,6 @@ import {
   env,
   glob,
   quote,
-
   readFile,
   run,
   sh,
@@ -41,16 +40,32 @@ task("examples", [], async function () {
   `);
 });
 
-desc(
-  "Create Git version number tag e.g. specifying 'vers=1.0.0' creates tag 'v1.0.0'",
-);
-task("tag", ["test"], async function () {
+function checkVers(task: any) {
   if (!env("vers")) {
-    abort("'vers' command-line variable not set e.g. drake tag vers=1.0.0");
+    abort(
+      `version number must be specified e.g. drake ${task.name} vers=1.0.0`,
+    );
   }
   if (!/^\d+\.\d+\.\d+/.test(env("vers"))) {
     abort(`illegal semantic version number: ${env("vers")}`);
   }
+}
+
+function checkEgg() {
+  const egg = JSON.parse(readFile("egg.json"));
+  if (env("vers") !== egg.version) {
+    abort(
+      `egg.json version ${egg.version} does not match version ${env("vers")}`,
+    );
+  }
+}
+
+desc(
+  "Create Git version number tag",
+);
+task("tag", ["test"], async function () {
+  checkVers(this);
+  checkEgg();
   if (vers() !== env("vers")) {
     abort(`${env("vers")} does not match version ${vers()} in mod.ts`);
   }
@@ -64,16 +79,25 @@ task("push", ["test"], async function () {
   await sh("git push -u --tags origin master");
 });
 
-desc("Publish release to nest.lang registry");
+desc("Publish tagged version to nest.land registry");
 task("publish-nest-egg", [], async function () {
-  const egg = JSON.parse(readFile("egg.json"));
-  if (vers() !== egg.version) {
-    abort(
-      `egg.json version ${egg.version} does not match Drake version ${vers()}`,
-    );
+  checkVers(this);
+  // Publication is staged from temporary directory.
+  const tmpDir = Deno.makeTempDirSync({ prefix: "drake-egg-" });
+  try {
+    await sh(`git clone . "${tmpDir}"`);
+    const savedDir = Deno.cwd();
+    try {
+      Deno.chdir(tmpDir);
+      await sh(`git checkout --quiet v${env("vers")}`);
+      checkEgg();
+      await sh("eggs publish");
+    } finally {
+      Deno.chdir(savedDir);
+    }
+  } finally {
+    Deno.removeSync(tmpDir, { recursive: true });
   }
-  // TODO: Should check that files for tagged version match those in the working directory.
-  await sh("eggs publish");
 });
 
 run();
