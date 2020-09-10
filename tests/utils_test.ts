@@ -40,6 +40,17 @@ Deno.test("fileFunctionsTest", function () {
     assertEquals(readFile(file), "fO!O!bar");
     assertEquals(updateFile(file, /o/g, "O!"), false);
     assertEquals(updateFile(file, /zzz/g, "O!"), false);
+    assertThrows(
+      () => readFile("non-existent file"),
+      DrakeError,
+      "readFile: non-existent file",
+    );
+    const filename = path.join("dir", "non-existent file");
+    assertThrows(
+      () => writeFile(filename, text),
+      DrakeError,
+      `writeFile: ${filename}`,
+    );
     const dir = path.join(tmpDir, "c/d/e");
     assert(makeDir(dir), "directory should not have already existed");
     assert(
