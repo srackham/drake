@@ -257,7 +257,7 @@ export class TaskRegistry extends Map<string, Task> {
       } as const;
       writeFile(filename, JSON.stringify(cache, null, 1));
     } else {
-      debug("saveCache", "no cache");
+      debug("saveCache", "skipped empty cache");
     }
   }
 
