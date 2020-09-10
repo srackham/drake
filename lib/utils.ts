@@ -82,12 +82,16 @@ export async function sleep(ms: number): Promise<unknown> {
 
 /** Read the entire contents of a file synchronously to a UTF-8 string. */
 export function readFile(filename: string): string {
-  const result = Deno.readTextFileSync(filename);
-  debug(
-    "readFile",
-    `${filename}: ${result.length} characters read`,
-  );
-  return result;
+  try {
+    const result = Deno.readTextFileSync(filename);
+    debug(
+      "readFile",
+      `${filename}: ${result.length} characters read`,
+    );
+    return result;
+  } catch (e) {
+    abort(`readFile: ${filename}: ${e.message}`);
+  }
 }
 
 /**
@@ -98,11 +102,15 @@ export function readFile(filename: string): string {
  * */
 export function writeFile(filename: string, text: string): boolean {
   const exists = existsSync(filename);
-  debug(
-    "writeFile",
-    `${filename}: ${text.length} characters written`,
-  );
-  Deno.writeTextFileSync(filename, text);
+  try {
+    debug(
+      "writeFile",
+      `${filename}: ${text.length} characters written`,
+    );
+    Deno.writeTextFileSync(filename, text);
+  } catch (e) {
+    abort(`writeFile: ${filename}: ${e.message}`);
+  }
   return !exists;
 }
 
