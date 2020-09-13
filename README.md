@@ -22,10 +22,10 @@ A drakefile is a TypeScript module that:
 2. Defines and registers tasks.
 3. Runs tasks.
 
-Example drakefile:
+### Example drakefile
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.2.6/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.3.2/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -62,6 +62,22 @@ Here are some of real-world drakefiles:
 
 - https://github.com/srackham/drake/blob/master/Drakefile.ts
 - https://github.com/srackham/rimu/blob/master/Drakefile.ts
+
+
+### Importing Drake
+A Drakefile uses Drake APIs imported from the Drake `mod.ts` module file. The module can be imported from:
+
+- [deno.land](https://deno.land/x/drake) (Deno's third party modules registry). For example:
+
+      import { desc, run, task } from "https://deno.land/x/drake@v1.3.2/mod.ts";
+
+- [nest.land](https://nest.land/package/drake) (a blockchain based Deno modules registry).  
+  **NOTE**: Drake version numbers in `nest.land` URLs are not prefixed with a 'v' character:
+
+      import { desc, run, task } from "https://x.nest.land/drake@1.3.2/mod.ts";
+
+Some Drake APIs are useful in non-drakefiles, use `lib.ts` (not `mod.ts`) to
+import them into non-drakefile modules.
 
 
 ## Tasks
@@ -294,11 +310,6 @@ an alpha character.
       ...
     });
     ```
-
-- Some Drake APIs are useful in non-drakefiles. They include: `abort`, `debug`,
-  `env`, `glob`, `log`, `makeDir`, `quote`, `readFile`, `sh`, `shCapture`,
-  `updateFile`, `writeFile`.  Use `lib.ts` (not `mod.ts`) to import them into
-  non-drakefile modules.
 
 - When executing in a drakefile, Drake functions manifest errors by printing an
   error message and exiting with a non-zero exit code.  You can change this
