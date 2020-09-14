@@ -1,6 +1,7 @@
+import { readFile } from "https://deno.land/x/drake@v1.3.2/lib/utils.ts";
 import { env } from "../lib/env.ts";
 import { desc, execute, run, task } from "../lib/registry.ts";
-import { DrakeError, writeFile } from "../lib/utils.ts";
+import { DrakeError, vers, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
@@ -70,6 +71,9 @@ Deno.test("registryTest", async function () {
       existsSync("./.drake.cache.json"),
       "drake cache should have been created",
     );
+    const cache = JSON.parse(readFile("./.drake.cache.json"));
+    assertEquals(cache.version, vers());
+    assertEquals(cache.os, Deno.build.os);
 
     await assertThrowsAsync(
       async () => await run(normalTask),
