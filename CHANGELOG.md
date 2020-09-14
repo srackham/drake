@@ -1,6 +1,6 @@
 # Drake Changelog
 
-## 1.4.0 / 2020-09-??
+## 1.4.0 / 2020-09-17
 - Add `--cache FILE` command-line option.
 
 ## 1.3.2 / 2020-09-08
