@@ -1,9 +1,7 @@
 # Drake Changelog
 
 ## 1.4.0 / 2020-09-??
-- Added `--cache FILE` command-line option.
-- Publish Drake to [nest.land](https://nest.land/package/drake) (in addition to
-  [deno.land](https://deno.land/x/drake)).
+- Add `--cache FILE` command-line option.
 
 ## 1.3.2 / 2020-09-08
 - Update examples.

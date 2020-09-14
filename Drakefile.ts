@@ -8,7 +8,7 @@ import {
   env,
   glob,
   quote,
-  readFile,
+
   run,
   sh,
   task,
@@ -51,21 +51,11 @@ function checkVers(task: any) {
   }
 }
 
-function checkEgg() {
-  const egg = JSON.parse(readFile("egg.json"));
-  if (env("vers") !== egg.version) {
-    abort(
-      `egg.json version ${egg.version} does not match version ${env("vers")}`,
-    );
-  }
-}
-
 desc(
   "Create Git version number tag",
 );
 task("tag", ["test"], async function () {
   checkVers(this);
-  checkEgg();
   if (vers() !== env("vers")) {
     abort(`${env("vers")} does not match version ${vers()} in mod.ts`);
   }
@@ -77,27 +67,6 @@ task("tag", ["test"], async function () {
 desc("Push changes to Github");
 task("push", ["test"], async function () {
   await sh("git push -u --tags origin master");
-});
-
-desc("Publish tagged version to nest.land registry");
-task("publish-nest-egg", [], async function () {
-  checkVers(this);
-  // Publication is staged from temporary directory.
-  const tmpDir = Deno.makeTempDirSync({ prefix: "drake-egg-" });
-  try {
-    await sh(`git clone . "${tmpDir}"`);
-    const savedDir = Deno.cwd();
-    try {
-      Deno.chdir(tmpDir);
-      await sh(`git checkout --quiet v${env("vers")}`);
-      checkEgg();
-      await sh("eggs publish");
-    } finally {
-      Deno.chdir(savedDir);
-    }
-  } finally {
-    Deno.removeSync(tmpDir, { recursive: true });
-  }
 });
 
 run();
