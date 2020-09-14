@@ -1,6 +1,7 @@
 # Drake Changelog
 
 ## 1.4.0 / 2020-09-??
+- Added `--cache FILE` command-line option.
 - Publish Drake to [nest.land](https://nest.land/package/drake) (in addition to
   [deno.land](https://deno.land/x/drake)).
 
@@ -40,7 +41,7 @@
 - Include a stack trace in the `abort` API output if the `"--debug"` environment
   option is `true`.
 - Added `makeDir` API.
-- FIX: An error occured if a File task contained a Normal task prerequisite.
+- FIX: An error occurred if a File task contained a Normal task prerequisite.
 - Upgraded to Deno version 1.0.3, `std/0.54.0`.
 
 ## 1.1.1 / 2020-05-21

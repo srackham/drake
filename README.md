@@ -144,10 +144,11 @@ never run twice.
   time or size no longer matches those recorded immediately after the task had
   last executed successfully.
 
+- The execution directory defaults to the current working directory and can be
+  changed using the Drake `--directory` command-line option.
+
 - Drake saves target and prerequisite file properties to a file named
-  `.drake.cache.json` in the drakefile execution directory. The
-  execution directory defaults to the current working directory and
-  can be changed using the Drake `--directory` command-line option. A
+  `.drake.cache.json` in the drakefile execution directory. A
   `.drake.cache.json` file will not be created until a file task has
   successfully executed.
 
@@ -200,6 +201,7 @@ DESCRIPTION
 
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
+  --cache FILE          Set Drake cache file path to FILE.
   -d, --directory DIR   Change to directory DIR before running drakefile.
   -D, --debug           Write debug information to stderr.
   -h, --help            Display this help message.
@@ -330,6 +332,21 @@ an alpha character.
   that capture Deno `run` command outputs. Use the Deno `--quiet` option
   to eliminate this problem.
 
+- In addition to the command-line `--cache FILE` option you can also set a
+  custom cache file path from within a Drakefile before calling the `run` API.
+  For example:
+
+    ``` typescript
+    env("--cache", path.join(env("--directory"), "my-cache.json"));
+    ```
+
+- Set the `--cache` option value to a blank string to restore the
+  default cache file path:
+      
+    ``` typescript
+    env("--cache", "");
+    ```
+
 
 ## Drake API
 The Drake library module exports the following functions:
@@ -372,8 +389,8 @@ The Drake `env` API function gets and optionally sets the command-line
 options, task names and variables.
 
 Options are keyed by their long option name e.g. `env("--dry-run")`.
-Command-line flag options return a boolean; the `--directory` option
-returns a string.
+Command-line flag options return a boolean; the `--cache` and `--directory`
+options return a string.
 
 Command-line variables are keyed by name. For example `vers=1.0.1` on the
 command-line sets the `vers` value to `"1.0.1"`.
