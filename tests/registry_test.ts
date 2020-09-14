@@ -1,7 +1,6 @@
-import { readFile } from "https://deno.land/x/drake@v1.3.2/lib/utils.ts";
 import { env } from "../lib/env.ts";
 import { desc, execute, run, task } from "../lib/registry.ts";
-import { DrakeError, vers, writeFile } from "../lib/utils.ts";
+import { DrakeError, readFile, vers, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
