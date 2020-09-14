@@ -8,6 +8,7 @@ Deno.test("envTest", function () {
     // "--abort-exits",
     "--always-make",
     // "--debug",
+    "--cache",
     "--default-task",
     "--directory",
     "--dry-run",
@@ -19,6 +20,9 @@ Deno.test("envTest", function () {
   ];
   for (const opt of opts) {
     switch (opt) {
+      case "--cache":
+        assertEquals(env(opt), "");
+        break;
       case "--default-task":
         assertEquals(env(opt), "");
         env(opt, "foobar");

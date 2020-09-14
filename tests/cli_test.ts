@@ -46,6 +46,16 @@ Deno.test("cliTest", async function () {
   assertStringContains(error, "missing task: nonexistent-task");
 
   ({ code, error } = await shCapture(
+    `${drake} --cache ${path.join("non-existent-dir", "cache.json")}`,
+    { stderr: "piped" },
+  ));
+  assertEquals(code, 1);
+  assertStringContains(
+    error,
+    "--cache file directory missing or not a directory",
+  );
+
+  ({ code, error } = await shCapture(
     `${drake} -d missing-directory`,
     { stderr: "piped" },
   ));

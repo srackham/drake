@@ -1,3 +1,4 @@
+import { existsSync } from "../lib/deps.ts";
 import { env } from "../lib/env.ts";
 import {
   isFileTask,
@@ -13,6 +14,7 @@ import {
   assertEquals,
   assertThrows,
   assertThrowsAsync,
+  path,
 } from "./deps.ts";
 
 Deno.test("normalizePathTest", function () {
@@ -71,6 +73,21 @@ Deno.test("isTasksTest", function () {
 Deno.test("taskRegistryTest", async function () {
   env("--quiet", true);
   const taskRegistry = new TaskRegistry();
+
+  assertEquals(
+    taskRegistry.cacheFile(),
+    path.join(Deno.cwd(), ".drake.cache.json"),
+  );
+  env("--cache", "tests/drake-test.cache.json");
+  assertEquals(
+    env("--cache"),
+    path.join(Deno.cwd(), "tests", "drake-test.cache.json"),
+  );
+  env("--cache", ""); // Reset default value.
+  assertEquals(
+    taskRegistry.cacheFile(),
+    path.join(Deno.cwd(), ".drake.cache.json"),
+  );
 
   assertThrows(
     () => taskRegistry.get("quux"),
@@ -199,6 +216,10 @@ Deno.test("fileTaskTest", async function () {
     taskRan = false;
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
+    assert(
+      existsSync(taskRegistry.cacheFile()),
+      `cache file should exist: ${taskRegistry.cacheFile()}`,
+    );
 
     writeFile(target, "");
     taskRan = true;
@@ -251,7 +272,20 @@ Deno.test("fileTaskTest", async function () {
       readFile(taskRegistry.cacheFile()) !== oldCache,
       "cache file should have updated after the error was thrown",
     );
+
+    env("--cache", "drake-test.cache.json");
+    const cacheFile = path.join(Deno.cwd(), "drake-test.cache.json");
+    assert(taskRegistry.cacheFile(), cacheFile);
+    Deno.removeSync(target);
+    taskRan = false;
+    await taskRegistry.run(target);
+    assert(taskRan, "task should have executed: no target file");
+    assert(
+      existsSync(cacheFile),
+      `cache file should exist: ${cacheFile}`,
+    );
   } finally {
+    env("--cache", "");
     env("--directory", savedCwd);
     Deno.removeSync(dir, { recursive: true });
   }
