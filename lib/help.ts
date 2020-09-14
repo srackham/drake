@@ -23,6 +23,7 @@ DESCRIPTION
 
 OPTIONS
   -a, --always-make     Unconditionally execute tasks.
+  --cache FILE          Set Drake cache file path to FILE.
   -d, --directory DIR   Change to directory DIR before running drakefile.
   -D, --debug           Write debug information to stderr.
   -h, --help            Display this help message.

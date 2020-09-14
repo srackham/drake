@@ -1,4 +1,4 @@
-import { existsSync } from "./deps.ts";
+import { existsSync, path } from "./deps.ts";
 import { abort, debug } from "./utils.ts";
 
 type EnvValue = boolean | string | Array<string>;
@@ -15,6 +15,7 @@ export class Env {
         "--tasks": [],
         "--debug": !!Deno.env.get("DRAKE_DEBUG"),
         "--default-task": "",
+        "--cache": "",
         "--directory": Deno.cwd(),
         "--abort-exits": false,
         "--always-make": false,
@@ -42,6 +43,18 @@ export class Env {
       case "--version":
         if (typeof value !== "boolean") {
           abort(`${name} must be a boolean`);
+        }
+        break;
+      case "--cache":
+        if (typeof value !== "string") {
+          abort(`${name} must be a string`);
+        }
+        if (value !== "") {
+          let dir = path.dirname(value);
+          if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
+            abort(`--cache file directory missing or not a directory: ${dir}`);
+          }
+          value = path.join(Deno.realPathSync(dir), path.basename(value));
         }
         break;
       case "--directory":
@@ -133,12 +146,13 @@ export class Env {
         case "--version":
           this.setValue(arg, true);
           break;
+        case "--cache":
         case "--directory":
-          arg = args.shift();
-          if (arg === undefined) {
-            abort("missing --directory option value");
+          const value = args.shift();
+          if (value === undefined) {
+            abort(`missing ${arg} option value`);
           }
-          this.setValue("--directory", arg);
+          this.setValue(arg, value);
           break;
         default:
           if (arg.startsWith("-")) {
@@ -156,8 +170,8 @@ export class Env {
  * options, task names and variables.
  *
  * Options are keyed by their long option name e.g. `env("--dry-run")`.
- * Command-line flag options return a boolean; the `--directory` option
- * returns a string.
+ * Command-line flag options return a boolean; the `--cache` and `--directory` options
+ * return a string.
  *
  * Command-line variables are keyed by name. For example `vers=1.0.1` on the
  * command-line sets the `vers` value to `"1.0.1"`.

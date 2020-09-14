@@ -200,7 +200,11 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   cacheFile(): string {
-    return path.join(env("--directory"), ".drake.cache.json");
+    if (!env("--cache")) {
+      return path.join(env("--directory"), ".drake.cache.json");
+    } else {
+      return env("--cache");
+    }
   }
 
   loadCache(): void {
