@@ -184,8 +184,8 @@ Deno.test("fileTaskTest", async function () {
     );
     writeFile(target, "quux");
     task.updateCache();
-    taskRegistry.saveCache();
-    taskRegistry.loadCache();
+    taskRegistry.saveCache(taskRegistry.cacheFile());
+    taskRegistry.loadCache(taskRegistry.cacheFile());
     assertEquals(
       task.cache![prereq].size,
       0,
@@ -203,7 +203,7 @@ Deno.test("fileTaskTest", async function () {
       "isOutOfDate should return true: modified prerequisite file",
     );
 
-    taskRegistry.saveCache();
+    taskRegistry.saveCache(taskRegistry.cacheFile());
     Deno.removeSync(prereq);
     await assertThrows(
       () => task.isOutOfDate(),
@@ -274,15 +274,15 @@ Deno.test("fileTaskTest", async function () {
     );
 
     env("--cache", "drake-test.cache.json");
-    const cacheFile = path.join(Deno.cwd(), "drake-test.cache.json");
-    assert(taskRegistry.cacheFile(), cacheFile);
+    const expected = path.join(Deno.cwd(), "drake-test.cache.json");
+    assert(taskRegistry.cacheFile(), expected);
     Deno.removeSync(target);
     taskRan = false;
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
     assert(
-      existsSync(cacheFile),
-      `cache file should exist: ${cacheFile}`,
+      existsSync(expected),
+      `cache file should exist: ${expected}`,
     );
   } finally {
     env("--cache", "");

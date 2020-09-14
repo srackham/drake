@@ -207,8 +207,7 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  loadCache(): void {
-    const filename = this.cacheFile();
+  loadCache(filename: string): void {
     if (!existsSync(filename)) {
       debug("loadCache:", `no cache file: ${filename}`);
       return;
@@ -240,12 +239,11 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  saveCache(): void {
+  saveCache(filename: string): void {
     if (env("--dry-run")) {
       debug("saveCache", "dry run");
       return;
     }
-    const filename = this.cacheFile();
     const tasksCache: RegistryCache = {};
     for (const task of this.values()) {
       if (isFileTask(task.name) && task.cache) {
@@ -365,7 +363,8 @@ export class TaskRegistry extends Map<string, Task> {
         abort(`missing task: ${name}`);
       }
     }
-    this.loadCache();
+    const cacheFile = this.cacheFile(); // Freeze cache for this run.
+    this.loadCache(cacheFile);
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
     const msg = `${colors.green(colors.bold(`run:`))}`;
@@ -379,7 +378,7 @@ export class TaskRegistry extends Map<string, Task> {
         env().setValue("--abort-exits", savedAbortExits);
       } catch (e) {
         env().setValue("--abort-exits", savedAbortExits);
-        this.saveCache();
+        this.saveCache(cacheFile);
         if (e instanceof DrakeError) {
           abort(e.message);
         } else {
@@ -387,7 +386,7 @@ export class TaskRegistry extends Map<string, Task> {
         }
       }
     }
-    this.saveCache();
+    this.saveCache(cacheFile);
     log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
   }
 
