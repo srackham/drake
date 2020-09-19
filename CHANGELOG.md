@@ -1,6 +1,6 @@
 # Drake Changelog
 
-## 1.4.1 / 2020-09-??
+## 1.4.1 / 2020-09-20
 - Publish Drake to [nest.land](https://nest.land/package/drake) (in addition to
   [deno.land](https://deno.land/x/drake)).
 
