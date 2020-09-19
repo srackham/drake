@@ -71,6 +71,11 @@ A Drakefile uses Drake APIs imported from the Drake `mod.ts` module file. The mo
 
       import { desc, run, task } from "https://deno.land/x/drake@v1.4.0/mod.ts";
 
+- [nest.land](https://nest.land/package/drake) (a blockchain based Deno modules registry).  
+  **NOTE**: Drake version numbers in `nest.land` URLs are not prefixed with a 'v' character:
+
+      import { desc, run, task } from "https://x.nest.land/drake@1.4.0/mod.ts";
+
 Some Drake APIs are useful in non-drakefiles, use `lib.ts` (not `mod.ts`) to
 import them into non-drakefile modules.
 

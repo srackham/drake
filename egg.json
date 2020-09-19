@@ -1,0 +1,15 @@
+{
+    "name": "drake",
+    "description": "Drake is a Make-like task runner for Deno",
+    "version": "1.4.1",
+    "stable": true,
+    "files": [
+        "mod.ts",
+        "lib.ts",
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md",
+        "lib/*.ts"
+    ],
+    "repository": "https://github.com/srackham/drake"
+}

@@ -1,5 +1,9 @@
 # Drake Changelog
 
+## 1.4.1 / 2020-09-??
+- Publish Drake to [nest.land](https://nest.land/package/drake) (in addition to
+  [deno.land](https://deno.land/x/drake)).
+
 ## 1.4.0 / 2020-09-17
 - Add `--cache FILE` command-line option.
 
@@ -49,7 +53,7 @@
 - APIs that are can be used in non-drakefiles are exposed via `lib.ts`.
 - Log message format consistency.
 - Tightened `env` runtime parameter checks.
-- A lot of code refactoring including spliting `deps.ts` into separate test and runtime deps.
+- A lot of code refactoring including splitting `deps.ts` into separate test and runtime deps.
 - Upgraded to Deno version 1.0.1, `std/0.52.0`.
 
 ## 1.0.0 / 2020-05-15
