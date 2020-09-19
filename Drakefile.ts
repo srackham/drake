@@ -29,7 +29,7 @@ task("test", ["fmt"], async function () {
 
 desc("Format source files");
 task("fmt", [], async function () {
-  await sh(`deno fmt ${quote(TS_FILES)}`);
+  await sh(`deno fmt --quiet ${quote(TS_FILES)}`);
 });
 
 desc("Run some example drakefiles");
