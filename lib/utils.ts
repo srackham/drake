@@ -203,9 +203,14 @@ function shArgs(command: string): [string[], string] {
     writeFile(cmdFile, `@echo off\n${command}`);
     return [[cmdFile], cmdFile];
   } else {
-    const shellExe = Deno.env.get("SHELL")!;
+    let shellExe = Deno.env.get("SHELL")!;
     if (!shellExe) {
-      abort(`cannot locate shell: missing SHELL environment variable`);
+      shellExe = "/bin/bash";
+      if (!existsSync(shellExe)) {
+        abort(
+          `cannot locate shell: no SHELL environment variable or ${shellExe} executable`,
+        );
+      }
     }
     return [[shellExe, "-c", command], ""];
   }
