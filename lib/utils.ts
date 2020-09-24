@@ -18,8 +18,8 @@ export class DrakeError extends Error {
 /**
  * Write an error message to to `stderr` and terminate execution.
  * 
- * - If the `"--abort-exits"` environment option is true throw a `DrakeError`.
- * - If the `"--debug"` environment option is true include the stack trace in
+ * - If the `"--abort-exits"` environment option is `false` throw a `DrakeError`.
+ * - If the `"--debug"` environment option is `true` include the stack trace in
  *   the error message.
  */
 export function abort(message: string): never {

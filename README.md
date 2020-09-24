@@ -307,7 +307,7 @@ an alpha character.
 
     ``` typescript
     desc("Build documents");
-    task("build-docs", ["./docs/index.html]);
+    task("build-docs", ["./docs/index.html"]);
     task("./docs/index.html", [...]) {
       ...
     });
@@ -358,8 +358,8 @@ function abort(message: string): void;
 
 Write an error message to `stderr` and terminate execution.
 
-- If the `"--abort-exits"` environment option is true throw a `DrakeError`.
-- If the `"--debug"` environment option is true include the stack trace in
+- If the `"--abort-exits"` environment option is `false` throw a `DrakeError`.
+- If the `"--debug"` environment option is `true` include the stack trace in
   the error message.
 
 ### debug
@@ -400,7 +400,7 @@ Command-line tasks are stored in the `--tasks` string array.
 Examples:
 
 ``` typescript
-env("--abort-exits", true);
+env("--abort-exits", false);
 env("--default-task", "test");
 console.log(`version: ${env("vers")}`);
 if (!env("--quiet")) console.log(message);
