@@ -12,12 +12,14 @@ export {
   readFile,
   sh,
   shCapture,
-  ShCaptureOpts,
-  ShOpts,
-  ShOutput,
   updateFile,
   vers,
   writeFile,
+} from "./lib/utils.ts";
+export type {
+  ShCaptureOpts,
+  ShOpts,
+  ShOutput,
 } from "./lib/utils.ts";
 
 import { env, Env } from "./lib/env.ts";
