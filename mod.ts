@@ -1,6 +1,13 @@
 /* Drake APIs. */
 export { env } from "./lib/env.ts";
+export type {
+  EnvValue,
+} from "./lib/env.ts";
 export { desc, execute, run, task } from "./lib/registry.ts";
+export type {
+  Action,
+  Task,
+} from "./lib/tasks.ts";
 export {
   abort,
   debug,

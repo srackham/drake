@@ -1,7 +1,7 @@
 import { existsSync, path } from "./deps.ts";
 import { abort, debug } from "./utils.ts";
 
-type EnvValue = boolean | string | Array<string>;
+export type EnvValue = boolean | string | Array<string>;
 type EnvValues = { [name: string]: EnvValue };
 type EnvFunction = (name?: string, value?: EnvValue) => any;
 
