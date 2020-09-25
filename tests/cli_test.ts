@@ -11,6 +11,12 @@ Deno.test("cliTest", async function () {
   assertEquals(code, 0);
   assertEquals(output.trimRight(), vers());
 
+  ({ code, output, error } = await shCapture(
+    `${denoRun} --unstable Drakefile.ts --version`,
+  ));
+  assertEquals(code, 0);
+  assertEquals(output.trimRight(), vers());
+
   ({ code, output } = await shCapture(
     `${drake} --help`,
   ));
