@@ -1,5 +1,10 @@
 # Drake Changelog
 
+## 1.4.2 / 2020-09-26
+- fix: Allow Drakefile execution with Deno `--unstable` option.
+- Export  types `Action`, `EnvValue` from `mod.ts` module.
+- Export  types `ShCaptureOpts`, `ShOpts`, `ShOutput` from `lib.ts` module.
+
 ## 1.4.1 / 2020-09-20
 - Publish Drake to [nest.land](https://nest.land/package/drake) (in addition to
   [deno.land](https://deno.land/x/drake)).
