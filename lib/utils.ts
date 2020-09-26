@@ -193,15 +193,11 @@ export function glob(...patterns: string[]): string[] {
   return result;
 }
 
-/** Synthesize platform dependent shell command arguments and Windows command file. */
-function shArgs(command: string): [string[], string] {
+/** Synthesize platform dependent shell command arguments. */
+function shArgs(command: string): string[] {
   let cmdArgs: string[];
   if (Deno.build.os === "windows") {
-    const cmdFile = Deno.makeTempFileSync(
-      { prefix: "drake_", suffix: ".cmd" },
-    );
-    writeFile(cmdFile, `@echo off\n${command}`);
-    return [[cmdFile], cmdFile];
+    return ["PowerShell.exe", "-Command", command];
   } else {
     let shellExe = Deno.env.get("SHELL")!;
     if (!shellExe) {
@@ -212,7 +208,7 @@ function shArgs(command: string): [string[], string] {
         );
       }
     }
-    return [[shellExe, "-c", command], ""];
+    return [shellExe, "-c", command];
   }
 }
 
@@ -236,6 +232,9 @@ export interface ShOpts {
  * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
  * - The `opts.env` mapping passes additional environment variables to the shell.
  * 
+ * On MS Windows run `PowerShell.exe -Command <cmd>`. On other platforms run `$SHELL -c <cmd>` (if `SHELL`
+ * is not defined use `/bin/bash`).
+ * 
  * Examples:
  * 
  *     await sh("echo Hello World");
@@ -247,17 +246,12 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
     commands = [commands];
   }
   debug("sh", `${commands.join("\n")}\nopts: ${JSON.stringify(opts)}`);
-  const tempFiles: string[] = [];
   const processes: Deno.Process[] = [];
   const results: Deno.ProcessStatus[] = [];
   try {
     for (const cmd of commands) {
-      let cmdArgs: string[];
-      let cmdFile = "";
-      [cmdArgs, cmdFile] = shArgs(cmd);
-      if (cmdFile) tempFiles.push(cmdFile);
       const p = Deno.run({
-        cmd: cmdArgs,
+        cmd: shArgs(cmd),
         cwd: opts.cwd,
         env: opts.env,
         stdout: opts.stdout ?? "inherit",
@@ -270,9 +264,6 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
     for (const p of processes) {
       p.close();
     }
-  }
-  for (const f of tempFiles) {
-    Deno.removeSync(f);
   }
   for (const i in results) {
     const cmd = commands[i];
@@ -323,11 +314,8 @@ export async function shCapture(
   command: string,
   opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
-  let cmdArgs: string[];
-  let cmdFile = "";
-  [cmdArgs, cmdFile] = shArgs(command);
   const p = Deno.run({
-    cmd: cmdArgs,
+    cmd: shArgs(command),
     cwd: opts.cwd,
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
@@ -353,7 +341,6 @@ export async function shCapture(
   } finally {
     p.close();
   }
-  if (cmdFile) Deno.removeSync(cmdFile);
   const result = {
     code: status.code,
     output: new TextDecoder().decode(outputBytes),
