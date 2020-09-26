@@ -1,4 +1,5 @@
 /* APIs that can be used in non-Drake modules. */
+export { env } from "./lib/env.ts";
 export {
   abort,
   debug,
