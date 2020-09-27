@@ -205,7 +205,7 @@ Deno.test("shCaptureTest", async function () {
 
   ({ code, output, error } = await shCapture(
     `cd examples
-       deno eval "console.log(Deno.cwd())"`,
+     deno eval "console.log(Deno.cwd())"`,
   ));
   assertEquals(
     [code, output.trimRight(), error],
