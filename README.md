@@ -487,6 +487,9 @@ Execute commands in the command shell.
 - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
 - The `opts.env` mapping passes additional environment variables to the shell.
 
+ On MS Windows run `PowerShell.exe -Command <cmd>`. On other platforms run `$SHELL -c <cmd>` (if `SHELL`
+ is not defined use `/bin/bash`).
+ 
 Examples:
 
 ``` typescript
