@@ -16,7 +16,7 @@ export function desc(description: string): void {
  *
  * - `name` is a unique task name.
  * - `prereqs` is an array of prerequisite task names.  Prerequisites can be
- *   Normal task names, File task names, file paths or globs (wildcards).
+ *   normal task names, file task names, file paths or globs (wildcards).
  * - `action` is an optional function that is run if the task is selected for
  *   execution (`type Action = (this: Task) => any;`).
  * - To fetch an existing task omit both the `prereqs` and `action` parameters.

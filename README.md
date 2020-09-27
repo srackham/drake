@@ -85,14 +85,14 @@ import them into non-drakefile modules.
 ### Task types
 There are two types of task:
 
-**Normal task**: A _Normal task_ executes unconditionally.
+**Normal task**: A _normal task_ executes unconditionally.
 
-**File task**: A _File task_ is only executed if it is out of date.
+**File task**: A _file task_ is only executed if it is out of date.
 
 Task types are distinguished by their names.  _Normal task_ names can
 only contain alphanumeric, underscore and hyphen characters and cannot
 start with a hyphen e.g. `test`, `hello-world`. _File task_ names are
-valid file paths. In cases of ambiguity a _File task_ name should be
+valid file paths. In cases of ambiguity a _file task_ name should be
 prefixed with a period and a path separator e.g. `./hello-world`.
 
 ### Task properties
@@ -108,7 +108,7 @@ task prerequisites in the tasks list).
 **prereqs**:
 An array of prerequisite task names i.e. the names of tasks to be run
 prior to executing the task action function. Prerequisites can be
-Normal task names, File task names, file paths or globs (wildcards).
+normal task names, file task names, file paths or globs (wildcards).
 
 **action**:
 An optional function that is run if the task is selected for
