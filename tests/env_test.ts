@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import { Env } from "../lib/env.ts";
 import { DrakeError } from "../lib/utils.ts";
 import { assertEquals, assertThrows } from "./deps.ts";

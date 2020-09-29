@@ -12,6 +12,7 @@ import {
   writeFile,
 } from "./utils.ts";
 
+// deno-lint-ignore no-explicit-any
 export type Action = (this: Task) => any;
 
 type FileCache = {

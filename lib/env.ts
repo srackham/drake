@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-explicit-any
+
 import { existsSync, path } from "./deps.ts";
 import { abort, debug } from "./utils.ts";
 
@@ -105,6 +107,7 @@ export class Env {
       if (name === undefined) {
         return this; // Return function's Env object if called without parameters.
       }
+      // deno-lint-ignore no-undef
       if (arguments.length !== 1) {
         debug("set", `${name}: ${value}`);
         this.setValue(name, value!);
@@ -116,6 +119,7 @@ export class Env {
   /** Parse command-line arguments. */
   parseArgs(args: string[]): void {
     let arg: string | undefined;
+    // deno-lint-ignore no-extra-boolean-cast
     while (!!(arg = args.shift())) {
       const match = arg.match(/^([a-zA-Z]\w*)=(.*)$/);
       if (match) {
@@ -147,6 +151,7 @@ export class Env {
           this.setValue(arg, true);
           break;
         case "--cache":
+        // deno-lint-ignore no-case-declarations
         case "--directory":
           const value = args.shift();
           if (value === undefined) {

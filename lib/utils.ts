@@ -53,6 +53,7 @@ export function log(message: string): void {
  * `--debug` command-line option was specified or the `DRAKE_DEBUG` shell
  * environment variable is set.
  */
+// deno-lint-ignore no-explicit-any
 export function debug(title: string, message: any = ""): void {
   if (typeof message === "object") {
     message = JSON.stringify(message, null, 1);
@@ -70,7 +71,7 @@ export function debug(title: string, message: any = ""): void {
  * Double-quote characters are escaped with a backspace.
  * The separator defaults to a space character.
  */
-export function quote(values: string[], sep: string = " "): string {
+export function quote(values: string[], sep = " "): string {
   values = values.map((value) => `"${value.replace(/"/g, '\\"')}"`);
   return values.join(sep);
 }
