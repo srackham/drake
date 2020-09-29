@@ -1,7 +1,6 @@
 /**
  * Drake drakefile.
  */
-
 import type { Task } from "./mod.ts";
 import {
   abort,
@@ -16,6 +15,8 @@ import {
   vers,
 } from "./mod.ts";
 
+const quiet = env("--quiet") ? "--quiet" : "";
+
 env("--default-task", "test");
 const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
   !p.endsWith(".d.ts")
@@ -24,19 +25,19 @@ const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
 desc("Run tests");
 task("test", ["lint", "fmt"], async function () {
   await sh(
-    `deno test -A ${env("--quiet") ? "--quiet" : ""} tests`,
+    `deno test -A ${quiet} tests`,
     env("--debug") ? { env: { DRAKE_DEBUG: "true" } } : {},
   );
 });
 
 desc("Format source files");
 task("fmt", [], async function () {
-  await sh(`deno fmt --quiet ${quote(TS_FILES)}`);
+  await sh(`deno fmt ${quiet} ${quote(TS_FILES)}`);
 });
 
 desc("Lint source files");
 task("lint", [], async function () {
-  await sh(`deno lint --unstable ${quote(TS_FILES)}`);
+  await sh(`deno lint ${quiet} --unstable ${quote(TS_FILES)}`);
 });
 
 desc("Run some example drakefiles");
