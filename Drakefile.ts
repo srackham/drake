@@ -2,6 +2,7 @@
  * Drake drakefile.
  */
 
+import type { Task } from "./mod.ts";
 import {
   abort,
   desc,
@@ -21,7 +22,7 @@ const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
 );
 
 desc("Run tests");
-task("test", ["fmt"], async function () {
+task("test", ["lint", "fmt"], async function () {
   await sh(
     `deno test -A ${env("--quiet") ? "--quiet" : ""} tests`,
     env("--debug") ? { env: { DRAKE_DEBUG: "true" } } : {},
@@ -33,6 +34,11 @@ task("fmt", [], async function () {
   await sh(`deno fmt --quiet ${quote(TS_FILES)}`);
 });
 
+desc("Lint source files");
+task("lint", [], async function () {
+  await sh(`deno lint --unstable ${quote(TS_FILES)}`);
+});
+
 desc("Run some example drakefiles");
 task("examples", [], async function () {
   await sh(`
@@ -40,7 +46,7 @@ task("examples", [], async function () {
   `);
 });
 
-function checkVers(task: any) {
+function checkVers(task: Task) {
   if (!env("vers")) {
     abort(
       `version number must be specified e.g. drake ${task.name} vers=1.0.0`,
