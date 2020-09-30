@@ -1,4 +1,4 @@
-name: Test Drake Module
+name: Run Drake tests
 
 on:
   push:
@@ -24,4 +24,4 @@ jobs:
       - name: Test Drake module
         run: |
           deno --version
-          deno test -A tests
+          deno run -A Drakefile.ts test
