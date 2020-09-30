@@ -6,21 +6,20 @@ import {
   assertEquals,
   assertThrowsAsync,
   existsSync,
-  path,
 } from "./deps.ts";
 env("--quiet", true);
 
 Deno.test("registryTest", async function () {
-  const dir = Deno.makeTempDirSync();
+  const tmpDir = Deno.makeTempDirSync();
   const savedCwd = Deno.cwd();
   try {
-    env("--directory", dir);
+    env("--directory", tmpDir);
 
+    const dir = env("--directory");
     env("--directory", ".");
     assertEquals(
-      env("--directory").replace(/\//g, path.SEP),
+      env("--directory"),
       dir,
-      "--directory path should be absolute",
     );
 
     await assertThrowsAsync(
@@ -136,6 +135,6 @@ Deno.test("registryTest", async function () {
     );
   } finally {
     env("--directory", savedCwd);
-    Deno.removeSync(dir, { recursive: true });
+    Deno.removeSync(tmpDir, { recursive: true });
   }
 });
