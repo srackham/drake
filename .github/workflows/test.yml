@@ -8,12 +8,11 @@ on:
 
 jobs:
   test:
-    runs-on: [ubuntu-latest, windows-latest, macos-latest]
-
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         deno-version: [1.4.2]
-
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -22,6 +21,4 @@ jobs:
         with:
           deno-version: ${{ matrix.deno-version }}
       - name: Test Drake module
-        run: |
-          deno --version
-          deno run -A Drakefile.ts test
+        run: deno run -A Drakefile.ts test
