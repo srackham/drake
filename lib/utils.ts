@@ -1,7 +1,7 @@
 import { colors, existsSync, path, walkSync } from "./deps.ts";
 import { env } from "./env.ts";
 
-const DRAKE_VERS = "1.4.2";
+const DRAKE_VERS = "1.4.3";
 
 /** Returns the Drake version number string. */
 export function vers(): string {
