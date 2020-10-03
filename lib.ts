@@ -14,8 +14,4 @@ export {
   updateFile,
   writeFile,
 } from "./lib/utils.ts";
-export type {
-  ShCaptureOpts,
-  ShOpts,
-  ShOutput,
-} from "./lib/utils.ts";
+export type { ShCaptureOpts, ShOpts, ShOutput } from "./lib/utils.ts";

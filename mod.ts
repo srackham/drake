@@ -1,13 +1,8 @@
 /* Drake APIs. */
 export { env } from "./lib/env.ts";
-export type {
-  EnvValue,
-} from "./lib/env.ts";
+export type { EnvValue } from "./lib/env.ts";
 export { desc, execute, run, task } from "./lib/registry.ts";
-export type {
-  Action,
-  Task,
-} from "./lib/tasks.ts";
+export type { Action, Task } from "./lib/tasks.ts";
 export {
   abort,
   debug,
@@ -23,13 +18,9 @@ export {
   vers,
   writeFile,
 } from "./lib/utils.ts";
-export type {
-  ShCaptureOpts,
-  ShOpts,
-  ShOutput,
-} from "./lib/utils.ts";
+export type { ShCaptureOpts, ShOpts, ShOutput } from "./lib/utils.ts";
 
-import { env, Env } from "./lib/env.ts";
+import { Env, env } from "./lib/env.ts";
 import { help } from "./lib/help.ts";
 import { vers } from "./lib/utils.ts";
 

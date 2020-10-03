@@ -1,12 +1,7 @@
 import { env } from "../lib/env.ts";
 import { desc, execute, run, task } from "../lib/registry.ts";
 import { DrakeError, readFile, vers, writeFile } from "../lib/utils.ts";
-import {
-  assert,
-  assertEquals,
-  assertThrowsAsync,
-  existsSync,
-} from "./deps.ts";
+import { assert, assertEquals, assertThrowsAsync, existsSync } from "./deps.ts";
 env("--quiet", true);
 
 Deno.test("registryTest", async function () {

@@ -6,9 +6,7 @@ import type {
   ShOutput,
   Task,
 } from "../mod.ts";
-import {
-  env,
-} from "../mod.ts";
+import { env } from "../mod.ts";
 import { assertEquals } from "./deps.ts";
 
 // Assert compile-time API.
