@@ -107,7 +107,6 @@ export class Env {
       if (name === undefined) {
         return this; // Return function's Env object if called without parameters.
       }
-      // deno-lint-ignore no-undef
       if (arguments.length !== 1) {
         debug("set", `${name}: ${value}`);
         this.setValue(name, value!);
