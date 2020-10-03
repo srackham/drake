@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.4.2 running on Ubuntu 20.04, Windows 10. See
+**Status**: Tested with Deno 1.4.4 running on Ubuntu 20.04, Windows 10. See
 the [changelog](CHANGELOG.md).
 
 
@@ -233,121 +233,6 @@ only contain alphanumeric or underscore characters and must start with
 an alpha character.
 
 
-## Tips for using Drake
-- A shell alias shortcut can be set to run the default drakefile:
-
-      alias drake="deno run -A Drakefile.ts"
-
-- Use shell quoting and escapes to pass Drake command-line variable values
-  that contain spaces or special characters e.g. `"title=Foo & bar"`.
-
-- Don't forget to use `await` when calling `async` functions.
-
-- Task path name prerequisites can be glob wildcards.
-
-- Task name and prerequisite file paths can refer to any file type
-  (not just regular files).
-
-- The Drake `sh` API can be used to run multiple shell commands
-  asynchronously. The following example starts two shell commands then
-  waits for both to finish before continuing:
-
-        await sh(["echo foo", "echo bar"]);
-
-- The Drake `sh` API can be used to run multi-line template string
-  scripts e.g.
-
-    ``` sh
-    await sh(`set -e  # Exit immediately on error.
-        echo Hello World
-        if [ "$EUID" -eq 0 ]; then
-            echo "Running as root"
-        else
-            echo "Running as $USER"
-        fi
-        ls
-        wc Drakefile.ts`);
-    ```
-
-- Escape backslash and backtick characters and placeholders in
-  template string literals with a backslash:
-
-  * `\\` translates to `\`
-  * `` \` `` translates to `` ` ``
-  * `\${` translates to `${` 
-
-- Tasks can be created dynamically at runtime. The following example is from
-  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
-
-    ``` typescript
-    for (const prereq of glob("*.md")) {
-      const target = `${path.basename(prereq, ".md")}.html`;
-      task(target, [prereq], async function () {
-        await sh(`markdown "${prereq}" > "${target}"`);
-      });
-    }
-    ```
-
-- Task actions can be run asynchronously using the `execute` API. The following
-  example is from
-  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
-
-    ``` typescript
-    await execute(...tasks);  // 'tasks' is a list of tasks with asynchronous action functions.
-    ```
-
-- When running multiple tasks asynchronously, for example using the `execute`
-  API, take care that there are no mutual dependencies that could cause race
-  conditions.
-
-- More meaningful file task names can be created with a dummy normal task. In
-  the following example the `build-docs` task executes the `./docs/index.html`
-  task. The `./docs/index.html` task will be hidden from the `--list-tasks`
-  command because it has not been assigned a description.
-
-    ``` typescript
-    desc("Build documents");
-    task("build-docs", ["./docs/index.html"]);
-    task("./docs/index.html", [...]) {
-      ...
-    });
-    ```
-
-- When executing in a drakefile, Drake functions manifest errors by printing an
-  error message and exiting with a non-zero exit code.  You can change this
-  behavior so that errors throw a `DrakeError` exception by setting
-  `env("--abort-exits", false)`. In non-drakefiles errors throw a `DrakeError`
-  exception by default.
-
--  Selected sections of code can be "debugged" by bracketing with
-   `env("--debug",true)` and `env("--debug",false)` statements.
-
-- Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
-  environment variable is set. This can be useful in conjunction with
-  the `debug` API in non-drakefiles (in lieu of the Drake `--debug`
-  command-line option).
-
-- The Deno `run` command automatically compiles updated source and
-  writes compilation messages to `stderr`. This can interfere with tests
-  that capture Deno `run` command outputs. Use the Deno `--quiet` option
-  to eliminate this problem.
-
-- In addition to the command-line `--cache FILE` option you can also set a
-  custom cache file path from within a Drakefile before calling the `run` API.
-  For example:
-
-    ``` typescript
-    env("--cache", path.join(env("--directory"), "my-cache.json"));
-    ```
-
-- Set the `--cache` option value to a blank string to restore the
-  default cache file path:
-      
-    ``` typescript
-    env("--cache", "");
-    ```
-
-
 ## Drake API
 The Drake library module exports the following functions:
 
@@ -446,7 +331,7 @@ Create directory.
 
 ### quote
 ``` typescript
-function quote(values: string[], sep: string = " "): string;
+function quote(values: string[], sep = " "): string;
 ```
 
 Quote string array values with double-quotes then join them with a separator.
@@ -564,3 +449,118 @@ function vers(): string;
 ```
 
 Returns the Drake version number string.
+
+
+## Tips for using Drake
+- A shell alias shortcut can be set to run the default drakefile:
+
+      alias drake="deno run -A Drakefile.ts"
+
+- Use shell quoting and escapes to pass Drake command-line variable values
+  that contain spaces or special characters e.g. `"title=Foo & bar"`.
+
+- Don't forget to use `await` when calling `async` functions.
+
+- Task path name prerequisites can be glob wildcards.
+
+- Task name and prerequisite file paths can refer to any file type
+  (not just regular files).
+
+- The Drake `sh` API can be used to run multiple shell commands
+  asynchronously. The following example starts two shell commands then
+  waits for both to finish before continuing:
+
+        await sh(["echo foo", "echo bar"]);
+
+- The Drake `sh` API can be used to run multi-line template string
+  scripts e.g.
+
+    ``` sh
+    await sh(`set -e  # Exit immediately on error.
+        echo Hello World
+        if [ "$EUID" -eq 0 ]; then
+            echo "Running as root"
+        else
+            echo "Running as $USER"
+        fi
+        ls
+        wc Drakefile.ts`);
+    ```
+
+- Escape backslash and backtick characters and placeholders in
+  template string literals with a backslash:
+
+  * `\\` translates to `\`
+  * `` \` `` translates to `` ` ``
+  * `\${` translates to `${` 
+
+- Tasks can be created dynamically at runtime. The following example is from
+  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
+
+    ``` typescript
+    for (const prereq of glob("*.md")) {
+      const target = `${path.basename(prereq, ".md")}.html`;
+      task(target, [prereq], async function () {
+        await sh(`markdown "${prereq}" > "${target}"`);
+      });
+    }
+    ```
+
+- Task actions can be run asynchronously using the `execute` API. The following
+  example is from
+  [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
+
+    ``` typescript
+    await execute(...tasks);  // 'tasks' is a list of tasks with asynchronous action functions.
+    ```
+
+- When running multiple tasks asynchronously, for example using the `execute`
+  API, take care that there are no mutual dependencies that could cause race
+  conditions.
+
+- More meaningful file task names can be created with a dummy normal task. In
+  the following example the `build-docs` task executes the `./docs/index.html`
+  task. The `./docs/index.html` task will be hidden from the `--list-tasks`
+  command because it has not been assigned a description.
+
+    ``` typescript
+    desc("Build documents");
+    task("build-docs", ["./docs/index.html"]);
+    task("./docs/index.html", [...]) {
+      ...
+    });
+    ```
+
+- When executing in a drakefile, Drake functions manifest errors by printing an
+  error message and exiting with a non-zero exit code.  You can change this
+  behavior so that errors throw a `DrakeError` exception by setting
+  `env("--abort-exits", false)`. In non-drakefiles errors throw a `DrakeError`
+  exception by default.
+
+-  Selected sections of code can be "debugged" by bracketing with
+   `env("--debug",true)` and `env("--debug",false)` statements.
+
+- Drake API debug messages will be emitted if the `DRAKE_DEBUG` shell
+  environment variable is set. This can be useful in conjunction with
+  the `debug` API in non-drakefiles (in lieu of the Drake `--debug`
+  command-line option).
+
+- The Deno `run` command automatically compiles updated source and
+  writes compilation messages to `stderr`. This can interfere with tests
+  that capture Deno `run` command outputs. Use the Deno `--quiet` option
+  to eliminate this problem.
+
+- In addition to the command-line `--cache FILE` option you can also set a
+  custom cache file path from within a Drakefile before calling the `run` API.
+  For example:
+
+    ``` typescript
+    env("--cache", path.join(env("--directory"), "my-cache.json"));
+    ```
+
+- Set the `--cache` option value to a blank string to restore the
+  default cache file path:
+      
+    ``` typescript
+    env("--cache", "");
+    ```
