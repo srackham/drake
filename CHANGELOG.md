@@ -1,5 +1,10 @@
 # Drake Changelog
 
+## 1.4.3 / 2020-10-04
+- Included `env` API in `lib.ts`.
+- On MS Windows use the PowerShell instead of `cmd.exe` to execute shell commands.
+- Implemented Github Actions workflow for testing.
+
 ## 1.4.2 / 2020-09-26
 - fix: Allow Drakefile execution with Deno `--unstable` option.
 - Export  types `Action`, `EnvValue` from `mod.ts` module.
