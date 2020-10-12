@@ -11,8 +11,9 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.4.6 running on Ubuntu 20.04, Windows 10. See
-the [changelog](CHANGELOG.md).
+**Status**: Tested with Deno 1.4.6 running on Github CI the following platforms:
+`ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
+[changelog](CHANGELOG.md).
 
 
 ## Drakefiles

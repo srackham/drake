@@ -1,5 +1,8 @@
 # Drake Changelog
 
+## 1.4.4 / 2020-10-12
+- Upgraded to Deno version 1.4.6,`std@0.74.0`.
+
 ## 1.4.3 / 2020-10-04
 - Included `env` API in `lib.ts`.
 - On MS Windows use the PowerShell instead of `cmd.exe` to execute shell commands.
