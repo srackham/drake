@@ -52,7 +52,7 @@ export class Env {
           abort(`${name} must be a string`);
         }
         if (value !== "") {
-          let dir = path.dirname(value);
+          const dir = path.dirname(value);
           if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
             abort(`--cache file directory missing or not a directory: ${dir}`);
           }

@@ -19,12 +19,9 @@ export type { ShCaptureOpts, ShOpts, ShOutput } from "../lib.ts";
 
 Deno.test("libTypesTest", function () {
   // See `mod_tests.ts` for more extensive tests.
-  let shCaptureOpts: ShCaptureOpts;
-  shCaptureOpts = {};
+  const shCaptureOpts: ShCaptureOpts = {};
 
-  let shOpts: ShOpts;
-  shOpts = {};
+  const shOpts: ShOpts = {};
 
-  let shOutput: ShOutput;
-  shOutput = { code: 1, output: "foo", error: "bar" };
+  const shOutput: ShOutput = { code: 1, output: "foo", error: "bar" };
 });

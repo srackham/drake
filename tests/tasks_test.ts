@@ -25,7 +25,7 @@ Deno.test("normalizePathTest", function () {
     ["/tmp/./foobar", "/tmp/foobar"],
     ["/tmp/../foobar", "/foobar"],
   ];
-  for (let [name, expected] of tests) {
+  for (const [name, expected] of tests) {
     assertEquals(normalizePath(name), normalizePath(expected));
   }
 });
@@ -35,7 +35,7 @@ Deno.test("normalizeTaskNameTest", function () {
     [" foobar", "foobar"],
     ["lib/io.ts", "lib/io.ts"].map((p) => normalizePath(p)),
   ];
-  for (let [name, expected] of tests) {
+  for (const [name, expected] of tests) {
     assertEquals(normalizeTaskName(name), expected);
   }
   assertThrows(
@@ -64,7 +64,7 @@ Deno.test("isTasksTest", function () {
     ["./foobar/quux", false],
     [".foobar", false],
   ];
-  for (let [name, expected] of tests) {
+  for (const [name, expected] of tests) {
     assertEquals(isNormalTask(name), expected);
     assertEquals(isFileTask(name), !expected);
   }
@@ -95,7 +95,7 @@ Deno.test("taskRegistryTest", async function () {
     "missing task: quux",
   );
 
-  let log: string[] = [];
+  const log: string[] = [];
   const action = function (this: Task) {
     log.push(this.name);
   };

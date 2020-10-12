@@ -21,9 +21,9 @@ export class Graph {
    * */
   searchForCycles() {
     this.errors = [];
-    let discovered: Set<string> = new Set();
-    let finished: Set<string> = new Set();
-    for (let node of this.nodes.keys()) {
+    const discovered: Set<string> = new Set();
+    const finished: Set<string> = new Set();
+    for (const node of this.nodes.keys()) {
       if (!discovered.has(node) && !finished.has(node)) {
         this.dfsVisit(node, discovered, finished);
       }
@@ -36,7 +36,7 @@ export class Graph {
     finished: Set<string>,
   ) {
     discovered.add(node);
-    for (let adjacent of this.nodes.get(node)!) {
+    for (const adjacent of this.nodes.get(node)!) {
       // Detect cycles.
       if (discovered.has(adjacent)) {
         this.errors.push(

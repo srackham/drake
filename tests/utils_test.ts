@@ -32,7 +32,7 @@ Deno.test("fileFunctionsTest", function () {
   const tmpDir = Deno.makeTempDirSync();
   try {
     // Read, write update tests.
-    let file = path.join(tmpDir, "fileTest");
+    const file = path.join(tmpDir, "fileTest");
     const text = "foobar";
     writeFile(file, text);
     assertEquals(readFile(file), text);

@@ -48,21 +48,19 @@ Deno.test("modTypesTest", function () {
   envValue = true;
   envValue = ["foo", "bar"];
 
-  let action: Action;
-  action = function () {};
+  const action: Action = function () {};
 
-  let t: Task = {
+  const t: Task = {
     name: "foo",
     desc: "foo task",
     prereqs: [],
   } as unknown as Task;
   let s: string;
-  let a: string[];
   s = t.name;
   assertEquals(s, "foo");
   s = t.desc;
   assertEquals(s, "foo task");
-  a = t.prereqs;
+  const a = t.prereqs;
   assertEquals(a, []);
 
   let shCaptureOpts: ShCaptureOpts;
@@ -84,7 +82,6 @@ Deno.test("modTypesTest", function () {
   shOpts.stderr = "piped";
   shOpts.stderr = 42;
 
-  let shOutput: ShOutput;
-  shOutput = { code: 1, output: "foo", error: "bar" };
+  const shOutput: ShOutput = { code: 1, output: "foo", error: "bar" };
   shOutput.code = undefined;
 });
