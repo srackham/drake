@@ -18,9 +18,8 @@ import {
 const quiet = env("--quiet") ? "--quiet" : "";
 
 env("--default-task", "test");
-const TS_FILES = [...glob("*.ts"), ...glob("+(lib|tests)/*.ts")].filter((p) =>
-  !p.endsWith(".d.ts")
-);
+const TS_FILES = [...glob("*.ts"), ...glob("+(examples|lib|tests)/*.ts")]
+  .filter((p) => !p.endsWith(".d.ts"));
 
 desc("Run tests");
 task("test", ["lint", "fmt"], async function () {
