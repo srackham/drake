@@ -413,7 +413,7 @@ export class TaskRegistry extends Map<string, Task> {
     let msg = "";
     let startTime: number = 0;
     if (names.length === 1) {
-      msg = `${colors.green(colors.bold(`${names[0]}:`))}`;
+      msg = `${colors.green(colors.bold(`${names[0]}` + (env("--github-actions") ? "" : ":")))}`;
     } else {
       msg = colors.green(colors.bold(`execute ${names.length} tasks:`));
       log(`${msg} started`);
@@ -432,7 +432,11 @@ export class TaskRegistry extends Map<string, Task> {
         continue;
       }
       if (names.length === 1) {
-        log(`${msg} started`);
+        if (env("--github-actions")) {
+          log(`::group::${msg}`)
+        } else {
+          log(`${msg} started`);
+        }
         startTime = new Date().getTime();
       }
       if (task.action.constructor.name === "AsyncFunction") {
@@ -447,7 +451,11 @@ export class TaskRegistry extends Map<string, Task> {
       task.updateCache();
     }
     if (startTime) {
-      log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
+      if (env("--github-actions")) {
+        log("::endgroup::");
+      } else {
+        log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
+      }
     }
   }
 }
