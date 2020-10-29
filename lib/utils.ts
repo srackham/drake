@@ -24,7 +24,7 @@ export class DrakeError extends Error {
  */
 export function abort(message: string): never {
   if (env("--abort-exits")) {
-    message = `${colors.red(colors.bold("drake error:"))} ${message}`;
+    message = `${colors.red(colors.bold("error"))}: ${message}`;
     if (env("--debug")) {
       const e = new Error();
       if (e.stack) {
