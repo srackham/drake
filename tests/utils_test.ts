@@ -14,7 +14,7 @@ import {
   assert,
   assertEquals,
   assertNotEquals,
-  assertStringContains,
+  assertStringIncludes,
   assertThrows,
   assertThrowsAsync,
   path,
@@ -163,7 +163,7 @@ Deno.test("shCaptureTest", async function () {
   ));
   assertNotEquals(code, 0);
   assertEquals(output, "");
-  assertStringContains(error, "a-nonexistent-command");
+  assertStringIncludes(error, "a-nonexistent-command");
 
   const cat: string = `deno eval "Deno.copy(Deno.stdin, Deno.stdout)"`;
   ({ code, output, error } = await shCapture(cat, { input: "Hello" }));

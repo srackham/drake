@@ -1,5 +1,5 @@
 import { shCapture, vers } from "../lib/utils.ts";
-import { assertEquals, assertStringContains, path } from "./deps.ts";
+import { assertEquals, assertStringIncludes, path } from "./deps.ts";
 
 Deno.test("cliTest", async function () {
   const denoRun = "deno run -A --quiet";
@@ -21,42 +21,42 @@ Deno.test("cliTest", async function () {
     `${drake} --help`,
   ));
   assertEquals(code, 0);
-  assertStringContains(output, "drake - a make-like task runner for Deno.");
+  assertStringIncludes(output, "drake - a make-like task runner for Deno.");
 
   ({ code, output } = await shCapture(
     `${drake} --list-tasks`,
     { env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 0);
-  assertStringContains(output, "Push changes to Github");
+  assertStringIncludes(output, "Push changes to Github");
 
   ({ code, output } = await shCapture(
     `${drake} -L`,
     { env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 0);
-  assertStringContains(output, "     test\n");
+  assertStringIncludes(output, "     test\n");
 
   ({ code, error } = await shCapture(
     `${drake} --foobar`,
     { stderr: "piped" },
   ));
   assertEquals(code, 1);
-  assertStringContains(error, "illegal option: --foobar");
+  assertStringIncludes(error, "illegal option: --foobar");
 
   ({ code, error } = await shCapture(
     `${drake} nonexistent-task`,
     { stderr: "piped" },
   ));
   assertEquals(code, 1);
-  assertStringContains(error, "missing task: nonexistent-task");
+  assertStringIncludes(error, "missing task: nonexistent-task");
 
   ({ code, error } = await shCapture(
     `${drake} --cache ${path.join("non-existent-dir", "cache.json")}`,
     { stderr: "piped" },
   ));
   assertEquals(code, 1);
-  assertStringContains(
+  assertStringIncludes(
     error,
     "--cache file directory missing or not a directory",
   );
@@ -66,7 +66,7 @@ Deno.test("cliTest", async function () {
     { stderr: "piped" },
   ));
   assertEquals(code, 1);
-  assertStringContains(error, "--directory missing or not a directory");
+  assertStringIncludes(error, "--directory missing or not a directory");
 
   ({ code, output } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts cwd --quiet`,
@@ -91,12 +91,12 @@ Deno.test("cliTest", async function () {
     { stderr: "piped", env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 1);
-  assertStringContains(error, "error: abort message");
+  assertStringIncludes(error, "error: abort message");
 
   ({ code, error } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts abort --debug`,
     { stderr: "piped", env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 1);
-  assertStringContains(error, "at async run");
+  assertStringIncludes(error, "at async run");
 });
