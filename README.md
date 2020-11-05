@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.5.0 running on Github CI the following platforms:
+**Status**: Tested with Deno 1.5.1 running on Github CI the following platforms:
 `ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
 [changelog](CHANGELOG.md).
 
