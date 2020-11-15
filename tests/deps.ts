@@ -1,5 +1,5 @@
-export { existsSync } from "https://deno.land/std@0.76.0/fs/exists.ts";
-export * as path from "https://deno.land/std@0.76.0/path/mod.ts";
+export { existsSync } from "https://deno.land/std@0.77.0/fs/exists.ts";
+export * as path from "https://deno.land/std@0.77.0/path/mod.ts";
 export {
   assert,
   assertEquals,
@@ -7,4 +7,4 @@ export {
   assertStringIncludes,
   assertThrows,
   assertThrowsAsync,
-} from "https://deno.land/std@0.76.0/testing/asserts.ts";
+} from "https://deno.land/std@0.77.0/testing/asserts.ts";
