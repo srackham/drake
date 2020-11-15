@@ -1,5 +1,8 @@
 # Drake Changelog
 
+## 1.4.5 / 2020-11-16
+- Upgraded to Deno version 1.5.2,`std@0.77.0`.
+
 ## 1.4.4 / 2020-10-12
 - Upgraded to Deno version 1.4.6,`std@0.74.0`.
 
