@@ -411,7 +411,7 @@ export class TaskRegistry extends Map<string, Task> {
       return;
     }
     let msg = "";
-    let startTime: number = 0;
+    let startTime = 0;
     if (names.length === 1) {
       msg = `${colors.green(colors.bold(`${names[0]}:`))}`;
     } else {

@@ -164,6 +164,7 @@ Deno.test("fileTaskTest", async function () {
   const target = normalizePath("./target");
   const prereq = normalizePath("./prereq");
   let taskRan = false;
+  // deno-lint-ignore require-await
   taskRegistry.register(target, [prereq], async function () {
     taskRan = true;
   });
@@ -256,6 +257,7 @@ Deno.test("fileTaskTest", async function () {
     }
 
     const target2 = normalizePath("./target2");
+    // deno-lint-ignore require-await
     taskRegistry.register(target2, [target], async function () {
       throw new DrakeError();
     });

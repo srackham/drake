@@ -165,7 +165,7 @@ Deno.test("shCaptureTest", async function () {
   assertEquals(output, "");
   assertStringIncludes(error, "a-nonexistent-command");
 
-  const cat: string = `deno eval "Deno.copy(Deno.stdin, Deno.stdout)"`;
+  const cat = `deno eval "Deno.copy(Deno.stdin, Deno.stdout)"`;
   ({ code, output, error } = await shCapture(cat, { input: "Hello" }));
   assertEquals([code, output, error], [0, "Hello", ""]);
 

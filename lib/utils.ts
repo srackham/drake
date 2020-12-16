@@ -77,6 +77,7 @@ export function quote(values: string[], sep = " "): string {
 }
 
 /** Wait `ms` milliseconds. Must be called with `await`. */
+// deno-lint-ignore require-await
 export async function sleep(ms: number): Promise<unknown> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

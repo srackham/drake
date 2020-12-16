@@ -116,6 +116,7 @@ Deno.test("registryTest", async function () {
     );
 
     let counter = 0;
+    // deno-lint-ignore require-await
     task("async", [], async () => counter += 1);
     task(
       "execAsync",

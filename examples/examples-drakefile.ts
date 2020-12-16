@@ -13,7 +13,7 @@ import {
 desc("command-line usage");
 task("help", [], function () {
   console.log(`
-Example Drakefile containing a number of frivilous example tasks.
+Example Drakefile containing a number of frivolous example tasks.
 `);
 });
 
@@ -70,7 +70,7 @@ desc("Asynchronous task pauses for 1 second");
 task("pause", [], async function () {
   await new Promise((resolve) => {
     setTimeout(() => {
-      resolve();
+      resolve(null);
     }, 1000);
   });
 });
