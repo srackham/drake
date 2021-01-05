@@ -7,7 +7,7 @@ import {
   run,
   sh,
   task,
-} from "https://deno.land/x/drake@v1.4.5/mod.ts";
+} from "https://deno.land/x/drake@v1.4.6/mod.ts";
 // } from "../mod.ts";
 
 desc("command-line usage");
