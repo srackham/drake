@@ -22,6 +22,7 @@ export class Env {
         "--abort-exits": false,
         "--always-make": false,
         "--dry-run": false,
+        "--github-actions": false,
         "--help": false,
         "--list-all": false,
         "--list-tasks": false,
@@ -38,6 +39,7 @@ export class Env {
       case "--always-make":
       case "--debug":
       case "--dry-run":
+      case "--github-actions":
       case "--help":
       case "--list-all":
       case "--list-tasks":
@@ -130,6 +132,7 @@ export class Env {
         "-D": "--debug",
         "-d": "--directory",
         "-n": "--dry-run",
+        "-g": "--github-actions",
         "-h": "--help",
         "-l": "--list-tasks",
         "-L": "--list-all",
@@ -141,6 +144,7 @@ export class Env {
       switch (arg) {
         case "--always-make":
         case "--debug":
+        case "--github-actions":
         case "--dry-run":
         case "--help":
         case "--list-tasks":
