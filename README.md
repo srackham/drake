@@ -123,6 +123,9 @@ Task execution is ordered such that prerequisite tasks (direct and
 indirect) are executed prior to their parent task. The same task is
 never run twice.
 
+- The execution directory defaults to the current working directory (this can be
+  changed using the Drake `--directory` command-line option).
+
 - Task name and prerequisite file paths are normalized at task
   registration.
 
@@ -145,13 +148,15 @@ never run twice.
   time or size no longer matches those recorded immediately after the task had
   last executed successfully.
 
-- The execution directory defaults to the current working directory and can be
-  changed using the Drake `--directory` command-line option.
+- Before exiting Drake saves the target and prerequisite file properties of
+  tasks that have successfully executed:
 
-- Drake saves target and prerequisite file properties to a file named
-  `.drake.cache.json` in the drakefile execution directory. A
-  `.drake.cache.json` file will not be created until a file task has
-  successfully executed.
+  * File properties are saved to a file named `.drake.cache.json` in the
+    drakefile execution directory (this file path can be changed using the
+    Drake `--cache` command-line option).
+  * Task target and prerequisite file properties are recorded immediately after
+    successful task execution (if a task fails its properties are not updated).
+  * A cache file will not be created until at least one file task has successfully executed.
 
 ### Asynchronous task actions
 Normally you will want tasks to execute sequentially i.e. the next

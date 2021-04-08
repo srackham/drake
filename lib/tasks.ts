@@ -394,7 +394,7 @@ export class TaskRegistry extends Map<string, Task> {
   /**
    * Execute task action functions.
    * First the non-async actions are executed synchronously then the
-   * async actions are exectuted asynchronously.
+   * async actions are executed asynchronously.
    * Silently skip tasks that have no action function.
    */
   async execute(...names: string[]) {
