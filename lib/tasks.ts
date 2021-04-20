@@ -85,7 +85,7 @@ export class Task {
     for (const prereq of this.prereqs) {
       if (isFileTask(prereq)) {
         if (existsSync(prereq)) {
-          const info = Deno.statSync(prereq);
+          const _info = Deno.statSync(prereq);
           taskCache[prereq] = Task.fileInfo(prereq);
         }
       } else {

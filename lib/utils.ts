@@ -197,7 +197,6 @@ export function glob(...patterns: string[]): string[] {
 
 /** Synthesize platform dependent shell command arguments. */
 function shArgs(command: string): string[] {
-  let cmdArgs: string[];
   if (Deno.build.os === "windows") {
     return ["PowerShell.exe", "-Command", command];
   } else {

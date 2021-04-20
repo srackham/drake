@@ -43,12 +43,12 @@ env("--abort-exits", false); // Ensure tests throw DrakeErrors instead of exitin
 
 // This "test" ensures basic conformance of exported types.
 Deno.test("modTypesTest", function () {
-  let envValue: EnvValue;
-  envValue = "bar";
-  envValue = true;
-  envValue = ["foo", "bar"];
+  let _envValue: EnvValue;
+  _envValue = "bar";
+  _envValue = true;
+  _envValue = ["foo", "bar"];
 
-  const action: Action = function () {};
+  const _action: Action = function () {};
 
   const t: Task = {
     name: "foo",
@@ -63,9 +63,9 @@ Deno.test("modTypesTest", function () {
   const a = t.prereqs;
   assertEquals(a, []);
 
-  let shCaptureOpts: ShCaptureOpts;
-  shCaptureOpts = {};
-  shCaptureOpts = { input: "foo" };
+  let _shCaptureOpts: ShCaptureOpts;
+  _shCaptureOpts = {};
+  _shCaptureOpts = { input: "foo" };
 
   let shOpts: ShOpts;
   shOpts = {};
