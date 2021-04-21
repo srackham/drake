@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.6.3 running on Github CI the following platforms:
+**Status**: Tested with Deno 1.9.0 running on Github CI the following platforms:
 `ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
 [changelog](CHANGELOG.md).
 
@@ -26,7 +26,7 @@ A drakefile is a TypeScript module that:
 ### Example drakefile
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.4.6/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.4.7/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -70,12 +70,12 @@ A Drakefile uses Drake APIs imported from the Drake `mod.ts` module file. The mo
 
 - [deno.land](https://deno.land/x/drake) (Deno's third party modules registry). For example:
 
-      import { desc, run, task } from "https://deno.land/x/drake@v1.4.6/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake@v1.4.7/mod.ts";
 
 - [nest.land](https://nest.land/package/drake) (a blockchain based Deno modules registry).  
   **NOTE**: Drake version numbers in `nest.land` URLs are not prefixed with a 'v' character:
 
-      import { desc, run, task } from "https://x.nest.land/drake@1.4.6/mod.ts";
+      import { desc, run, task } from "https://x.nest.land/drake@1.4.7/mod.ts";
 
 Some Drake APIs are useful in non-drakefiles, use `lib.ts` (not `mod.ts`) to
 import them into non-drakefile modules.
@@ -145,18 +145,19 @@ never run twice.
     since the task was last executed successfully.
 
 - A file is considered to have changed if it's current modification
-  time or size no longer matches those recorded immediately after the task had
+  time or size no longer matches those recorded immediately after the task
   last executed successfully.
 
-- Before exiting Drake saves the target and prerequisite file properties of
-  tasks that have successfully executed:
+- Before exiting Drake saves the target and prerequisite file properties of the
+  tasks that successfully executed:
 
   * File properties are saved to a file named `.drake.cache.json` in the
-    drakefile execution directory (this file path can be changed using the
-    Drake `--cache` command-line option).
+    drakefile execution directory (this file path can be changed using the Drake
+    `--cache` command-line option).
   * Task target and prerequisite file properties are recorded immediately after
     successful task execution (if a task fails its properties are not updated).
-  * A cache file will not be created until at least one file task has successfully executed.
+  * A cache file will not be created until at least one file task has
+    successfully executed.
 
 ### Asynchronous task actions
 Normally you will want tasks to execute sequentially i.e. the next
@@ -446,7 +447,7 @@ function updateFile(filename: string, find: RegExp, replace: string): boolean;
 ```
 
 Find and replace in text file synchronously.  If the file contents is
-unchanged return `false`.  If the contents has changed write it to the
+unchanged return `false`.  If the contents have changed update the
 file and return `true`.
 
 ### vers
@@ -492,13 +493,6 @@ Returns the Drake version number string.
         ls
         wc Drakefile.ts`);
     ```
-
-- Escape backslash and backtick characters and placeholders in
-  template string literals with a backslash:
-
-  * `\\` translates to `\`
-  * `` \` `` translates to `` ` ``
-  * `\${` translates to `${` 
 
 - Tasks can be created dynamically at runtime. The following example is from
   [examples/dynamic-tasks.ts](https://github.com/srackham/drake/blob/master/examples/dynamic-tasks.ts):
