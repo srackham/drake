@@ -564,3 +564,9 @@ Returns the Drake version number string.
     ``` typescript
     env("--cache", "");
     ```
+
+- Wildcard `VARIABLE` arguments should be quoted to ensure they aren't
+  expanded by the shell. For example:
+
+      mdfiles=$HOME'/docs/*.md'     # Correct
+      mdfiles=~/docs/*.md           # Incorrect (the zsh shell attempts expansion)
