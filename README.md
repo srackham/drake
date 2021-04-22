@@ -570,3 +570,14 @@ Returns the Drake version number string.
 
       mdfiles=$HOME'/docs/*.md'     # Correct
       mdfiles=~/docs/*.md           # Incorrect (the zsh shell attempts expansion)
+
+- Regarding Drake `sh` and `shCapture` APIs: To execute them using a different
+  shell (to the login shell) the shell needs to be explicitly specified. For
+  example:
+
+      sh('/usr/bin/bash -c ls')                     // Run ls in the bash shell
+      SHELL=/usr/bin/bash deno run -A Drakefile.ts  # Use the bash shell throughout
+
+  The `SHELL` shell environment variable reflects the login shell specified in
+  the password database (`/etc/passwd`) and not the shell that you are currently
+  using.
