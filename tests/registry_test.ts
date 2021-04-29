@@ -77,7 +77,7 @@ Deno.test("registryTest", async function () {
 
     task(prereq, []);
     await run(normalTask), // Should now run OK.
-     task(normalTask).prereqs = ["missing-task"];
+      task(normalTask).prereqs = ["missing-task"];
     await assertThrowsAsync(
       async () => await run(normalTask),
       DrakeError,
