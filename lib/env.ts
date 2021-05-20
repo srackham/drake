@@ -181,9 +181,9 @@ export class Env {
  * command-line sets the `vers` value to `"1.0.1"`.
  *
  * Command-line tasks are stored in the `--tasks` string array.
- * 
+ *
  * Examples:
- * 
+ *
  *     env("--abort-exits", true);
  *     env("--default-task", "test");
  *     console.log(`version: ${env("vers")}`);
