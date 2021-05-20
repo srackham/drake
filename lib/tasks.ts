@@ -98,13 +98,13 @@ export class Task {
 
   /**
    * Return `true` if:
-   * 
+   *
    * - The target file does not exist.
    * - The target file or any of the prerequisite files have changed
    *   since the task was last executed successfully.
    * - The Drake version or the operating system has changed
    *   since the task was last executed successfully.
-   * 
+   *
    * Throw error is one or more prerequisite files are missing.
    */
   isOutOfDate(): boolean {
@@ -469,11 +469,11 @@ export function isNormalTask(name: string): boolean {
 
 /**
  * Return true if `name` is a file task name. File task names are valid file paths.
- * 
+ *
  *     isFileTask("io.ts")          // true
  *     isFileTask("hello-world")    // false
  *     isFileTask("./hello-world")  // true
- * 
+ *
  */
 export function isFileTask(name: string): boolean {
   return !isNormalTask(name);

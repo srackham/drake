@@ -17,7 +17,7 @@ export class DrakeError extends Error {
 
 /**
  * Write an error message to to `stderr` and terminate execution.
- * 
+ *
  * - If the `"--abort-exits"` environment option is `false` throw a `DrakeError`.
  * - If the `"--debug"` environment option is `true` include the stack trace in
  *   the error message.
@@ -142,7 +142,7 @@ export function updateFile(
 
 /**
  * Create directory.
- * 
+ *
  * - Missing parent directory paths are created.
  * - Returns `true` if a new directory was created.
  * - Returns `false` if the directory already exists.
@@ -225,19 +225,19 @@ export interface ShOpts {
 
 /**
  * Execute commands asynchronously in the command shell.
- * 
+ *
  * - If `commands` is a string execute it.
  * - If `commands` is an array of commands execute them asynchronously.
  * - If any command fails throw an error.
  * - If `opts.stdout` or `opts.stderr` is set to `"null"` then the respective outputs are ignored.
  * - `opts.cwd` sets the shell current working directory (defaults to the parent process working directory).
  * - The `opts.env` mapping passes additional environment variables to the shell.
- * 
+ *
  * On MS Windows run `PowerShell.exe -Command <cmd>`. On other platforms run `$SHELL -c <cmd>` (if `SHELL`
  * is not defined use `/bin/bash`).
- * 
+ *
  * Examples:
- * 
+ *
  *     await sh("echo Hello World");
  *     await sh(["echo Hello 1", "echo Hello 2", "echo Hello 3"]);
  *     await sh("echo Hello World", { stdout: "null" });
@@ -307,9 +307,9 @@ export interface ShCaptureOpts extends ShOpts {
  *
  * Examples:
  *
- *     const { code, stdout } = await shCapture("echo Hello"); 
- *     const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" }); 
- * 
+ *     const { code, stdout } = await shCapture("echo Hello");
+ *     const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" });
+ *
  */
 export async function shCapture(
   command: string,
