@@ -48,6 +48,14 @@ export function log(message: string): void {
   }
 }
 
+export function logExecution(title: string, info: string, duration?: number) {
+  info = `${colors.green(colors.bold(`${title}: `))}${info}`;
+  if (duration !== undefined) {
+    info += ` ${colors.brightWhite(colors.bold(`(${duration}ms)`))}`;
+  }
+  log(info);
+}
+
 /**
  * Write the `title` and `message` to stderr if it is a TTY and the
  * `--debug` command-line option was specified or the `DRAKE_DEBUG` shell
@@ -247,6 +255,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
     commands = [commands];
   }
   debug("sh", `${commands.join("\n")}\nopts: ${JSON.stringify(opts)}`);
+  const startTime = new Date().getTime();
   const processes: Deno.Process[] = [];
   const results: Deno.ProcessStatus[] = [];
   try {
@@ -276,6 +285,11 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
       abort(`sh: ${cmd}: error code: ${code}`);
     }
   }
+  logExecution(
+    "sh",
+    `${commands.join("\n")}`,
+    new Date().getTime() - startTime,
+  );
 }
 
 export type ShOutput = {
@@ -315,6 +329,7 @@ export async function shCapture(
   command: string,
   opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
+  const startTime = new Date().getTime();
   const p = Deno.run({
     cmd: shArgs(command),
     cwd: opts.cwd,
@@ -353,5 +368,6 @@ export async function shCapture(
       JSON.stringify(result)
     }`,
   );
+  logExecution("shCapture", command, new Date().getTime() - startTime);
   return result;
 }

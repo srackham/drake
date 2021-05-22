@@ -7,6 +7,7 @@ import {
   DrakeError,
   glob,
   log,
+  logExecution,
   readFile,
   vers,
   writeFile,
@@ -368,9 +369,8 @@ export class TaskRegistry extends Map<string, Task> {
     this.loadCache(cacheFile);
     this.checkForCycles();
     const tasks = this.resolveDependencies(names);
-    const msg = `${colors.green(colors.bold(`run:`))}`;
     const startTime = new Date().getTime();
-    log(`${msg} started`);
+    logExecution("run", "started");
     for (const task of tasks) {
       const savedAbortExits = env("--abort-exits");
       env().setValue("--abort-exits", false);
@@ -388,7 +388,7 @@ export class TaskRegistry extends Map<string, Task> {
       }
     }
     this.saveCache(cacheFile);
-    log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
+    logExecution("run", "finished", new Date().getTime() - startTime);
   }
 
   /**
@@ -410,13 +410,13 @@ export class TaskRegistry extends Map<string, Task> {
       log(`${colors.green(colors.bold(`${names}:`))} dry run`);
       return;
     }
-    let msg = "";
+    let title = "";
     let startTime = 0;
     if (names.length === 1) {
-      msg = `${colors.green(colors.bold(`${names[0]}:`))}`;
+      title = `${names[0]}`;
     } else {
-      msg = colors.green(colors.bold(`execute ${names.length} tasks:`));
-      log(`${msg} started`);
+      title = `execute ${names.length} tasks`;
+      logExecution(title, "started");
       startTime = new Date().getTime();
     }
     const asyncTasks: Task[] = [];
@@ -432,7 +432,7 @@ export class TaskRegistry extends Map<string, Task> {
         continue;
       }
       if (names.length === 1) {
-        log(`${msg} started`);
+        log(`${title} started`);
         startTime = new Date().getTime();
       }
       if (task.action.constructor.name === "AsyncFunction") {
@@ -447,7 +447,7 @@ export class TaskRegistry extends Map<string, Task> {
       task.updateCache();
     }
     if (startTime) {
-      log(`${msg} finished (${new Date().getTime() - startTime}ms)`);
+      logExecution(title, "finished", new Date().getTime() - startTime);
     }
   }
 }
