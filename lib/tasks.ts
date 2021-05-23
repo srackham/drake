@@ -432,7 +432,7 @@ export class TaskRegistry extends Map<string, Task> {
         continue;
       }
       if (names.length === 1) {
-        log(`${title} started`);
+        logExecution(title, "started");
         startTime = new Date().getTime();
       }
       if (task.action.constructor.name === "AsyncFunction") {
