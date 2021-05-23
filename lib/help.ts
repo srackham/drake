@@ -30,6 +30,7 @@ OPTIONS
   -l, -L, --list-tasks  List tasks (-L for hidden tasks and prerequisites).
   -n, --dry-run         Skip task execution.
   -q, --quiet           Do not log drake messages to standard output.
+  -v, --verbose         Increase verbosity.
   --version             Display the drake version.
 
 ENVIRONMENT VARIABLES

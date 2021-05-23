@@ -49,6 +49,12 @@ export function log(message: string): void {
 }
 
 export function logExecution(title: string, info: string, duration?: number) {
+  if (env("--quiet")) {
+    return;
+  }
+  if ((title == "sh" || title == "shCapture") && !env("--verbose")) {
+    return;
+  }
   info = `${colors.green(colors.bold(`${title}: `))}${info}`;
   if (duration !== undefined) {
     info += ` ${colors.brightWhite(colors.bold(`(${duration}ms)`))}`;

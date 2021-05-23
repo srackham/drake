@@ -26,6 +26,7 @@ export class Env {
         "--list-all": false,
         "--list-tasks": false,
         "--quiet": false,
+        "--verbose": false,
         "--version": false,
       },
     } as EnvValues;
@@ -42,6 +43,7 @@ export class Env {
       case "--list-all":
       case "--list-tasks":
       case "--quiet":
+      case "--verbose":
       case "--version":
         if (typeof value !== "boolean") {
           abort(`${name} must be a boolean`);
@@ -134,6 +136,7 @@ export class Env {
         "-l": "--list-tasks",
         "-L": "--list-all",
         "-q": "--quiet",
+        "-v": "--verbose",
       } as const;
       if (shortOpts[arg] !== undefined) {
         arg = shortOpts[arg];
@@ -147,6 +150,7 @@ export class Env {
         case "--list-all":
         case "--quiet":
         case "--version":
+        case "--verbose":
           this.setValue(arg, true);
           break;
         case "--cache":/* falls through */
