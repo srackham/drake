@@ -1,5 +1,5 @@
 import { shCapture, vers } from "../lib/utils.ts";
-import { assertEquals, assertStringIncludes, path } from "./deps.ts";
+import { assert, assertEquals, assertStringIncludes, path } from "./deps.ts";
 
 Deno.test("cliTest", async function () {
   const denoRun = "deno run -A --quiet";
@@ -99,4 +99,26 @@ Deno.test("cliTest", async function () {
   ));
   assertEquals(code, 1);
   assertStringIncludes(error, "at async run");
+
+  ({ code, output } = await shCapture(
+    `${denoRun} examples/examples-drakefile.ts --quiet shell`,
+    { env: { "NO_COLOR": "true" } },
+  ));
+  assertEquals(code, 0);
+  assertEquals(output.trim(), "Hello World");
+
+  ({ code, output } = await shCapture(
+    `${denoRun} examples/examples-drakefile.ts shell`,
+    { env: { "NO_COLOR": "true" } },
+  ));
+  assertEquals(code, 0);
+  assert(output.includes("run: started"));
+  assert(!output.includes("sh: echo Hello World"));
+
+  ({ code, output } = await shCapture(
+    `${denoRun} examples/examples-drakefile.ts --verbose shell`,
+    { env: { "NO_COLOR": "true" } },
+  ));
+  assertEquals(code, 0);
+  assert(output.includes("sh: echo Hello World"));
 });
