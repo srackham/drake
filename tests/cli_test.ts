@@ -114,12 +114,12 @@ Deno.test("cliTest", async function () {
   ));
   assertEquals(code, 0);
   assert(output.includes("run: started"));
-  assert(!output.includes("sh: echo Hello World"));
+  assert(!output.includes("sh: echo 'Hello World'"));
 
   ({ code, output } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts --verbose shell`,
     { env: { "NO_COLOR": "true" } },
   ));
   assertEquals(code, 0);
-  assert(output.includes("sh: echo Hello World"));
+  assert(output.includes("sh: echo 'Hello World'"));
 });

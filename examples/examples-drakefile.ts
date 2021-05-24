@@ -33,7 +33,7 @@ task("noop", ["pause"], function () {
 
 desc("Execute shell command");
 task("shell", [], async function () {
-  await sh("echo Hello World");
+  await sh("echo 'Hello World'");
 });
 
 desc("Execute multiple shell commands sequentially");
