@@ -11,7 +11,7 @@ for [Deno](https://deno.land/) inspired by
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
 
-**Status**: Tested with Deno 1.9.0 running on Github CI the following platforms:
+**Status**: Tested with Deno 1.10.2 running on Github CI the following platforms:
 `ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
 [changelog](CHANGELOG.md).
 
@@ -26,7 +26,7 @@ A drakefile is a TypeScript module that:
 ### Example drakefile
 
 ``` typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.4.7/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.5.0/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function() {
@@ -70,12 +70,12 @@ A Drakefile uses Drake APIs imported from the Drake `mod.ts` module file. The mo
 
 - [deno.land](https://deno.land/x/drake) (Deno's third party modules registry). For example:
 
-      import { desc, run, task } from "https://deno.land/x/drake@v1.4.7/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake@v1.5.0/mod.ts";
 
 - [nest.land](https://nest.land/package/drake) (a blockchain based Deno modules registry).  
   **NOTE**: Drake version numbers in `nest.land` URLs are not prefixed with a 'v' character:
 
-      import { desc, run, task } from "https://x.nest.land/drake@1.4.7/mod.ts";
+      import { desc, run, task } from "https://x.nest.land/drake@1.5.0/mod.ts";
 
 Some Drake APIs are useful in non-drakefiles, use `lib.ts` (not `mod.ts`) to
 import them into non-drakefile modules.
