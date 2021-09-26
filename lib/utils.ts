@@ -115,7 +115,7 @@ export function readFile(filename: string): string {
  * If the file exists it will be overwritten.
  * Returns `true` if a new file was created.
  * Returns `false` if the file already exists.
- * */
+ */
 export function writeFile(filename: string, text: string): boolean {
   const exists = existsSync(filename);
   try {
@@ -329,7 +329,6 @@ export interface ShCaptureOpts extends ShOpts {
  *
  *     const { code, stdout } = await shCapture("echo Hello");
  *     const { code, output, error } = await shCapture( "mkdir tmpdir", { stderr: "piped" });
- *
  */
 export async function shCapture(
   command: string,

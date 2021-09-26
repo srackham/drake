@@ -20,7 +20,6 @@ export function desc(description: string): void {
  * - `action` is an optional function that is run if the task is selected for
  *   execution (`type Action = (this: Task) => any;`).
  * - To fetch an existing task omit both the `prereqs` and `action` parameters.
- *
  */
 export function task(name: string, prereqs?: string[], action?: Action): Task {
   if (prereqs !== undefined) {

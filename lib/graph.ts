@@ -18,7 +18,7 @@ export class Graph {
   /**
    * Search the graph for cycles. Each cycle contributes an error message to the list of `errors`.
    * If no cycles are found the `errors` list will be empty.
-   * */
+   */
   searchForCycles() {
     this.errors = [];
     const discovered: Set<string> = new Set();

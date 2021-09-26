@@ -461,7 +461,6 @@ export class TaskRegistry extends Map<string, Task> {
  *     isNormalTask("hello-world")    // true
  *     isNormalTask("io.ts")          // false
  *     isNormalTask("./hello-world")  // false
- *
  */
 export function isNormalTask(name: string): boolean {
   return /^\w[\w-]*$/.test(name);
@@ -473,7 +472,6 @@ export function isNormalTask(name: string): boolean {
  *     isFileTask("io.ts")          // true
  *     isFileTask("hello-world")    // false
  *     isFileTask("./hello-world")  // true
- *
  */
 export function isFileTask(name: string): boolean {
   return !isNormalTask(name);
