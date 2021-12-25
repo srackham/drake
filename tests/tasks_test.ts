@@ -12,8 +12,8 @@ import { DrakeError, readFile, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
+  assertRejects,
   assertThrows,
-  assertThrowsAsync,
   path,
 } from "./deps.ts";
 
@@ -142,7 +142,7 @@ Deno.test("taskRegistryTest", async function () {
   taskRegistry.desc("Task 4");
   taskRegistry.register("4", ["1", "4"], action);
   taskRegistry.get("2").prereqs.push("4");
-  await assertThrowsAsync(
+  await assertRejects(
     async () => await taskRegistry.run("4"),
     DrakeError,
     "cyclic dependency between '4' and '1', cyclic dependency between '4' and '4'",
@@ -241,7 +241,7 @@ Deno.test("fileTaskTest", async function () {
     assert(!taskRan, "task should not have executed: target file up to date");
 
     Deno.removeSync(prereq);
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await taskRegistry.run(target),
       DrakeError,
       "missing prerequisite file:",

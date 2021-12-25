@@ -14,8 +14,8 @@ import {
   assert,
   assertEquals,
   assertNotEquals,
+  assertRejects,
   assertThrows,
-  assertThrowsAsync,
   path,
 } from "./deps.ts";
 
@@ -141,7 +141,7 @@ Deno.test("quoteTest", function () {
 
 Deno.test("shTest", async function () {
   await sh("echo Hello", { stdout: "null" });
-  await assertThrowsAsync(
+  await assertRejects(
     async () => await sh("non-existent-command", { stderr: "null" }),
     DrakeError,
     "sh: non-existent-command: error code:",

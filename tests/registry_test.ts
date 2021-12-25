@@ -1,7 +1,7 @@
 import { env } from "../lib/env.ts";
 import { desc, execute, run, task } from "../lib/registry.ts";
 import { DrakeError, readFile, vers, writeFile } from "../lib/utils.ts";
-import { assert, assertEquals, assertThrowsAsync, existsSync } from "./deps.ts";
+import { assert, assertEquals, assertRejects, existsSync } from "./deps.ts";
 env("--quiet", true);
 
 Deno.test("registryTest", async function () {
@@ -17,14 +17,14 @@ Deno.test("registryTest", async function () {
       dir,
     );
 
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await run("missing-normal-task"),
       DrakeError,
       "missing task:",
       "normal task passed to `run` API must exist",
     );
 
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await run("./missing-file-task"),
       DrakeError,
       "missing task:",
@@ -51,7 +51,7 @@ Deno.test("registryTest", async function () {
     desc("Normal task");
     task(normalTask, [prereq], () => signature += normalTask);
 
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await run(target),
       DrakeError,
       "missing prerequisite file:",
@@ -68,7 +68,7 @@ Deno.test("registryTest", async function () {
     assertEquals(cache.version, vers());
     assertEquals(cache.os, Deno.build.os);
 
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await run(normalTask),
       DrakeError,
       `${normalTask}: missing prerequisite task: `,
@@ -78,7 +78,7 @@ Deno.test("registryTest", async function () {
     task(prereq, []);
     await run(normalTask), // Should now run OK.
       task(normalTask).prereqs = ["missing-task"];
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await run(normalTask),
       DrakeError,
       `${normalTask}: missing prerequisite task: missing-task`,
@@ -91,7 +91,7 @@ Deno.test("registryTest", async function () {
     task(target).prereqs.push(normalTask);
     await run(target); // Normal prerequisites do not throw a "missing prerequisite" error.
 
-    await assertThrowsAsync(
+    await assertRejects(
       async () => await execute(normalTask),
       DrakeError,
       "'execute' API must be called by 'run' API",
