@@ -9,6 +9,11 @@
 - Optional task prerequisites (dependencies).
 - File tasks and non-file tasks.
 - Drake API functions for defining, registering and running tasks.
+- Drake uses conditionally cached file properties to determine whether or not a
+  file task is out of date (see [Task Execution](#task-execution)). This
+  eliminates the denpendency errors that programs such as `make` encounter when
+  file system _mtimes_ are used directly (see
+  [mtime comparison considered harmful](https://apenwarr.ca/log/20181113)).
 
 **Status**: Tested with Deno 1.10.2 running on Github CI the following
 platforms: `ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
