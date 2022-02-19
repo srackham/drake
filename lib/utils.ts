@@ -1,4 +1,4 @@
-import { colors, existsSync, path, walkSync } from "./deps.ts";
+import { colors, path, walkSync } from "./deps.ts";
 import { env } from "./env.ts";
 
 const DRAKE_VERS = "1.5.0";
@@ -155,7 +155,7 @@ export function readFile(filename: string): string {
  * Returns `false` if the file already exists.
  */
 export function writeFile(filename: string, text: string): boolean {
-  const exists = existsSync(filename);
+  const exists = pathExists(filename);
   try {
     debug(
       "writeFile",
@@ -201,9 +201,9 @@ export function updateFile(
  */
 export function makeDir(dir: string): boolean {
   debug("makeDir", dir);
-  const exists = existsSync(dir);
+  const exists = pathExists(dir);
   if (exists) {
-    if (!Deno.statSync(dir).isDirectory) {
+    if (!isDirectory(dir)) {
       abort(`file is not directory: ${dir}`);
     }
   } else {
@@ -255,7 +255,7 @@ function shArgs(command: string): string[] {
     let shellExe = Deno.env.get("SHELL")!;
     if (!shellExe) {
       shellExe = "/bin/bash";
-      if (!existsSync(shellExe)) {
+      if (!isFile(shellExe)) {
         abort(
           `cannot locate shell: no SHELL environment variable or ${shellExe} executable`,
         );

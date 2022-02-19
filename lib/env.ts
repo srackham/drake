@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { existsSync, path } from "./deps.ts";
-import { abort, debug } from "./utils.ts";
+import { path } from "./deps.ts";
+import { abort, debug, isDirectory } from "./utils.ts";
 
 export type EnvValue = boolean | string | Array<string>;
 type EnvValues = { [name: string]: EnvValue };
@@ -55,7 +55,7 @@ export class Env {
         }
         if (value !== "") {
           const dir = path.dirname(value);
-          if (!existsSync(dir) || !Deno.statSync(dir).isDirectory) {
+          if (!isDirectory(dir)) {
             abort(`--cache file directory missing or not a directory: ${dir}`);
           }
           value = path.join(Deno.realPathSync(dir), path.basename(value));
@@ -65,7 +65,7 @@ export class Env {
         if (typeof value !== "string") {
           abort(`${name} must be a string`);
         }
-        if (!existsSync(value) || !Deno.statSync(value).isDirectory) {
+        if (!isDirectory(value)) {
           abort(`--directory missing or not a directory: ${value}`);
         }
         value = Deno.realPathSync(value);

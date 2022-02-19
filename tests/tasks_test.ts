@@ -1,5 +1,5 @@
-import { existsSync } from "../lib/deps.ts";
 import { env } from "../lib/env.ts";
+import { isFile } from "../lib/utils.ts";
 import {
   isFileTask,
   isNormalTask,
@@ -218,7 +218,7 @@ Deno.test("fileTaskTest", async function () {
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
     assert(
-      existsSync(taskRegistry.cacheFile()),
+      isFile(taskRegistry.cacheFile()),
       `cache file should exist: ${taskRegistry.cacheFile()}`,
     );
 
@@ -283,7 +283,7 @@ Deno.test("fileTaskTest", async function () {
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
     assert(
-      existsSync(expected),
+      isFile(expected),
       `cache file should exist: ${expected}`,
     );
   } finally {

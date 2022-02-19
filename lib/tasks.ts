@@ -1,4 +1,4 @@
-import { colors, existsSync, path } from "./deps.ts";
+import { colors, path } from "./deps.ts";
 import { env } from "./env.ts";
 import { Graph } from "./graph.ts";
 import {
@@ -8,6 +8,7 @@ import {
   glob,
   log,
   logExecution,
+  pathExists,
   readFile,
   vers,
   writeFile,
@@ -80,12 +81,12 @@ export class Task {
       return;
     }
     const taskCache: TaskCache = {};
-    if (existsSync(this.name)) {
+    if (pathExists(this.name)) {
       taskCache[this.name] = Task.fileInfo(this.name);
     }
     for (const prereq of this.prereqs) {
       if (isFileTask(prereq)) {
-        if (existsSync(prereq)) {
+        if (pathExists(prereq)) {
           const _info = Deno.statSync(prereq);
           taskCache[prereq] = Task.fileInfo(prereq);
         }
@@ -113,7 +114,7 @@ export class Task {
     let result = false;
     let debugMsg = "false";
     for (const prereq of prereqs) {
-      if (!existsSync(prereq)) {
+      if (!pathExists(prereq)) {
         if (env("--dry-run")) {
           // Assume the missing prerequisite would have been created thus rendering the target out of date.
           debugMsg = `true: dry run`;
@@ -128,7 +129,7 @@ export class Task {
     } else if (!this.cache) {
       debugMsg = "true: no previous task cache";
       result = true;
-    } else if (!existsSync(this.name)) {
+    } else if (!pathExists(this.name)) {
       debugMsg = "true: no target file";
       result = true;
     } else {
@@ -210,7 +211,7 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   loadCache(filename: string): void {
-    if (!existsSync(filename)) {
+    if (!pathExists(filename)) {
       debug("loadCache:", `no cache file: ${filename}`);
       return;
     }
