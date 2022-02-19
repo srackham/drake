@@ -30,7 +30,7 @@ A drakefile is a TypeScript module that:
 ### Example drakefile
 
 ```typescript
-import { desc, run, task } from "https://deno.land/x/drake@v1.5.0/mod.ts";
+import { desc, run, task } from "https://deno.land/x/drake@v1.5.1/mod.ts";
 
 desc("Minimal Drake task");
 task("hello", [], function () {
@@ -76,14 +76,14 @@ module can be imported from:
 - [deno.land](https://deno.land/x/drake) (Deno's third party modules registry).
   For example:
 
-      import { desc, run, task } from "https://deno.land/x/drake@v1.5.0/mod.ts";
+      import { desc, run, task } from "https://deno.land/x/drake@v1.5.1/mod.ts";
 
 - [nest.land](https://nest.land/package/drake) (a blockchain based Deno modules
   registry).\
   **NOTE**: Drake version numbers in `nest.land` URLs are not prefixed with a
   'v' character:
 
-      import { desc, run, task } from "https://x.nest.land/drake@1.5.0/mod.ts";
+      import { desc, run, task } from "https://x.nest.land/drake@1.5.1/mod.ts";
 
 Some Drake APIs are useful in non-drakefiles, use `lib.ts` (not `mod.ts`) to
 import them into non-drakefile modules.
