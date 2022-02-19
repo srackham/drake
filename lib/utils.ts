@@ -16,6 +16,44 @@ export class DrakeError extends Error {
 }
 
 /**
+ * Return `FileInfo` (or `null` if file does not exist).
+ */
+export function fileStat(path: string): Deno.FileInfo | null {
+  try {
+    return Deno.statSync(path);
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return null;
+    } else {
+      throw err;
+    }
+  }
+}
+
+/**
+ * Return `true` if `path` exists, otherwise return `false`.
+ */
+export function pathExists(path: string): boolean {
+  return fileStat(path) != null;
+}
+
+/**
+ * Return `true` if the `path` is that of a regular file.
+ * Return `false` if it is not a regular file or does not exist.
+ */
+export function isFile(path: string): boolean {
+  return !!fileStat(path)?.isFile;
+}
+
+/**
+ * Return `true` if `path` is that of a directory.
+ * Return `false` if it is not a directory or does not exist.
+ */
+export function isDirectory(path: string): boolean {
+  return !!fileStat(path)?.isDirectory;
+}
+
+/**
  * Write an error message to to `stderr` and terminate execution.
  *
  * - If the `"--abort-exits"` environment option is `false` throw a `DrakeError`.

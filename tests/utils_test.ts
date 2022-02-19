@@ -1,10 +1,14 @@
 import {
   abort,
   DrakeError,
+  fileStat,
   glob,
   makeDir,
   quote,
   readFile,
+  pathExists,
+  isFile,
+  isDirectory,
   sh,
   shCapture,
   updateFile,
@@ -30,10 +34,17 @@ Deno.test("abortTest", function () {
 Deno.test("fileFunctionsTest", function () {
   const tmpDir = Deno.makeTempDirSync();
   try {
-    // Read, write update tests.
     const file = path.join(tmpDir, "fileTest");
+    assertEquals(fileStat(file), null);
+    assertEquals(pathExists(file), false);
+    assertEquals(isFile(file), false);
+    assertEquals(isDirectory(file), false);
     const text = "foobar";
     writeFile(file, text);
+    assertNotEquals(fileStat(file), null);
+    assertEquals(pathExists(file), true);
+    assertEquals(isFile(file), true);
+    assertEquals(isDirectory(file), false);
     assertEquals(readFile(file), text);
     assertEquals(updateFile(file, /o/g, "O!"), true);
     assertEquals(readFile(file), "fO!O!bar");
@@ -56,6 +67,10 @@ Deno.test("fileFunctionsTest", function () {
       Deno.statSync(dir).isDirectory,
       "directory should have been created",
     );
+    assertNotEquals(fileStat(dir), null);
+    assertEquals(pathExists(dir), true);
+    assertEquals(isFile(dir), false);
+    assertEquals(isDirectory(dir), true);
     assert(!makeDir(dir), "directory should have already existed");
     assert(
       Deno.statSync(dir).isDirectory,
