@@ -1,27 +1,31 @@
 # Drake Changelog
 
+## 1.5.1 / 2022-02-20
+
+- Upgraded to Deno 1.19.0, standard modules 0.123.0.
+
 ## 1.5.0 / 2021-05-27
 
 - Added `--verbose` command-line option (currently it prints `sh` and
   `shCapture` API calls).
 - Drake execution output now highlights execution times.
-- Upgraded to Deno vrsion 1.10.2,`std@0.97.0`.
+- Upgraded to Deno vrsion 1.10.2, `std@0.97.0`.
 
 ## 1.4.7 / 2021-04-21
 
-- Upgraded to Deno version 1.9.0,`std@0.93.0`.
+- Upgraded to Deno 1.9.0, standard modules 0.93.0.
 
 ## 1.4.6 / 2021-01-06
 
-- Upgraded to Deno version 1.6.3,`std@0.83.0`.
+- Upgraded to Deno 1.6.3, standard modules 0.83.0.
 
 ## 1.4.5 / 2020-11-16
 
-- Upgraded to Deno version 1.5.2,`std@0.77.0`.
+- Upgraded to Deno 1.5.2, standard modules 0.77.0.
 
 ## 1.4.4 / 2020-10-12
 
-- Upgraded to Deno version 1.4.6,`std@0.74.0`.
+- Upgraded to Deno 1.4.6, standard modules 0.74.0.
 
 ## 1.4.3 / 2020-10-04
 
@@ -59,31 +63,31 @@
 - Reassign `no action` and `out of date` info messages to debug messages.
 - `glob` API debug message truncates files list to 100 files.
 - `debug` API does not print `title` if it is blank.
-- Upgraded to Deno version 1.3.3,`std/0.68.0`.
+- Upgraded to Deno 1.3.3, standard modules 0.68.0.
 
 ## 1.2.6 / 2020-08-03
 
-- Upgraded to Deno version 1.2.2,`std/0.63.0`.
+- Upgraded to Deno 1.2.2, standard modules 0.63.0.
 
 ## 1.2.5 / 2020-07-14
 
-- Upgraded to Deno version 1.2.0,`std/0.61.0`.
+- Upgraded to Deno 1.2.0, standard modules 0.61.0.
 
 ## 1.2.4 / 2020-06-27
 
-- Upgraded to Deno version 1.1.2,`std/0.59.0`.
+- Upgraded to Deno 1.1.2, standard modules 0.59.0.
 
 ## 1.2.3 / 2020-06-16
 
-- Upgraded to Deno version 1.1.0,`std/0.57.0`.
+- Upgraded to Deno 1.1.0, standard modules 0.57.0.
 
 ## 1.2.2 / 2020-06-04
 
-- Upgraded to Deno version 1.0.5, `std/0.56.0`.
+- Upgraded to Deno 1.0.5, standard modules 0.56.0.
 
 ## 1.2.1 / 2020-06-04
 
-- Upgraded to Deno version 1.0.4, `std/0.55.0`.
+- Upgraded to Deno 1.0.4, standard modules 0.55.0.
 
 ## 1.2.0 / 2020-05-31
 
@@ -91,7 +95,7 @@
   option is `true`.
 - Added `makeDir` API.
 - FIX: An error occurred if a File task contained a Normal task prerequisite.
-- Upgraded to Deno version 1.0.3, `std/0.54.0`.
+- Upgraded to Deno 1.0.3, standard modules 0.54.0.
 
 ## 1.1.1 / 2020-05-21
 
@@ -104,7 +108,7 @@
 - Tightened `env` runtime parameter checks.
 - A lot of code refactoring including splitting `deps.ts` into separate test and
   runtime deps.
-- Upgraded to Deno version 1.0.1, `std/0.52.0`.
+- Upgraded to Deno 1.0.1, standard modules 0.52.0.
 
 ## 1.0.0 / 2020-05-15
 

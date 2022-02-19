@@ -15,7 +15,7 @@
   file system _mtimes_ are used directly (see
   [mtime comparison considered harmful](https://apenwarr.ca/log/20181113)).
 
-**Status**: Tested with Deno 1.10.2 running on Github CI the following
+**Status**: Tested with Deno 1.19.0 running on Github CI the following
 platforms: `ubuntu-latest`, `macos-latest`, `windows-latest`. See also the
 [changelog](CHANGELOG.md).
 
