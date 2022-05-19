@@ -266,13 +266,16 @@ export class TaskRegistry extends Map<string, Task> {
     }
   }
 
-  /** Create a printable list of tasks. */
+  /** Create a printable list of task names. */
   list(): string[] {
     let keys = Array.from(this.keys());
     if (!env("--list-all")) {
       keys = keys.filter((k) => this.get(k).desc); // Drop "hidden" tasks.
     }
-    const maxLen = keys.reduce(function (a, b) {
+    if (keys.length == 0) {
+      return [];
+    }
+    const maxLen = keys.reduce(function (a, b) { // Longest task name length (https://stackoverflow.com/a/6521513/1136455)
       return a.length > b.length ? a : b;
     }).length;
     const result: string[] = [];

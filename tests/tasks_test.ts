@@ -100,6 +100,8 @@ Deno.test("taskRegistryTest", async function () {
     log.push(this.name);
   };
 
+  assertEquals(taskRegistry.list().length, 0, "zero tasks");
+
   taskRegistry.desc("Task 1");
   taskRegistry.register("1", ["2", "3"], action);
 
