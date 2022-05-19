@@ -1,5 +1,10 @@
 # Drake Changelog
 
+## 1.5.2 / 2022-05-20
+
+- FIX: Drake crashes when listing tasks with no description (https://github.com/srackham/drake/issues/18).
+- Upgraded to Deno 1.22.0, standard modules 0.140.0.
+
 ## 1.5.1 / 2022-02-20
 
 - Upgraded to Deno 1.19.0, standard modules 0.123.0.
@@ -36,7 +41,7 @@
 
 ## 1.4.2 / 2020-09-26
 
-- fix: Allow Drakefile execution with Deno `--unstable` option.
+- FIX: Allow Drakefile execution with Deno `--unstable` option.
 - Export types `Action`, `EnvValue` from `mod.ts` module.
 - Export types `ShCaptureOpts`, `ShOpts`, `ShOutput` from `lib.ts` module.
 

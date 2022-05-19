@@ -1,7 +1,7 @@
 {
     "name": "drake",
     "description": "Drake is a Make-like task runner for Deno",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "stable": true,
     "files": [
         "mod.ts",
