@@ -4,6 +4,7 @@
 
 - Added `stat(path)` API function which returns information about a file or
   `null` if the file does not exist.
+- Added `isFile(path)`, `isDirectory(path)` and `pathExists(path)` path query functions.
 
 ## 1.5.2 / 2022-05-20
 

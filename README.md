@@ -324,6 +324,20 @@ Return a sorted array of normalized file names matching the wildcard patterns.
 Valid glob patterns are those supported by Deno's `path` library Example:
 `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 
+### isDirectory
+```typescript
+export function isDirectory(path: string): boolean;
+```
+Return `true` if `path` is that of a directory.
+Return `false` if it is not a directory or does not exist.
+
+### isFile
+```typescript
+function isFile(path: string): boolean;
+```
+Return `true` if the `path` is that of a regular file.
+Return `false` if it is not a regular file or does not exist.
+
 ### log
 
 ```typescript
@@ -344,6 +358,12 @@ Create directory.
 - Missing parent directory paths are created.
 - Returns `true` if a new directory was created.
 - Returns `false` if the directory already exists.
+
+### pathExists
+```typescript
+function pathExists(path: string): boolean;
+```
+Return `true` if `path` exists, otherwise return `false`.
 
 ### quote
 
