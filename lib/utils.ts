@@ -18,7 +18,7 @@ export class DrakeError extends Error {
 /**
  * Return `FileInfo` (or `null` if file does not exist).
  */
-export function fileStat(path: string): Deno.FileInfo | null {
+export function stat(path: string): Deno.FileInfo | null {
   try {
     return Deno.statSync(path);
   } catch (err) {
@@ -34,7 +34,7 @@ export function fileStat(path: string): Deno.FileInfo | null {
  * Return `true` if `path` exists, otherwise return `false`.
  */
 export function pathExists(path: string): boolean {
-  return fileStat(path) != null;
+  return stat(path) != null;
 }
 
 /**
@@ -42,7 +42,7 @@ export function pathExists(path: string): boolean {
  * Return `false` if it is not a regular file or does not exist.
  */
 export function isFile(path: string): boolean {
-  return !!fileStat(path)?.isFile;
+  return !!stat(path)?.isFile;
 }
 
 /**
@@ -50,7 +50,7 @@ export function isFile(path: string): boolean {
  * Return `false` if it is not a directory or does not exist.
  */
 export function isDirectory(path: string): boolean {
-  return !!fileStat(path)?.isDirectory;
+  return !!stat(path)?.isDirectory;
 }
 
 /**
@@ -155,7 +155,7 @@ export function readFile(filename: string): string {
  * Returns `false` if the file already exists.
  */
 export function writeFile(filename: string, text: string): boolean {
-  const exists = pathExists(filename);
+  const exists = !!stat(filename);
   try {
     debug(
       "writeFile",
@@ -201,9 +201,9 @@ export function updateFile(
  */
 export function makeDir(dir: string): boolean {
   debug("makeDir", dir);
-  const exists = pathExists(dir);
+  const exists = !!stat(dir);
   if (exists) {
-    if (!isDirectory(dir)) {
+    if (!stat(dir)?.isDirectory) {
       abort(`file is not directory: ${dir}`);
     }
   } else {
@@ -255,7 +255,7 @@ function shArgs(command: string): string[] {
     let shellExe = Deno.env.get("SHELL")!;
     if (!shellExe) {
       shellExe = "/bin/bash";
-      if (!isFile(shellExe)) {
+      if (!stat(shellExe)?.isFile) {
         abort(
           `cannot locate shell: no SHELL environment variable or ${shellExe} executable`,
         );

@@ -1,7 +1,6 @@
 import {
   abort,
   DrakeError,
-  fileStat,
   glob,
   isDirectory,
   isFile,
@@ -11,6 +10,7 @@ import {
   readFile,
   sh,
   shCapture,
+  stat,
   updateFile,
   writeFile,
 } from "../lib/utils.ts";
@@ -35,13 +35,19 @@ Deno.test("fileFunctionsTest", function () {
   const tmpDir = Deno.makeTempDirSync();
   try {
     const file = path.join(tmpDir, "fileTest");
-    assertEquals(fileStat(file), null);
+    assertEquals(stat(file), null);
+    assertEquals(stat(file), null);
+    assertEquals(stat(file)?.isFile, undefined);
+    assertEquals(stat(file)?.isDirectory, undefined);
     assertEquals(pathExists(file), false);
     assertEquals(isFile(file), false);
     assertEquals(isDirectory(file), false);
     const text = "foobar";
     writeFile(file, text);
-    assertNotEquals(fileStat(file), null);
+    assertNotEquals(stat(file), undefined);
+    assertEquals(!!stat(file), true);
+    assertNotEquals(stat(file)?.isFile, undefined);
+    assertEquals(stat(file)?.isDirectory, false);
     assertEquals(pathExists(file), true);
     assertEquals(isFile(file), true);
     assertEquals(isDirectory(file), false);
@@ -67,7 +73,10 @@ Deno.test("fileFunctionsTest", function () {
       Deno.statSync(dir).isDirectory,
       "directory should have been created",
     );
-    assertNotEquals(fileStat(dir), null);
+    assertNotEquals(stat(dir), null);
+    assertEquals(!!stat(dir), true);
+    assertEquals(stat(dir)?.isFile, false);
+    assertEquals(stat(dir)?.isDirectory, true);
     assertEquals(pathExists(dir), true);
     assertEquals(isFile(dir), false);
     assertEquals(isDirectory(dir), true);

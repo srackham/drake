@@ -14,6 +14,7 @@ export {
   readFile,
   sh,
   shCapture,
+  stat,
   updateFile,
   vers,
   writeFile,

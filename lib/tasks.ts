@@ -8,8 +8,8 @@ import {
   glob,
   log,
   logExecution,
-  pathExists,
   readFile,
+  stat,
   vers,
   writeFile,
 } from "./utils.ts";
@@ -81,12 +81,12 @@ export class Task {
       return;
     }
     const taskCache: TaskCache = {};
-    if (pathExists(this.name)) {
+    if (stat(this.name)) {
       taskCache[this.name] = Task.fileInfo(this.name);
     }
     for (const prereq of this.prereqs) {
       if (isFileTask(prereq)) {
-        if (pathExists(prereq)) {
+        if (stat(prereq)) {
           const _info = Deno.statSync(prereq);
           taskCache[prereq] = Task.fileInfo(prereq);
         }
@@ -114,7 +114,7 @@ export class Task {
     let result = false;
     let debugMsg = "false";
     for (const prereq of prereqs) {
-      if (!pathExists(prereq)) {
+      if (!stat(prereq)) {
         if (env("--dry-run")) {
           // Assume the missing prerequisite would have been created thus rendering the target out of date.
           debugMsg = `true: dry run`;
@@ -129,7 +129,7 @@ export class Task {
     } else if (!this.cache) {
       debugMsg = "true: no previous task cache";
       result = true;
-    } else if (!pathExists(this.name)) {
+    } else if (!stat(this.name)) {
       debugMsg = "true: no target file";
       result = true;
     } else {
@@ -211,7 +211,7 @@ export class TaskRegistry extends Map<string, Task> {
   }
 
   loadCache(filename: string): void {
-    if (!pathExists(filename)) {
+    if (!stat(filename)) {
       debug("loadCache:", `no cache file: ${filename}`);
       return;
     }

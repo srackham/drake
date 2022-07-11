@@ -436,6 +436,24 @@ const { code, output, error } = await shCapture("mkdir tmpdir", {
 });
 ```
 
+### stat
+
+```typescript
+function stat(path: string): Deno.FileInfo | null;
+```
+
+Returns information about a file or `null` if the file does not exist.
+
+Examples:
+
+```typescript
+const pathExists = !!stat(path);
+const isDirectory = !!stat(path)?.isDirectory;
+if (stat(path)?.isFile) {
+    ...
+}
+```
+
 ### task
 
 ```typescript

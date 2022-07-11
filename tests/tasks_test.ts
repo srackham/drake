@@ -1,5 +1,4 @@
 import { env } from "../lib/env.ts";
-import { isFile } from "../lib/utils.ts";
 import {
   isFileTask,
   isNormalTask,
@@ -8,7 +7,7 @@ import {
   Task,
   TaskRegistry,
 } from "../lib/tasks.ts";
-import { DrakeError, readFile, writeFile } from "../lib/utils.ts";
+import { DrakeError, readFile, stat, writeFile } from "../lib/utils.ts";
 import {
   assert,
   assertEquals,
@@ -220,7 +219,7 @@ Deno.test("fileTaskTest", async function () {
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
     assert(
-      isFile(taskRegistry.cacheFile()),
+      stat(taskRegistry.cacheFile())?.isFile,
       `cache file should exist: ${taskRegistry.cacheFile()}`,
     );
 
@@ -285,7 +284,7 @@ Deno.test("fileTaskTest", async function () {
     await taskRegistry.run(target);
     assert(taskRan, "task should have executed: no target file");
     assert(
-      isFile(expected),
+      stat(expected)?.isFile,
       `cache file should exist: ${expected}`,
     );
   } finally {

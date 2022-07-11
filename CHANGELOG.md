@@ -1,5 +1,10 @@
 # Drake Changelog
 
+## 1.6.0 / 2022-??-??
+
+- Added `stat(path)` API function which returns information about a file or
+  `null` if the file does not exist.
+
 ## 1.5.2 / 2022-05-20
 
 - FIX: Drake crashes when listing tasks with no description (https://github.com/srackham/drake/issues/18).
