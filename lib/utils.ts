@@ -247,6 +247,16 @@ export function glob(...patterns: string[]): string[] {
   return result;
 }
 
+/**
+ * Delete files matching the wildcard glob patterns.
+ * Example: `remove("tmp/*.ts", "lib/*.ts", "mod.ts");`
+ */
+export function remove(...patterns: string[]): void {
+  for (const f of glob(...patterns)) {
+    Deno.removeSync(f);
+  }
+}
+
 /** Synthesize platform dependent shell command arguments. */
 function shArgs(command: string): string[] {
   if (Deno.build.os === "windows") {

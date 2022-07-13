@@ -8,6 +8,7 @@ import {
   pathExists,
   quote,
   readFile,
+  remove,
   sh,
   shCapture,
   stat,
@@ -127,6 +128,7 @@ Deno.test("globTest", function () {
       path.join(tmpDir, f)
     ).sort();
     fixtures.forEach((f) => writeFile(f, ""));
+    // glob tests.
     files = glob(...["**/*.ts", "u"].map((f) => path.join(tmpDir, f)));
     assertEquals(files, fixtures);
     assertEquals(glob(path.join(tmpDir, "non-existent-file")), []);
@@ -151,6 +153,19 @@ Deno.test("globTest", function () {
         ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map((p) => path.normalize(p))
           .sort(),
       );
+      // remove tests.
+      Deno.chdir("..");
+      assert(isFile("a/b/z.ts"));
+      remove("a/b/z.ts");
+      assert(!pathExists("a/b/z.ts"));
+      assertEquals(glob("a/**").length, 1);
+      remove("a/**/*");
+      assertEquals(glob("a/**").length, 0);
+      assertEquals(glob("**").length, 2);
+      remove("x.*");
+      assertEquals(glob("**").length, 1);
+      remove("*");
+      assertEquals(glob("**").length, 0);
     } finally {
       Deno.chdir(saved);
     }
