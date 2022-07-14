@@ -321,8 +321,11 @@ function glob(...patterns: string[]): string[];
 ```
 
 Return a sorted array of normalized file names matching the wildcard patterns.
-Valid glob patterns are those supported by Deno's `path` library Example:
-`glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
+
+- Does not return directory names.
+- Valid glob patterns are those supported by Deno's `path` library.
+
+Example: `glob("tmp/*.ts", "lib/**/*.ts", "mod.ts");`
 
 ### log
 
@@ -362,6 +365,19 @@ function readFile(filename: string): string;
 ```
 
 Read the entire contents of a file synchronously to a UTF-8 string.
+
+### remove
+
+```typescript
+function remove(...patterns: string[]): void;
+```
+
+Delete files matching the wildcard glob patterns.
+
+- Does not remove directories.
+- Valid glob patterns are those supported by Deno's `path` library.
+
+Example: `remove("tmp/*.ts", "lib/*.ts", "mod.ts");`
 
 ### run
 
@@ -447,11 +463,10 @@ Returns information about a file or `null` if the file does not exist.
 Examples:
 
 ```typescript
-const pathExists = !!stat(path);
-const isDirectory = !!stat(path)?.isDirectory;
-if (stat(path)?.isFile) {
-    ...
-}
+if (stat(path)) { /* `path` exists */ }
+if (stat(path)?.isFile) { /* `path` is a regular file */ }
+const timeStamp  = stat(path)?.mtime; // Date | null | undefined
+const fileSize  = stat(path)?.size;i  // number | undefined
 ```
 
 ### task
