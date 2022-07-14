@@ -354,9 +354,16 @@ Create directory.
 function quote(values: string[], sep = " "): string;
 ```
 
-Quote string array values with double-quotes then join them with a separator.
-Double-quote characters are escaped with a backspace. The separator defaults to
-a space character.
+Return a string of double-quoted array values joined by a separator.
+
+- Double-quote characters are escaped with a backspace.
+- The separator defaults to a space character.
+
+Examples:
+
+- `quote(["foo bar", "baz"])` returns `"foo bar" "baz"`
+- `quote(["foo bar", "baz"], ",")` returns `"foo bar","baz"`
+- `quote(["foo bar", '"baz"'])` returns `"foo bar" "\"baz\""`
 
 ### readFile
 
@@ -458,7 +465,8 @@ const { code, output, error } = await shCapture("mkdir tmpdir", {
 function stat(path: string): Deno.FileInfo | null;
 ```
 
-Returns information about a file or `null` if the file does not exist.
+Returns `path` [file information](https://doc.deno.land/deno/stable/~/Deno.FileInfo)
+or `null` if the file does not exist.
 
 Examples:
 
@@ -466,7 +474,7 @@ Examples:
 if (stat(path)) { /* `path` exists */ }
 if (stat(path)?.isFile) { /* `path` is a regular file */ }
 const timeStamp  = stat(path)?.mtime; // Date | null | undefined
-const fileSize  = stat(path)?.size;i  // number | undefined
+const fileSize  = stat(path)?.size;   // number | undefined
 ```
 
 ### task
