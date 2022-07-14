@@ -148,13 +148,14 @@ Deno.test("globTest", function () {
       );
       Deno.chdir("a");
       files = glob("../**/*.ts");
+      Deno.chdir("..");
       assertEquals(
         files,
         ["../a/b/z.ts", "../a/y.ts", "../x.ts"].map((p) => path.normalize(p))
           .sort(),
       );
+      assert(glob("no-such-file").length === 0);
       // remove tests.
-      Deno.chdir("..");
       assert(isFile("a/b/z.ts"));
       remove("a/b/z.ts");
       assert(!pathExists("a/b/z.ts"));
