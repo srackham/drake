@@ -225,6 +225,9 @@ export function glob(...patterns: string[]): string[] {
     while (root !== "." && path.isGlob(root)) {
       root = path.dirname(root);
     }
+    if (!stat(root)) {
+      return [];
+    }
     const regexp = path.globToRegExp(pattern, globOptions);
     const iter = walkSync(root, { match: [regexp], includeDirs: false });
     return Array.from(iter, (info) => info.path);
@@ -252,6 +255,7 @@ export function glob(...patterns: string[]): string[] {
  * Example: `remove("tmp/*.ts", "lib/*.ts", "mod.ts");`
  */
 export function remove(...patterns: string[]): void {
+  debug("remove", `${quote(patterns, ", ")}`);
   for (const f of glob(...patterns)) {
     Deno.removeSync(f);
   }

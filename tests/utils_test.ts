@@ -98,7 +98,7 @@ Deno.test("fileFunctionsTest", function () {
   }
 });
 
-Deno.test("globTest", function () {
+Deno.test("globAndRemoveTests", function () {
   let files = glob("./mod.ts", "./lib/*.ts");
   assertEquals(
     files,
@@ -132,6 +132,8 @@ Deno.test("globTest", function () {
     files = glob(...["**/*.ts", "u"].map((f) => path.join(tmpDir, f)));
     assertEquals(files, fixtures);
     assertEquals(glob(path.join(tmpDir, "non-existent-file")), []);
+    assertEquals(glob(path.join(tmpDir, "non-existent-directory/*")), []);
+    assertEquals(glob(path.join(tmpDir, "non-existent-directory/**")), []);
     const saved = Deno.cwd();
     try {
       Deno.chdir(tmpDir);
