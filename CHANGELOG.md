@@ -1,10 +1,13 @@
 # Drake Changelog
 
-## 1.6.0 / 2022-??-??
+## 1.6.0 / 2022-07-19
 
 - Added `stat(path)` API function which returns information about a file or
   `null` if the file does not exist.
-- Added `isFile(path)`, `isDirectory(path)` and `pathExists(path)` path query functions.
+- Added `remove(...patterns)` API function which deletes files matching the
+  wildcard patterns.
+- FIX: `glob` API fails if pattern begins with a nonexistent directory e.g.
+  `non-existent-directory/*`.
 
 ## 1.5.2 / 2022-05-20
 
