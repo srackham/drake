@@ -379,7 +379,7 @@ Read the entire contents of a file synchronously to a UTF-8 string.
 function remove(...patterns: string[]): void;
 ```
 
-Delete files matching the wildcard glob patterns.
+Synchronously delete files matching the wildcard glob patterns.
 
 - Does not remove directories.
 - Valid glob patterns are those supported by Deno's `path` library.
@@ -457,6 +457,7 @@ const { code, output } = await shCapture("echo Hello");
 const { code, output, error } = await shCapture("mkdir tmpdir", {
   stderr: "piped",
 });
+const vers = (await shCapture("make version")).output.trim();
 ```
 
 ### stat
