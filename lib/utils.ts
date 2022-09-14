@@ -214,7 +214,8 @@ export function makeDir(dir: string): boolean {
 
 /**
  * Return a sorted array of normalized file names matching the wildcard glob patterns.
- * Valid glob patterns are those supported by Deno's `path` library.
+ * Valid glob patterns are those supported by Deno's `path` library
+ * (see https://deno.land/std@0.152.0/path/mod.ts?s=globToRegExp).
  * Example: `glob("tmp/*.ts", "lib/*.ts", "mod.ts");`
  */
 export function glob(...patterns: string[]): string[] {
