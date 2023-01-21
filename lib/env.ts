@@ -153,7 +153,7 @@ export class Env {
         case "--verbose":
           this.setValue(arg, true);
           break;
-        case "--cache":/* falls through */
+        case "--cache": /* falls through */
         // deno-lint-ignore no-case-declarations
         case "--directory":
           const value = args.shift();
