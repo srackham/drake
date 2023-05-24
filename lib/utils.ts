@@ -319,6 +319,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
   const results: Deno.ProcessStatus[] = [];
   try {
     for (const cmd of commands) {
+      // deno-lint-ignore no-deprecated-deno-api
       const p = Deno.run({
         cmd: shArgs(cmd),
         cwd: opts.cwd,
@@ -389,6 +390,7 @@ export async function shCapture(
   opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
   const startTime = new Date().getTime();
+  // deno-lint-ignore no-deprecated-deno-api
   const p = Deno.run({
     cmd: shArgs(command),
     cwd: opts.cwd,
