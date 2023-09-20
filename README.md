@@ -11,7 +11,7 @@
 - Drake API functions for defining, registering and running tasks.
 - Drake uses conditionally cached file properties to determine whether or not a
   file task is out of date (see [Task Execution](#task-execution)). This
-  eliminates the denpendency errors that programs such as `make` encounter when
+  eliminates the dependency errors that programs such as `make` encounter when
   file system _mtimes_ are used directly (see
   [mtime comparison considered harmful](https://apenwarr.ca/log/20181113)).
 
