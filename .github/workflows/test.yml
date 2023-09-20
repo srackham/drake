@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        deno-version: [1.34.1]
+        deno-version: [1.37.0]
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout repository

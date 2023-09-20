@@ -490,7 +490,7 @@ export function isFileTask(name: string): boolean {
 export function normalizePath(name: string): string {
   name = path.normalize(name);
   if (isNormalTask(name)) {
-    name = "." + path.sep + name;
+    name = "." + path.SEP + name;
   }
   return name;
 }
