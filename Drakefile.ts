@@ -36,7 +36,7 @@ task("fmt", [], async function () {
 
 desc("Lint source files");
 task("lint", [], async function () {
-  await sh(`deno lint ${quiet} --unstable ${quote(TS_FILES)}`);
+  await sh(`deno lint ${quiet} ${quote(TS_FILES)}`);
 });
 
 desc("Run some example drakefiles");
