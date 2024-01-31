@@ -23,7 +23,7 @@
 - Added `--verbose` command-line option (currently it prints `sh` and
   `shCapture` API calls).
 - Drake execution output now highlights execution times.
-- Upgraded to Deno vrsion 1.10.2, `std@0.97.0`.
+- Upgraded to Deno version 1.10.2, `std@0.97.0`.
 
 ## 1.4.7 / 2021-04-21
 
