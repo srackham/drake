@@ -110,7 +110,7 @@ export function debug(title: string, message: any = ""): void {
   if (typeof message === "object") {
     message = JSON.stringify(message, null, 1);
   }
-  if (env("--debug") && Deno.isatty(Deno.stderr.rid)) {
+  if (env("--debug") && Deno.stdin.isTerminal()) {
     if (title !== "") {
       message = `${colors.yellow(colors.bold(title + ":"))} ${message}`;
     }
