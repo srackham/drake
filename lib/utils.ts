@@ -395,7 +395,7 @@ export async function shCapture(
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
-    stderr: opts.stderr ?? "piped",
+    stderr: opts.stderr ?? "inherit",
   };
   const cmd = new Deno.Command(
     args[0],
