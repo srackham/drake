@@ -196,7 +196,7 @@ Deno.test("shTest", async function () {
 
 Deno.test("shCaptureTest", async function () {
   let { code, output, error } = await shCapture("echo Hello");
-  assertEquals([code, output.trimRight(), error], [0, "Hello", ""]);
+  assertEquals([code, output.trimEnd(), error], [0, "Hello", ""]);
 
   ({ code, output, error } = await shCapture(
     "a-nonexistent-command",
@@ -223,7 +223,7 @@ Deno.test("shCaptureTest", async function () {
     { cwd: "lib" },
   ));
   assertEquals(
-    [code, output.trimRight(), error],
+    [code, output.trimEnd(), error],
     [0, path.join(Deno.cwd(), "lib"), ""],
   );
 
@@ -231,7 +231,7 @@ Deno.test("shCaptureTest", async function () {
     `deno eval "console.log(Deno.env.get('FOO')+Deno.env.get('BAR'))"`,
     { env: { FOO: "foo", BAR: "bar" } },
   ));
-  assertEquals([code, output.trimRight(), error], [0, "foobar", ""]);
+  assertEquals([code, output.trimEnd(), error], [0, "foobar", ""]);
 
   ({ code, output, error } = await shCapture(
     "echo Hello",
@@ -250,7 +250,7 @@ Deno.test("shCaptureTest", async function () {
      deno eval "console.log(Deno.cwd())"`,
   ));
   assertEquals(
-    [code, output.trimRight(), error],
+    [code, output.trimEnd(), error],
     [0, path.join(Deno.cwd(), "examples"), ""],
   );
 });

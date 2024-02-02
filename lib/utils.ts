@@ -286,8 +286,8 @@ export interface ShOpts {
   cwd?: string;
   /** Map containing additional shell environment variables. */
   env?: { [key: string]: string };
-  stdout?: "inherit" | "piped" | "null" | number;
-  stderr?: "inherit" | "piped" | "null" | number;
+  stdout?: "inherit" | "piped" | "null";
+  stderr?: "inherit" | "piped" | "null";
 }
 
 /**
@@ -315,26 +315,23 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
   }
   debug("sh", `${commands.join("\n")}\nopts: ${JSON.stringify(opts)}`);
   const startTime = new Date().getTime();
-  const processes: Deno.Process[] = [];
-  const results: Deno.ProcessStatus[] = [];
-  try {
-    for (const cmd of commands) {
-      // deno-lint-ignore no-deprecated-deno-api
-      const p = Deno.run({
-        cmd: shArgs(cmd),
+  const outputs: Promise<Deno.CommandOutput>[] = [];
+  const results: Deno.CommandOutput[] = [];
+  for (const cmd of commands) {
+    const args = shArgs(cmd);
+    const command = new Deno.Command(
+      args[0],
+      {
+        args: args.slice(1),
         cwd: opts.cwd,
         env: opts.env,
         stdout: opts.stdout ?? "inherit",
         stderr: opts.stderr ?? "inherit",
-      });
-      processes.push(p);
-    }
-    results.push(...await Promise.all(processes.map((p) => p.status())));
-  } finally {
-    for (const p of processes) {
-      p.close();
-    }
+      },
+    );
+    outputs.push(command.output());
   }
+  results.push(...await Promise.all(outputs));
   for (const i in results) {
     const cmd = commands[i];
     const code = results[i].code;
@@ -375,8 +372,9 @@ export interface ShCaptureOpts extends ShOpts {
  *   parent process working directory).
  * - The `opts.env` mapping passes additional environment variables to
  *   the shell.
- * - `opts.stdout` and `opts.stderr` have `Deno.RunOptions` semantics.
- *   `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
+ * - `opts.stdout` and `opts.stderr` have `Deno.CommandOptions.stdout`
+ *    and `Deno.CommandOptions.stdout` semantics.
+ * -  `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
  *   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
  *
  * Examples:
@@ -390,39 +388,35 @@ export async function shCapture(
   opts: ShCaptureOpts = {},
 ): Promise<ShOutput> {
   const startTime = new Date().getTime();
-  // deno-lint-ignore no-deprecated-deno-api
-  const p = Deno.run({
-    cmd: shArgs(command),
+  const args = shArgs(command);
+  const options: Deno.CommandOptions = {
+    args: args.slice(1),
     cwd: opts.cwd,
     env: opts.env,
     stdin: opts.input !== undefined ? "piped" : undefined,
     stdout: opts.stdout ?? "piped",
-    stderr: opts.stderr ?? "inherit",
-  });
-  let status: Deno.ProcessStatus;
-  let outputBytes, errorBytes: Uint8Array;
-  try {
-    if (p.stdin) {
-      await p.stdin.write(
-        new TextEncoder().encode(opts.input),
-      );
-      p.stdin.close();
-    }
-    [status, outputBytes, errorBytes] = await Promise.all(
-      [
-        p.status(),
-        p.stdout ? p.output() : Promise.resolve(new Uint8Array()),
-        p.stderr ? p.stderrOutput() : Promise.resolve(new Uint8Array()),
-      ],
-    );
-  } finally {
-    p.close();
+    stderr: opts.stderr ?? "piped",
+  };
+  const cmd = new Deno.Command(
+    args[0],
+    options,
+  );
+  const process = cmd.spawn();
+  if (options.stdin == "piped") {
+    const writer = process.stdin.getWriter();
+    writer.write(new TextEncoder().encode(opts.input));
+    writer.close();
   }
-  const result = {
-    code: status.code,
-    output: new TextDecoder().decode(outputBytes),
-    error: new TextDecoder().decode(errorBytes),
-  } as const;
+  const result: ShOutput = { code: undefined, output: "", error: "" };
+  const output = await process.output();
+  result.code = output.code;
+  if (options.stdout == "piped") {
+    result.output = new TextDecoder().decode(output.stdout);
+  }
+  if (options.stderr == "piped") {
+    result.error = new TextDecoder().decode(output.stderr);
+  }
+  process.unref();
   debug(
     "shCapture",
     `${command}\nopts:      ${JSON.stringify(opts)}\noutputs:   ${

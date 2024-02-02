@@ -9,13 +9,13 @@ Deno.test("cliTest", async function () {
     `${drake} --version`,
   );
   assertEquals(code, 0);
-  assertEquals(output.trimRight(), vers());
+  assertEquals(output.trimEnd(), vers());
 
   ({ code, output, error } = await shCapture(
     `${denoRun} Drakefile.ts --version`,
   ));
   assertEquals(code, 0);
-  assertEquals(output.trimRight(), vers());
+  assertEquals(output.trimEnd(), vers());
 
   ({ code, output } = await shCapture(
     `${drake} --help`,
@@ -73,19 +73,19 @@ Deno.test("cliTest", async function () {
     `${denoRun} examples/examples-drakefile.ts cwd --quiet`,
   ));
   assertEquals(code, 0);
-  assertEquals(output.trimRight(), Deno.cwd());
+  assertEquals(output.trimEnd(), Deno.cwd());
 
   ({ code, output } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts cwd --quiet --directory .`,
   ));
   assertEquals(code, 0);
-  assertEquals(output.trimRight(), Deno.cwd());
+  assertEquals(output.trimEnd(), Deno.cwd());
 
   ({ code, output } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts cwd --quiet --directory examples`,
   ));
   assertEquals(code, 0);
-  assertEquals(output.trimRight(), path.join(Deno.cwd(), "examples"));
+  assertEquals(output.trimEnd(), path.join(Deno.cwd(), "examples"));
 
   ({ code, error } = await shCapture(
     `${denoRun} examples/examples-drakefile.ts abort`,
