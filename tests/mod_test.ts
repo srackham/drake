@@ -83,5 +83,5 @@ Deno.test("modTypesTest", function () {
   shOpts.stderr = "piped";
 
   const shOutput: ShOutput = { code: 1, output: "foo", error: "bar" };
-  shOutput.code = 0;
+  shOutput.code = undefined;
 });

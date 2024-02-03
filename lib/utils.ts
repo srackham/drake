@@ -350,7 +350,7 @@ export async function sh(commands: string | string[], opts: ShOpts = {}) {
 }
 
 export type ShOutput = {
-  code: number;
+  code: number | undefined;
   output: string;
   error: string;
 };
@@ -373,7 +373,7 @@ export interface ShCaptureOpts extends ShOpts {
  * - The `opts.env` mapping passes additional environment variables to
  *   the shell.
  * - `opts.stdout` and `opts.stderr` have `Deno.CommandOptions.stdout`
- *    and `Deno.CommandOptions.stdout` semantics respectively.
+ *    and `Deno.CommandOptions.stdout` semantics.
  * -  `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
  *   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
  *
@@ -407,7 +407,7 @@ export async function shCapture(
     writer.write(new TextEncoder().encode(opts.input));
     writer.close();
   }
-  const result: ShOutput = { code: 1, output: "", error: "" };
+  const result: ShOutput = { code: undefined, output: "", error: "" };
   const output = await process.output();
   result.code = output.code;
   if (options.stdout == "piped") {
