@@ -373,7 +373,7 @@ export interface ShCaptureOpts extends ShOpts {
  * - The `opts.env` mapping passes additional environment variables to
  *   the shell.
  * - `opts.stdout` and `opts.stderr` have `Deno.CommandOptions.stdout`
- *    and `Deno.CommandOptions.stdout` semantics.
+ *    and `Deno.CommandOptions.stdout` semantics respectively.
  * -  `opts.stdout` defaults to `"piped"`. `opts.stderr` defaults to
  *   `"inherit"` (to capture stderr set `opts.stderr` to `"piped"`).
  *
