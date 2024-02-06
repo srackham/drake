@@ -15,10 +15,10 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Use Deno ${{ matrix.deno-version }}
-        uses: denolib/setup-deno@v2
+        uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno-version }}
+          deno-version: v${{ matrix.deno-version }}
       - name: Run tests
         run: deno run -A Drakefile.ts test
