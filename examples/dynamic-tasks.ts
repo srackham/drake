@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@0.213.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.214.0/path/mod.ts";
 import {
   desc,
   env,
@@ -7,7 +7,7 @@ import {
   run,
   sh,
   task,
-} from "https://deno.land/x/drake@v1.6.0/mod.ts";
+} from "https://deno.land/x/drake@v1.7.0/mod.ts";
 // } from "../mod.ts";
 
 desc("command-line usage");

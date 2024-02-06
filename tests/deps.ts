@@ -5,5 +5,5 @@ export {
   assertRejects,
   assertStringIncludes,
   assertThrows,
-} from "https://deno.land/std@0.213.0/assert/mod.ts";
-export * as path from "https://deno.land/std@0.213.0/path/mod.ts";
+} from "https://deno.land/std@0.214.0/assert/mod.ts";
+export * as path from "https://deno.land/std@0.214.0/path/mod.ts";
