@@ -1,5 +1,10 @@
 # Drake Changelog
 
+## 1.7.0 / 2024-02-07
+
+- Replace deprecated `Deno.run` function with `Deno.Command` class (Drake `sh` and `shCapture` APIs).
+- Compatibility updates for [Deno 1.4 release](https://deno.com/blog/v1.4).
+
 ## 1.6.0 / 2022-07-19
 
 - Added `stat(path)` API function which returns information about a file or
